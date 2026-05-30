@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 672f704ca413722b04b5223201ced7a9, type: 3}
+  m_Name: CrateVisualConfig_Box
+  m_EditorClassIdentifier:
+  CratePrefab9: {fileID: 1709254077376921, guid: a73937b9bc71d7242947b62df3014eb2, type: 2}
+  CratePrefab18: {fileID: 1709254077376921, guid: f5d9f0b757d1ee24ea5a7a0c05484af2, type: 2}
+  CratePrefab27: {fileID: 1709254077376921, guid: a069eb6399f5dd0419e1f840a69d522f, type: 2}
+  UseIconsWithOutline: 0
+  CrateArriveDelay: 0
+  CrateArriveDuration: 0
+  CratePauseBeforeDeliver: 0.5
+  CrateDeliverDelay: 0.8
+  CrateDeliverDuration: 0
+  FruitsJumpToCrateDuration: 0.4
+  NextCrateSignPrefab: {fileID: 1709254077376921, guid: 339acdcd92db9514d8f82b982fc9e042, type: 2}

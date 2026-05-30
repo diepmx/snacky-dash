@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045d869fbeba97e88c4f2780620afb8f, type: 3}
+  m_Name: DebuggerCanvas
+  m_EditorClassIdentifier:
+  screenPrefabs:
+  - {fileID: 114044625135789424, guid: 4e1dc1f919a698f48b679b0e8b08dab0, type: 2}
+  - {fileID: 114704330047573733, guid: 90969bee9d2102b47a7ef4153d9cec06, type: 2}
+  - {fileID: 114044625135789424, guid: d8b37f2b46f8d4c4fb66807d10aab449, type: 2}
+  - {fileID: 114722951815217645, guid: 501421c898e24aa4297865e3194db6c5, type: 2}
+  - {fileID: 114985305603660343, guid: 765540e3ca4a2e34faadc81782c67346, type: 2}
+  - {fileID: 114336590748365959, guid: c4d12c6c16376c44a833d50f738a6470, type: 2}
+  - {fileID: 114703437598541787, guid: c8e4002470933014e9672f577be7b383, type: 2}
+  - {fileID: 114336590748365959, guid: b4e1695817c2bb547a6523f1c676998a, type: 2}
+  - {fileID: 114572839542275309, guid: 2a6b10fa3e9895b46af434f05ac26b8e, type: 2}
+  - {fileID: 114044625135789424, guid: 1ec655b615fc7a049bdf424a6ca48ebc, type: 2}
+  - {fileID: 114044625135789424, guid: 84bff1865f2dfa4469d1d350fdd146c4, type: 2}
+  - {fileID: 114044625135789424, guid: 0ba9b62e4f1c16f41b56e02492d4cbc8, type: 2}
+  - {fileID: 114044625135789424, guid: 376c6f37091f87c4ebcf60c33dcad903, type: 2}

@@ -1,0 +1,15 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab972e30dd726803ba85c0dd0da2ffbf, type: 3}
+  m_Name: OffersConfig
+  m_EditorClassIdentifier:
+  offersConfig: '{"items":[{"id":"69c32fa4-c594-476c-a010-25000262b85a","name":"Coin","tags":[],"IsValid":true},{"id":"58d6d56f-ea40-4044-8820-a4579d99d450","name":"FruitCannon","tags":[],"IsValid":true},{"id":"9f771176-3bd5-4c5b-9256-b548136414e0","name":"InfinityLife","tags":[],"IsValid":true},{"id":"b9de9371-b145-4e65-8717-bc04501e88a3","name":"Live","tags":[],"IsValid":true},{"id":"d3ed93a9-0c65-4b37-acbd-6b2fbc90407a","name":"NoAds","tags":[],"IsValid":true},{"id":"c9b5fb3a-bf10-4850-a44d-ef0088fb2e64","name":"Shrink","tags":[],"IsValid":true},{"id":"18f95c18-d7d3-4592-88ff-e573d0b18664","name":"Shuffle","tags":[],"IsValid":true},{"id":"2594d4de-9cf4-415a-93e3-e410d4c9413d","name":"Tunnel","tags":[],"IsValid":true}],"offers":[],"config":{"ConfigurationId":"","SegmentIds":"","AbTestIds":"","CohortIds":"","CohortNames":"","TreatmentIds":"","VersionNumber":"","SegmentIdsToList":[""],"AbTestIdsToList":[""],"CohortIdsToList":[""],"TreatmentIdsToList":[""],"CohortNamesToList":[""],"MainAbTestId":"","MainCohortId":"","MainCohortName":"","IsValid":true},"campaigns":[],"nonConsumableProductToItems":{"ios":{},"android":{}}}'

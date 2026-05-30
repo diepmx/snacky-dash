@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c46d06cbe404109758a196188cd0ffd2, type: 3}
+  m_Name: AnalyticsSettings_ios_worldwide
+  m_EditorClassIdentifier:
+  platform: ios
+  store: worldwide
+  useFirebaseAnalytics: 1
+  useRemoteConfig: 1
+  adjustAppToken: macg2th6cge8
+  noAdsBundleId: com.b2p.gobbledash2.no_ads
+  useVoodooAnalytics: 1
+  conversionEvents:
+    UseConversionEvents: 1
+    DaysUntilExpiration: 1
+    AdEvents: []
+    UnknownEvents: []
+  isChinaStore: 0
+  appleStoreId: 6755592877
+  voodooFunnels:
+    funnels: []
+  gameAnalyticsGameKey: 8a0b8d8455b6cf1d1aea88e3f8d9c335
+  gameAnalyticsSecretKey: cff03f4a38f4f4d43d61be71551df45b01d8da95
+  excludeGameAnalyticsSDK: 0
+  facebookAppId: 835029515988995

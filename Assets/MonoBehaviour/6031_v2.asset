@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a895ccc9707dab3da44b60e732524bd, type: 3}
+  m_Name: 6031_v2
+  m_EditorClassIdentifier:
+  <usingSeedRandom>k__BackingField: 0
+  <seedRandom>k__BackingField: 0
+  hasLdfTutorialForThisLevel: 0
+  ldfTutorialIngredientType: 0
+  <speedPlayer>k__BackingField: 0
+  <difficulty>k__BackingField: 0
+  <difficultyScore>k__BackingField: 0
+  <boardAlgorithm>k__BackingField:
+    enabled: 1
+    waveCount: 6
+    densityMin: 0.4
+    densityMax: 0.6
+    waveModifier: 0.15
+    safetyFloor: 0.3
+    secretSpawnChanceMin: 0
+    secretSpawnChanceMax: 0
+  manualColumns:
+  - crates:
+    - pillKind: 5
+      requiredCount: 18
+    - pillKind: 3
+      requiredCount: 9
+    - pillKind: 2
+      requiredCount: 18
+    - pillKind: 0
+      requiredCount: 9
+    - pillKind: 5
+      requiredCount: 9
+    - pillKind: 2
+      requiredCount: 9
+    - pillKind: 0
+      requiredCount: 9
+  - crates:
+    - pillKind: 6
+      requiredCount: 9
+    - pillKind: 0
+      requiredCount: 27
+    - pillKind: 1
+      requiredCount: 9
+    - pillKind: 3
+      requiredCount: 18
+    - pillKind: 6
+      requiredCount: 9
+    - pillKind: 3
+      requiredCount: 9
+    - pillKind: 1
+      requiredCount: 18
+  cratesTotal: 180
+  respawnSequence:
+    batches:
+    - colors:
+      - pillKind: 5
+        count: 13
+      - pillKind: 6
+        count: 7
+      - pillKind: 3
+        count: 1
+      - pillKind: 2
+        count: 1
+      - pillKind: 0
+        count: 1
+      - pillKind: 1
+        count: 1
+      total: 24
+    - colors:
+      - pillKind: 5
+        count: 5
+      - pillKind: 6
+        count: 2
+      - pillKind: 3
+        count: 5
+      - pillKind: 2
+        count: 4
+      - pillKind: 0
+        count: 7
+      - pillKind: 1
+        count: 4
+      total: 27
+    - colors:
+      - pillKind: 3
+        count: 2
+      - pillKind: 0
+        count: 13
+      - pillKind: 2
+        count: 5
+      - pillKind: 5
+        count: 2
+      - pillKind: 1
+        count: 5
+      - pillKind: 6
+        count: 2
+      total: 29
+    - colors:
+      - pillKind: 0
+        count: 12
+      - pillKind: 2
+        count: 7
+      - pillKind: 5
+        count: 3
+      - pillKind: 6
+        count: 3
+      - pillKind: 1
+        count: 6
+      total: 31
+    - colors:
+      - pillKind: 3
+        count: 1
+      - pillKind: 0
+        count: 9
+      - pillKind: 2
+        count: 8
+      - pillKind: 5
+        count: 3
+      - pillKind: 6
+        count: 3
+      - pillKind: 1
+        count: 9
+      total: 33
+    - colors:
+      - pillKind: 5
+        count: 1
+      - pillKind: 2
+        count: 2
+      - pillKind: 0
+        count: 3
+      - pillKind: 3
+        count: 27
+      - pillKind: 6
+        count: 1
+      - pillKind: 1
+        count: 2
+      total: 36
+    grandTotal: 180
+  risingBlockDeliveriesToLower: 3
+  destructibleWallHealth: 3
+  destructibleWallGroupHealths:
+  - groupId: 1
+    seedCell: {x: 17, y: 4}
+    cellCount: 8
+    health: 3
+  - groupId: 2
+    seedCell: {x: 11, y: 19}
+    cellCount: 5
+    health: 3
+  destructibleWallGroupsFingerprint: -519723989
+  debug_Colors:
+  - pillKind: 0
+    countInCrates: 45
+    numberSpawned: 45
+  - pillKind: 1
+    countInCrates: 27
+    numberSpawned: 27
+  - pillKind: 2
+    countInCrates: 27
+    numberSpawned: 27
+  - pillKind: 3
+    countInCrates: 36
+    numberSpawned: 36
+  - pillKind: 5
+    countInCrates: 27
+    numberSpawned: 27
+  - pillKind: 6
+    countInCrates: 18
+    numberSpawned: 18
+  useLevelPrefab: 0
+  levelPrefab: {fileID: 0}
+  LevelMapJsonData:

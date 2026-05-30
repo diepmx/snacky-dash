@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30b7c22f95e45b1ef33bfd626f8d7349, type: 3}
+  m_Name: BoosterConfig
+  m_EditorClassIdentifier:
+  _forcedTutorialEntries:
+  - _boosterId: 0
+    _flowType: 1
+    _delayedTailLengthThreshold: 0
+  - _boosterId: 2
+    _flowType: 1
+    _delayedTailLengthThreshold: 0
+  - _boosterId: 1
+    _flowType: 2
+    _delayedTailLengthThreshold: 7
+  - _boosterId: 3
+    _flowType: 2
+    _delayedTailLengthThreshold: 10
+  _tutorialPopupPrefabPath: Boosters/BoosterTutorialView
+  _shuffleVortexVfxPrefab: {fileID: 198061268324235159, guid: f910ecd7c9837574d88da91373d71912, type: 2}
+  _shuffleVortexPreShuffleDelaySeconds: 0.75
+  _boomerangFlightVfxPrefab: {fileID: 1709254077376921, guid: 6fe7cddfb8f5a0d47bb712ad88cb25e4, type: 2}
+  _boomerangFlightDuration: 0.65
+  _boomerangFlightMaxScaleMultiplier: 2
+  _boomerangFlightPositionEase: 7
+  _boomerangFlightScaleEase: 27
+  _boomerangRiseOffset: {x: 0, y: 0, z: -5}
+  _boomerangRiseDuration: 0.45
+  _boomerangRiseEase: 8
+  _boomerangSkyHoverDuration: 0.2
+  _boomerangLaunchInterval: 0.06
+  _boomerangCrateTransitionMaxWait: 1.5

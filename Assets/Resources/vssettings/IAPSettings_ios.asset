@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -13238107, guid: 5533087e61cd035854f4828e2e6112dd, type: 3}
+  m_Name: IAPSettings_ios
+  m_EditorClassIdentifier:
+  platform: ios
+  noAdsProductId: com.b2p.gobbledash2.no_ads
+  isIAPEnabled: 1
+  subscriptionsGroup:
+  - None
+  - SubGroup 1
+  productsFamily:
+  - None
+  - Coins
+  - Skipets
+  - EndlessOffer
+  - Card pack
+  products:
+  - _productId: com.b2p.gobbledash2.coins_pack1
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.coins_pack2
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.coins_pack3
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.coins_pack4
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.coins_pack5
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.coins_pack6
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.no_ads_pack
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.starter_pack
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.shop_small_bundle
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.shop_medium_bundle
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.shop_large_bundle
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.extra_large_pack
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.xxl_pack
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  - _productId: com.b2p.gobbledash2.no_egp_offer
+    _type: 0
+    _subscriptionGroup:
+    _productFamily: None
+    _usdPrice: 0
+  subscriptionSharedKey:
+  ignoreTheGoogleKeyError: 1

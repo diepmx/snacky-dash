@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f97b5161f97577f2f4f8114aff69218b, type: 3}
+  m_Name: IngredientUnlockConfig
+  m_EditorClassIdentifier:
+  definitions:
+  - name: BRIDGE
+    type: 0
+    icon: {fileID: 21300000, guid: 637e65661558cfc42b5cf3ffdf5dbae8, type: 2}
+    tutorialTitle: ldf_bridge_name
+    tutorialDescription: ldf_bridge_desc
+    levelToStartShowingUp: 0
+    levelToUnlock: 3
+  - name: GATES
+    type: 1
+    icon: {fileID: 21300000, guid: 3b71e5fc081b55b459d2f9020bf1c8ec, type: 2}
+    tutorialTitle: ldf_gate_name
+    tutorialDescription: ldf_gate_desc
+    levelToStartShowingUp: 3
+    levelToUnlock: 9
+  - name: SWITCHING ARROW
+    type: 2
+    icon: {fileID: 21300000, guid: dc4d5d8704c107643b1200cbebc7d264, type: 2}
+    tutorialTitle: ldf_arrows_name
+    tutorialDescription: ldf_arrows_desc
+    levelToStartShowingUp: 9
+    levelToUnlock: 14
+  - name: TUNNEL
+    type: 3
+    icon: {fileID: 21300000, guid: 924f772a90c6e4e47ab5bb3f4d7a537b, type: 2}
+    tutorialTitle: ldf_tunnel_name
+    tutorialDescription: ldf_tunnel_desc
+    levelToStartShowingUp: 14
+    levelToUnlock: 20
+  - name: BLOCKER
+    type: 4
+    icon: {fileID: 21300000, guid: 6634997299fc89f4db213ac4610b505d, type: 2}
+    tutorialTitle: ldf_blocker_name
+    tutorialDescription: ldf_blocker_desc
+    levelToStartShowingUp: 20
+    levelToUnlock: 30
+  - name: RISING BLOCK
+    type: 5
+    icon: {fileID: 21300000, guid: 8a5fb6abe82496e43941a321e439bfcb, type: 2}
+    tutorialTitle: ldf_rising_name
+    tutorialDescription: ldf_rising_desc
+    levelToStartShowingUp: 30
+    levelToUnlock: 40
+  - name: FLIPPING BRIDGE
+    type: 7
+    icon: {fileID: 21300000, guid: 42e46f3cbcecfcb4589767a8f6690ad6, type: 2}
+    tutorialTitle: ldf_swbridge_name
+    tutorialDescription: ldf_swbridge_desc
+    levelToStartShowingUp: 40
+    levelToUnlock: 50
+  - name: TUBE
+    type: 6
+    icon: {fileID: 21300000, guid: 6d76d81e250f8884b93939d5efbc3c12, type: 2}
+    tutorialTitle: ldf_swtube_name
+    tutorialDescription: ldf_swtube_desc
+    levelToStartShowingUp: 50
+    levelToUnlock: 60
+  - name: SECRET COLLECTIBLE
+    type: 8
+    icon: {fileID: 21300000, guid: 69109992437f90149815a259b6c0754e, type: 2}
+    tutorialTitle: ldf_secretcol_name
+    tutorialDescription: ldf_secretcol_desc
+    levelToStartShowingUp: 60
+    levelToUnlock: 80

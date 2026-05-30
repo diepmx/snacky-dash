@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a401970773727821791e9003c1934213, type: 3}
+  m_Name: GraphicSet_Main
+  m_EditorClassIdentifier:
+  _pillController: {fileID: 114320256170494724, guid: 978aff71a32c6e94c88c7e68ff3fc586, type: 2}
+  snakeHead: {fileID: 1709254077376921, guid: eab8e59eb7ea03d43853d941efb45e5f, type: 2}
+  graphicDatas:
+  - pillKind: 0
+    materialCrate: {fileID: 2100000, guid: 0ba64dabe88a07c4abfad8db431432eb, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: b39b548a5051f8848a2734cbaeb07112, type: 2}
+  - pillKind: 1
+    materialCrate: {fileID: 2100000, guid: 2406ce8f1dc6b6149b72cf61ba77a2f2, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: 5588e31c275ebb84ba78026ae75a1c63, type: 2}
+  - pillKind: 2
+    materialCrate: {fileID: 2100000, guid: 66817beddbee3974eb4176cd1fd13d94, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: aebc3270d8139be45b4ca79ae8bc8b4c, type: 2}
+  - pillKind: 3
+    materialCrate: {fileID: 2100000, guid: 89e2fa33965a2b24d93d737087d539c6, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: 1bafd9e078fcb114ebd07d48db9b6a38, type: 2}
+  - pillKind: 4
+    materialCrate: {fileID: 2100000, guid: c3f7f0033ba89d541a3201d7313d3711, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: ac8012c97e931154cb97b0fe08cb25c8, type: 2}
+  - pillKind: 5
+    materialCrate: {fileID: 2100000, guid: 81d4e13a399f5cf4bb1458cf5d7d1ed0, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: 1c33ed79242dd3b41a25119dc816e439, type: 2}
+  - pillKind: 6
+    materialCrate: {fileID: 2100000, guid: 12a92f690657fc445b054bc04de83864, type: 2}
+    materialPillInSnake: {fileID: 2100000, guid: 94f255da842ce414f8cd2fbc9d93bafc, type: 2}

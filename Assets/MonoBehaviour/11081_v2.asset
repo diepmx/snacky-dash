@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a895ccc9707dab3da44b60e732524bd, type: 3}
+  m_Name: 11081_v2
+  m_EditorClassIdentifier:
+  <usingSeedRandom>k__BackingField: 0
+  <seedRandom>k__BackingField: 0
+  hasLdfTutorialForThisLevel: 0
+  ldfTutorialIngredientType: 0
+  <speedPlayer>k__BackingField: 0
+  <difficulty>k__BackingField: 0
+  <difficultyScore>k__BackingField: 0
+  <boardAlgorithm>k__BackingField:
+    enabled: 0
+    waveCount: 5
+    densityMin: 0.6
+    densityMax: 0.8
+    waveModifier: 0.1
+    safetyFloor: 0.3
+    secretSpawnChanceMin: 0
+    secretSpawnChanceMax: 0
+  manualColumns:
+  - crates:
+    - pillKind: 0
+      requiredCount: 18
+    - pillKind: 1
+      requiredCount: 18
+    - pillKind: 2
+      requiredCount: 18
+    - pillKind: 1
+      requiredCount: 18
+    - pillKind: 0
+      requiredCount: 9
+    - pillKind: 3
+      requiredCount: 27
+    - pillKind: 2
+      requiredCount: 18
+    - pillKind: 4
+      requiredCount: 18
+  cratesTotal: 144
+  respawnSequence:
+    batches:
+    - colors:
+      - pillKind: 0
+        count: 16
+      - pillKind: 1
+        count: 9
+      - pillKind: 2
+        count: 9
+      - pillKind: 3
+        count: 9
+      total: 43
+    - colors:
+      - pillKind: 0
+        count: 5
+      - pillKind: 1
+        count: 13
+      - pillKind: 2
+        count: 18
+      total: 36
+    - colors:
+      - pillKind: 0
+        count: 3
+      - pillKind: 1
+        count: 9
+      - pillKind: 4
+        count: 9
+      - pillKind: 3
+        count: 9
+      total: 30
+    - colors:
+      - pillKind: 0
+        count: 3
+      - pillKind: 1
+        count: 5
+      - pillKind: 2
+        count: 9
+      - pillKind: 3
+        count: 9
+      - pillKind: 4
+        count: 9
+      total: 35
+    grandTotal: 144
+  risingBlockDeliveriesToLower: 3
+  destructibleWallHealth: 3
+  destructibleWallGroupHealths: []
+  destructibleWallGroupsFingerprint: 0
+  debug_Colors:
+  - pillKind: 0
+    countInCrates: 27
+    numberSpawned: 27
+  - pillKind: 1
+    countInCrates: 36
+    numberSpawned: 36
+  - pillKind: 2
+    countInCrates: 36
+    numberSpawned: 36
+  - pillKind: 3
+    countInCrates: 27
+    numberSpawned: 27
+  - pillKind: 4
+    countInCrates: 18
+    numberSpawned: 18
+  useLevelPrefab: 0
+  levelPrefab: {fileID: 0}
+  LevelMapJsonData:

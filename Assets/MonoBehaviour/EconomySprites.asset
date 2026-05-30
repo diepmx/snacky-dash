@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91364ab1e29b1d2ad05ae48c19be4e01, type: 3}
+  m_Name: EconomySprites
+  m_EditorClassIdentifier:
+  <CurrencyEconomySprites>k__BackingField:
+  - <Id>k__BackingField: 0
+    <MainViewSprite>k__BackingField: {fileID: 21300000, guid: d3e891172b5ca45468e9dca7860cca16, type: 2}
+    <SmallPackSprite>k__BackingField: {fileID: 21300000, guid: bfde4147be2347e498b5e99647f42a47, type: 2}
+    <MediumPackSprite>k__BackingField: {fileID: 21300000, guid: 4f131a87608e56f4eacc707a61103faa, type: 2}
+    <LargePackSprite>k__BackingField: {fileID: 21300000, guid: 11f1cc1878a2aae43a3cf72e8ae5792a, type: 2}
+    <ExtraLargePackSprite>k__BackingField: {fileID: 21300000, guid: de4f29964aef49b469895a704700fdcd, type: 2}
+    <XXLPackSprite>k__BackingField: {fileID: 21300000, guid: 02fed0f71b8df82448822cd98a1f0940, type: 2}
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: f3bcadce93e033d4f91b1a793c580b70, type: 2}
+  - <Id>k__BackingField: 2
+    <MainViewSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <SmallPackSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <MediumPackSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <LargePackSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <ExtraLargePackSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <XXLPackSprite>k__BackingField: {fileID: 21300000, guid: e12b6e8001bc41b4aaa4cc934d471654, type: 2}
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 85d7a4edb55524e48b4b89b3304bcd9d, type: 2}
+  - <Id>k__BackingField: 3
+    <MainViewSprite>k__BackingField: {fileID: 21300000, guid: b3bf9b48dc28f4b42acd61e6e496145f, type: 2}
+    <SmallPackSprite>k__BackingField: {fileID: 0}
+    <MediumPackSprite>k__BackingField: {fileID: 0}
+    <LargePackSprite>k__BackingField: {fileID: 0}
+    <ExtraLargePackSprite>k__BackingField: {fileID: 0}
+    <XXLPackSprite>k__BackingField: {fileID: 0}
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: b3bf9b48dc28f4b42acd61e6e496145f, type: 2}
+  <BoosterEconomySprites>k__BackingField:
+  - <Id>k__BackingField: 0
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 4be4759a18e58e0479aeefd4e800486c, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 4be4759a18e58e0479aeefd4e800486c, type: 2}
+  - <Id>k__BackingField: 1
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 3c8aab89ce71e0a4487de1d65adaa063, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 3c8aab89ce71e0a4487de1d65adaa063, type: 2}
+  - <Id>k__BackingField: 2
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 4b49d399decbe8f4b9766a3d1ceef7d3, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 4b49d399decbe8f4b9766a3d1ceef7d3, type: 2}
+  - <Id>k__BackingField: 3
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 1d7460923b7de054d89ff3aa65c33eec, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 1d7460923b7de054d89ff3aa65c33eec, type: 2}
+  <EntitlementEconomySprites>k__BackingField:
+  - <Id>k__BackingField: 1
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 4c962dbbf27578b4f9d5d876d45b1fd0, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 4c962dbbf27578b4f9d5d876d45b1fd0, type: 2}
+  - <Id>k__BackingField: 0
+    <ParticleSprite>k__BackingField: {fileID: 21300000, guid: 2c61bcbe4b65d914fba72d097e5419c0, type: 2}
+    <HudSprite>k__BackingField: {fileID: 21300000, guid: 2c61bcbe4b65d914fba72d097e5419c0, type: 2}

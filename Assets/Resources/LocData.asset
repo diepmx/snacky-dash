@@ -1,0 +1,4970 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60a9a7e4aa50c180eb92e13cc76998fe, type: 3}
+  m_Name: LocData
+  m_EditorClassIdentifier:
+  selectedSheetIndex: 0
+  sheetVersions:
+  - name: Default
+    languageCodes:
+    - EN
+    - FR
+    - JA
+    - KO
+    - ID
+    - DE
+    - ES
+    - IT
+    - PT
+    - RU
+    - TR
+    translationRows:
+    - key: top_hud_lives_full
+      translations:
+      - Full
+      - Plein
+      - 満タン
+      - 가득
+      - Penuh
+      - Voll
+      - Llenas
+      - Pieno
+      - Cheio
+      - Полно
+      - Dolu
+    - key: booster_button_unlock_level_prefix
+      translations:
+      - lvl.
+      - niv.
+      - Lv.
+      - 레벨
+      - lvl.
+      - Lvl.
+      - niv.
+      - liv.
+      - nív.
+      - ур.
+      - sev.
+    - key: combo_ui_plus_prefix
+      translations:
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+      - +
+    - key: combo_ui_total_label
+      translations:
+      - TOTAL
+      - TOTAL
+      - 合計
+      - 합계
+      - TOTAL
+      - GESAMT
+      - TOTAL
+      - TOTALE
+      - TOTAL
+      - ИТОГ
+      - TOPLAM
+    - key: panel_debug_tail_prefix
+      translations:
+      - 'tail :'
+      - 'queue :'
+      - 'しっぽ :'
+      - '꼬리 :'
+      - 'ekor :'
+      - 'Schwanz :'
+      - 'cola :'
+      - 'coda :'
+      - 'cauda :'
+      - 'хвост :'
+      - 'kuyruk :'
+    - key: panel_debug_chunk_prefix
+      translations:
+      - 'chunk :'
+      - 'morceau :'
+      - 'チャンク :'
+      - '청크 :'
+      - 'blok :'
+      - 'Block :'
+      - 'trozo :'
+      - 'blocco :'
+      - 'bloco :'
+      - 'чанк :'
+      - 'parça :'
+    - key: ingredient_progress_new_feature
+      translations:
+      - NEW FEATURE
+      - NOUVEAUTÉ
+      - 新機能
+      - 새 기능
+      - FITUR BARU
+      - NEUE FUNKTION
+      - NUEVA FUNCIÓN
+      - NOVITÀ
+      - NOVIDADE
+      - НОВОЕ
+      - YENİ ÖZELLİK
+    - key: ingredient_progress_next_feature
+      translations:
+      - NEXT FEATURE
+      - PROCHAINEMENT
+      - 次の機能
+      - 다음 기능
+      - FITUR BERIKUT
+      - NÄCHSTE FUNKTION
+      - PRÓXIMA FUNCIÓN
+      - PROSSIMA NOVITÀ
+      - PRÓXIMA
+      - ДАЛЕЕ
+      - SONRAKİ ÖZELLİK
+    - key: force_swipe_swipe_up
+      translations:
+      - Swipe Up
+      - Glisse vers le haut
+      - 上にスワイプ
+      - 위로 스와이프
+      - Geser ke atas
+      - Nach oben wischen
+      - Desliza arriba
+      - Scorri su
+      - Deslize p/ cima
+      - Свайп вверх
+      - Yukarı kaydır
+    - key: N311
+      translations:
+      - Swipe Down
+      - Glisse vers le bas
+      - 下にスワイプ
+      - 아래로 스와이프
+      - Geser ke bawah
+      - Nach unten wischen
+      - Desliza abajo
+      - Scorri giù
+      - Deslize p/ baixo
+      - Свайп вниз
+      - Aşağı kaydır
+    - key: force_swipe_swipe_left
+      translations:
+      - Swipe Left
+      - Glisse à gauche
+      - 左にスワイプ
+      - 왼쪽으로 스와이프
+      - Geser ke kiri
+      - Nach links wischen
+      - Desliza izquierda
+      - Scorri a sinistra
+      - Deslize p/ esquerda
+      - Свайп влево
+      - Sola kaydır
+    - key: force_swipe_swipe_right
+      translations:
+      - Swipe Right
+      - Glisse à droite
+      - 右にスワイプ
+      - 오른쪽으로 스와이프
+      - Geser ke kanan
+      - Nach rechts wischen
+      - Desliza derecha
+      - Scorri a destra
+      - Deslize p/ direita
+      - Свайп вправо
+      - Sağa kaydır
+    - key: force_swipe_error_fallback
+      translations:
+      - Problem
+      - Problème
+      - 問題
+      - 문제
+      - Masalah
+      - Problem
+      - Problema
+      - Problema
+      - Problema
+      - Проблема
+      - Sorun
+    - key: booster_buy_quantity_prefix
+      translations:
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+    - key: crate_column_count_prefix
+      translations:
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+      - x
+    - key: "\nrefill_lives_title_unlimited"
+      translations:
+      - Unlimited lives!
+      - Vies illimitées !
+      - 無限ライフ!
+      - 무한 생명!
+      - Nyawa tanpa batas!
+      - Unbegrenzte Leben!
+      - Vidas ilimitadas!
+      - Vite illimitate!
+      - Vidas ilimitadas!
+      - Бесконечные жизни!
+      - Sınırsız can!
+    - key: refill_lives_title_zero_lives
+      translations:
+      - Refill your lives!
+      - Recharge tes vies !
+      - ライフをチャージ!
+      - 생명 충전해봐!
+      - Isi nyawamu!
+      - Lade deine Leben auf!
+      - Recarga tus vidas!
+      - Ricarica le vite!
+      - Recarregue suas vidas!
+      - Пополни жизни!
+      - Canlarını yenile!
+    - key: refill_lives_title_has_lives
+      translations:
+      - Lives
+      - Vies
+      - ライフ
+      - 생명
+      - Nyawa
+      - Leben
+      - Vidas
+      - Vite
+      - Vidas
+      - Жизни
+      - Canlar
+    - key: refill_lives_timer_full
+      translations:
+      - Full
+      - Plein
+      - 満タン
+      - 가득
+      - Penuh
+      - Voll
+      - Llenas
+      - Pieno
+      - Cheio
+      - Полно
+      - Dolu
+    - key: refill_lives_cost_free
+      translations:
+      - FREE
+      - GRATUIT
+      - 無料
+      - 무료
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRÁTIS
+      - БЕСПЛАТНО
+      - ÜCRETSİZ
+    - key: refill_lives_timer_full_caps
+      translations:
+      - FULL
+      - PLEIN
+      - 満タン
+      - 가득
+      - PENUH
+      - VOLL
+      - LLENAS
+      - PIENO
+      - CHEIO
+      - ПОЛНО
+      - DOLU
+    - key: lose_screen_egp_timer_full
+      translations:
+      - Full
+      - Plein
+      - 満タン
+      - 가득
+      - Penuh
+      - Voll
+      - Llenas
+      - Pieno
+      - Cheio
+      - Полно
+      - Dolu
+    - key: lose_screen_egp_reward_popup_title
+      translations:
+      - Purchase Successful!
+      - Achat réussi !
+      - 購入完了!
+      - 구매 완료!
+      - Pembelian berhasil!
+      - Kauf erfolgreich!
+      - Compra exitosa!
+      - Acquisto riuscito!
+      - Compra concluída!
+      - Покупка совершена!
+      - Satın alma başarılı!
+    - key: confirm_quit_timer_full
+      translations:
+      - FULL
+      - PLEIN
+      - 満タン
+      - 가득
+      - PENUH
+      - VOLL
+      - LLENAS
+      - PIENO
+      - CHEIO
+      - ПОЛНО
+      - DOLU
+    - key: lose_screen_failed_infinity_lives_label
+      translations:
+      - 'Infinite lives for:'
+      - 'Vies infinies pendant :'
+      - 無限ライフ：
+      - '무한 생명:'
+      - 'Nyawa tak terbatas:'
+      - 'Unendliche Leben für:'
+      - 'Vidas infinitas durante:'
+      - 'Vite infinite per:'
+      - 'Vidas infinitas por:'
+      - 'Бесконечные жизни:'
+      - 'Sınırsız can:'
+    - key: lose_screen_failed_level_failed
+      translations:
+      - Level Failed!
+      - Niveau raté !
+      - レベル失敗!
+      - 레벨 실패!
+      - Level gagal!
+      - Level gescheitert!
+      - Nivel fallido!
+      - Livello fallito!
+      - Nível falhou!
+      - Уровень провален!
+      - Seviye başarısız!
+    - key: shrinker_debug_shrink_inactive
+      translations:
+      - 'Shrink: -'
+      - 'Rétrécisseur : -'
+      - 'シュリンク: -'
+      - '슈링크: -'
+      - 'Pengecil: -'
+      - 'Schrumpfer: -'
+      - 'Reductor: -'
+      - 'Riduttore: -'
+      - 'Redutor: -'
+      - 'Уменьшитель: -'
+      - 'Küçültücü: -'
+    - key: shrinker_debug_regrow_inactive
+      translations:
+      - 'Regrow: -'
+      - 'Repousser : -'
+      - '再成長: -'
+      - '재성장: -'
+      - 'Tumbuh: -'
+      - 'Nachwachsen: -'
+      - 'Recrecer: -'
+      - 'Ricresci: -'
+      - 'Crescer: -'
+      - 'Восстан.: -'
+      - 'Uzat: -'
+    - key: shrinker_debug_moves_inactive
+      translations:
+      - 'Moves left: -'
+      - 'Coups restants : -'
+      - '残り手数: -'
+      - '남은 이동: -'
+      - 'Sisa langkah: -'
+      - 'Züge übrig: -'
+      - 'Movim. rest.: -'
+      - 'Mosse rimaste: -'
+      - 'Jogadas: -'
+      - 'Ходов: -'
+      - 'Kalan hamle: -'
+    - key: prefab_booster_hint_no_fruits_rich
+      translations:
+      - '<color=#8929F6><size=100%>NO FRUITS TO SEND! </color></size> \nTry later'
+      - '<color=#8929F6><size=100%>AUCUN FRUIT À ENVOYER ! </color></size> \nRéessaie plus tard'
+      - '<color=#8929F6><size=100%>送れるフルーツなし! </color></size> \n後でね'
+      - '<color=#8929F6><size=100%>보낼 과일 없음! </color></size> \n나중에 해봐'
+      - '<color=#8929F6><size=100%>TIDAK ADA BUAH! </color></size> \nCoba lagi nanti'
+      - '<color=#8929F6><size=100%>KEINE FRÜCHTE! </color></size> \nVersuch''s später'
+      - '<color=#8929F6><size=100%>SIN FRUTAS! </color></size> \nInténtalo luego'
+      - '<color=#8929F6><size=100%>NESSUN FRUTTO! </color></size> \nRiprova più tardi'
+      - '<color=#8929F6><size=100%>SEM FRUTAS! </color></size> \nTente depois'
+      - '<color=#8929F6><size=100%>НЕТ ФРУКТОВ! </color></size> \nПопробуй позже'
+      - '<color=#8929F6><size=100%>MEYVE YOK! </color></size> \nSonra dene'
+    - key: prefab_booster_hint_no_fruits_plain
+      translations:
+      - NO FRUITS TO SEND! \nTry later
+      - AUCUN FRUIT À ENVOYER ! \nRéessaie plus tard
+      - 送れるフルーツなし! \n後でね
+      - 보낼 과일 없음! \n나중에 해봐
+      - TIDAK ADA BUAH! \nCoba lagi nanti
+      - KEINE FRÜCHTE! \nVersuch's später
+      - SIN FRUTAS! \nInténtalo luego
+      - NESSUN FRUTTO! \nRiprova più tardi
+      - SEM FRUTAS! \nTente depois
+      - НЕТ ФРУКТОВ! \nПопробуй позже
+      - MEYVE YOK! \nSonra dene
+    - key: prefab_booster_hint_fruit_cannon
+      translations:
+      - Fruit Cannon
+      - Canon à fruits
+      - フルーツ砲
+      - 과일 대포
+      - Meriam buah
+      - Fruchtkanone
+      - Cañón de frutas
+      - Cannone alla frutta
+      - Canhão de frutas
+      - Фруктовая пушка
+      - Meyve topu
+    - key: prefab_booster_hint_click_arrow
+      translations:
+      - Click the arrow to deliver your fruits!
+      - Clique la flèche pour livrer tes fruits !
+      - 矢印をタップしてフルーツを届けよう!
+      - 화살표 눌러서 과일 배달해!
+      - Klik panah untuk kirim buahmu!
+      - Klick den Pfeil, um deine Früchte zu liefern!
+      - Pulsa la flecha para entregar tus frutas!
+      - Tocca la freccia per consegnare i frutti!
+      - Clique na seta para entregar suas frutas!
+      - Нажми стрелку, чтобы доставить фрукты!
+      - Meyvelerini gönder için oka tıkla!
+    - key: prefab_canvas_main_tip_body
+      translations:
+      - THE SNAKE FOLLOWS THE CURVES AUTOMATICALLY
+      - LE SERPENT ÉPOUSE LES COURBES TOUT SEUL
+      - ヘビは自動でカーブを滑り抜ける
+      - 뱀은 곡선을 자동으로 미끄러져 가
+      - ULAR MELUNCUR DI BELOKAN OTOMATIS
+      - DIE SCHLANGE GLEITET VON ALLEIN DURCH DIE KURVEN
+      - LA SERPIENTE SE DESLIZA POR LAS CURVAS SOLA
+      - IL SERPENTE SCIVOLA SULLE CURVE DA SOLO
+      - A COBRA DESLIZA PELAS CURVAS SOZINHA
+      - ЗМЕЙКА САМА СКОЛЬЗИТ ПО ИЗГИБАМ
+      - YILAN KIVRIMLARDA OTOMATİK SÜZÜLÜR
+    - key: prefab_canvas_main_tip_label
+      translations:
+      - TIP
+      - ASTUCE
+      - ヒント
+      - 꿀팁
+      - TIPS
+      - TIPP
+      - TRUCO
+      - SUGGERIMENTO
+      - DICA
+      - СОВЕТ
+      - İPUCU
+    - key: prefab_canvas_main_place_tunnel
+      translations:
+      - Place Tunnel
+      - Place le tunnel
+      - トンネルを置く
+      - 터널 놓기
+      - Tempatkan terowongan
+      - Tunnel platzieren
+      - Coloca el túnel
+      - Posiziona tunnel
+      - Coloque o túnel
+      - Поставь тоннель
+      - Tüneli yerleştir
+    - key: prefab_canvas_main_undo
+      translations:
+      - Undo
+      - Annuler
+      - 元に戻す
+      - 되돌리기
+      - Urungkan
+      - Rückgängig
+      - Deshacer
+      - Annulla
+      - Desfazer
+      - C52
+      - Geri al
+    - key: prefab_canvas_main_next
+      translations:
+      - NEXT
+      - SUIVANT
+      - 次へ
+      - 다음
+      - LANJUT
+      - WEITER
+      - SIGUIENTE
+      - AVANTI
+      - PRÓXIMO
+      - ДАЛЕЕ
+      - İLERİ
+    - key: prefab_canvas_main_deliver
+      translations:
+      - Deliver
+      - Livrer
+      - 配達
+      - 배달
+      - Kirim
+      - Liefern
+      - Entregar
+      - Consegna
+      - Entregar
+      - Доставить
+      - Teslim et
+    - key: prefab_canvas_main_got_it
+      translations:
+      - GOT IT
+      - COMPRIS
+      - わかった
+      - 알겠어
+      - OKE
+      - VERSTANDEN
+      - ENTENDIDO
+      - OK
+      - ENTENDI
+      - ПОНЯТНО
+      - ANLADIM
+    - key: prefab_canvas_main_number_in_level
+      translations:
+      - Number in Level
+      - Nombre dans le niveau
+      - レベル内の数
+      - 레벨 내 개수
+      - Jumlah di level
+      - Anzahl im Level
+      - Número en el nivel
+      - Numero nel livello
+      - Número no nível
+      - Число на уровне
+      - Seviyede sayı
+    - key: prefab_canvas_main_number_in_tail
+      translations:
+      - Number in Tail
+      - Nombre dans la queue
+      - しっぽの数
+      - 꼬리 개수
+      - Jumlah di ekor
+      - Anzahl im Schwanz
+      - Número en la cola
+      - Numero nella coda
+      - Número na cauda
+      - Число в хвосте
+      - Kuyrukta sayı
+    - key: prefab_canvas_main_swipe_straight
+      translations:
+      - SWIPE STRAIGHT TO MOVE
+      - GLISSE TOUT DROIT POUR AVANCER
+      - まっすぐスワイプして進もう
+      - 똑바로 스와이프해서 이동
+      - GESER LURUS UNTUK BERGERAK
+      - GERADE WISCHEN ZUM BEWEGEN
+      - DESLIZA RECTO PARA MOVER
+      - SCORRI DRITTO PER MUOVERTI
+      - DESLIZE RETO PARA MOVER
+      - СВАЙПНИ ПРЯМО, ЧТОБЫ СКОЛЬЗТИ
+      - HAREKET İÇİN DÜZ KAYDIR
+    - key: prefab_bottom_hud_home
+      translations:
+      - HOME
+      - ACCUEIL
+      - ホーム
+      - 홈
+      - BERANDA
+      - START
+      - INICIO
+      - HOME
+      - INÍCIO
+      - ГЛАВНАЯ
+      - ANA SAYFA
+    - key: prefab_bottom_hud_shop
+      translations:
+      - shop
+      - boutique
+      - ショップ
+      - 상점
+      - toko
+      - shop
+      - tienda
+      - negozio
+      - loja
+      - магазин
+      - mağaza
+    - key: prefab_play_btn_play
+      translations:
+      - Play
+      - Jouer
+      - プレイ
+      - 플레이
+      - Main
+      - Spielen
+      - Jugar
+      - Gioca
+      - Jogar
+      - Играть
+      - Oyna
+    - key: prefab_play_btn_super_hard
+      translations:
+      - Super Hard
+      - Très difficile
+      - 超難
+      - 초고난도
+      - Sangat sulit
+      - Sehr schwer
+      - Súper difícil
+      - Difficilissimo
+      - Superdifícil
+      - Очень сложно
+      - Çok zor
+    - key: prefab_play_btn_hard
+      translations:
+      - Hard
+      - Difficile
+      - 難しい
+      - 어려움
+      - Sulit
+      - Schwer
+      - Difícil
+      - Difficile
+      - Difícil
+      - Сложно
+      - Zor
+    - key: prefab_ingame_hud_level
+      translations:
+      - Level
+      - Niveau
+      - レベル
+      - 레벨
+      - Level
+      - Level
+      - Nivel
+      - Livello
+      - Nível
+      - Уровень
+      - Seviye
+    - key: prefab_ldf_tutorial_destroy_trap
+      translations:
+      - Destroy <color=#8929F6><size=100%>TRAP LASER</color></size>  \nto unblock
+      - Détruis <color=#8929F6><size=100%>LE LASER PIÈGE</color></size> \npour débloquer
+      - '<color=#8929F6><size=100%>トラップレーザー</color></size>を壊して \n通り抜けよう'
+      - '<color=#8929F6><size=100%>함정 레이저</color></size>를 부숴서 \n길을 열어'
+      - Hancurkan <color=#8929F6><size=100%>JEBAKAN LASER</color></size> \nuntuk membuka
+      - Zerstöre <color=#8929F6><size=100%>FALLENLASER</color></size> \nzum Freischalten
+      - Destruye <color=#8929F6><size=100%>EL LÁSER TRAMPA</color></size> \npara desbloquear
+      - Distruggi <color=#8929F6><size=100%>LASER TRAPPOLA</color></size> \nper sbloccare
+      - Destrua <color=#8929F6><size=100%>O LASER ARMADILHA</color></size> \npara desbloquear
+      - Уничтожь <color=#8929F6><size=100%>ЛАЗЕР-ЛОВУШКУ</color></size> \nи открой путь
+      - '<color=#8929F6><size=100%>TUZAK LAZERİ</color></size> yok et \nve yolu aç'
+    - key: prefab_ldf_tutorial_shrink
+      translations:
+      - Shrink
+      - Rétrécisseur
+      - シュリンク
+      - 슈링크
+      - Pengecil
+      - Schrumpfer
+      - Reductor
+      - Riduttore
+      - Redutor
+      - Уменьшитель
+      - Küçültücü
+    - key: prefab_tutorial_parent_tap_continue
+      translations:
+      - Tap to continue!
+      - Touche pour continuer !
+      - タップして続行!
+      - 눌러서 계속하기!
+      - Ketuk untuk lanjut!
+      - Zum Fortfahren tippen!
+      - Toca para continuar!
+      - Tocca per continuare!
+      - Toque para continuar!
+      - Нажми, чтобы продолжить!
+      - Devam için dokun!
+    - key: prefab_booster_free_badge
+      translations:
+      - FREE
+      - GRATUIT
+      - 無料
+      - 무료
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRÁTIS
+      - БЕСПЛАТНО
+      - ÜCRETSİZ
+    - key: prefab_defeat_shorten_tail
+      translations:
+      - Shorten the tail and keep playing !
+      - Raccourcis la queue et continue !
+      - しっぽを短くして続けよう!
+      - 꼬리 줄이고 계속 플레이!
+      - Pendekkan ekor dan terus bermain!
+      - Schwanz kürzen und weiterspielen!
+      - Acorta la cola y sigue jugando!
+      - Accorcia la coda e continua a giocare!
+      - Encurte a cauda e continue jogando!
+      - Укороти хвост и играй дальше!
+      - Kuyruğu kısalt ve oynamaya devam et!
+    - key: prefab_defeat_try_again
+      translations:
+      - Try Again
+      - Réessayer
+      - もう一度
+      - 다시 하기
+      - Coba lagi
+      - Erneut versuchen
+      - Reintentar
+      - Riprova
+      - Tentar de novo
+      - Ещё раз
+      - Tekrar dene
+    - key: prefab_defeat_add_30_seconds
+      translations:
+      - Add 30 secondes to complete the level!
+      - Ajoute 30 secondes pour finir le niveau !
+      - 30秒追加してレベルクリア!
+      - 30초 더 받고 레벨 완료!
+      - Tambah 30 detik untuk selesaikan level!
+      - 30 Sekunden für das Level holen!
+      - Suma 30 segundos para terminar el nivel!
+      - Aggiungi 30 secondi per finire il livello!
+      - Ganhe 30 segundos para terminar o nível!
+      - +30 секунд, чтобы пройти уровень!
+      - Seviyeyi bitirmek için 30 saniye ekle!
+    - key: prefab_defeat_extend
+      translations:
+      - EXTEND?
+      - PROLONGER ?
+      - 延長する?
+      - 연장할래?
+      - PERPANJANG?
+      - VERLÄNGERN?
+      - AMPLIAR?
+      - PROLUNGARE?
+      - ESTENDER?
+      - ПРОДЛИТЬ?
+      - UZAT?
+    - key: prefab_defeat_revive
+      translations:
+      - REVIVE?
+      - REVIVRE ?
+      - 復活する?
+      - 부활할래?
+      - HIDUP LAGI?
+      - WIEDERBELEBEN?
+      - REVIVIR?
+      - RIVIVERE?
+      - REVIVER?
+      - ОЖИВИТЬ?
+      - DİRİL?
+    - key: prefab_defeat_continue_playing
+      translations:
+      - Continue Playing
+      - Continuer à jouer
+      - プレイを続ける
+      - 계속 플레이
+      - Lanjut main
+      - Weiterspielen
+      - Seguir jugando
+      - Continua a giocare
+      - Continuar jogando
+      - Продолжить
+      - Oynamaya devam
+    - key: prefab_defeat_failed
+      translations:
+      - Failed!
+      - Échec !
+      - 失敗!
+      - 실패!
+      - Gagal!
+      - Gescheitert!
+      - Fallaste!
+      - Fallito!
+      - Falhou!
+      - Провал!
+      - Başarısız!
+    - key: prefab_loading_label
+      translations:
+      - Loading
+      - Chargement
+      - 読み込み中
+      - 로딩 중
+      - Memuat
+      - Lädt
+      - Cargando
+      - Caricamento
+      - Carregando
+      - Загрузка
+      - Yükleniyor
+    - key: prefab_victory_level_complete
+      translations:
+      - Level Complete!
+      - Niveau terminé !
+      - レベルクリア!
+      - 레벨 완료!
+      - Level selesai!
+      - Level geschafft!
+      - Nivel completado!
+      - Livello completato!
+      - Nível concluído!
+      - Уровень пройден!
+      - Seviye tamam!
+    - key: prefab_victory_watch_ad
+      translations:
+      - WATCH AD
+      - VOIR LA PUB
+      - 広告を見る
+      - 광고 보기
+      - TONTON IKLAN
+      - WERBUNG ANSEHEN
+      - VER ANUNCIO
+      - GUARDA ANNUNCIO
+      - VER ANÚNCIO
+      - СМОТРЕТЬ РЕКЛАМУ
+      - REKLAMI İZLE
+    - key: prefab_victory_new_feature
+      translations:
+      - NEW FEATURE
+      - NOUVEAUTÉ
+      - 新機能
+      - 새 기능
+      - FITUR BARU
+      - NEUE FUNKTION
+      - NUEVA FUNCIÓN
+      - NOVITÀ
+      - NOVIDADE
+      - НОВОЕ
+      - YENİ ÖZELLİK
+    - key: prefab_victory_continue
+      translations:
+      - CONTINUE
+      - CONTINUER
+      - つづける
+      - 계속
+      - LANJUT
+      - WEITER
+      - CONTINUAR
+      - CONTINUA
+      - CONTINUAR
+      - ПРОДОЛЖИТЬ
+      - DEVAM
+    - key: prefab_generic_button_refill_all
+      translations:
+      - REFILL ALL
+      - TOUT RECHARGER
+      - すべて補充
+      - 전부 충전
+      - ISI SEMUA
+      - ALLE AUFFÜLLEN
+      - RECARGAR TODO
+      - RICARICA TUTTO
+      - RECARREGAR TUDO
+      - ПОПОЛНИТЬ ВСЁ
+      - HEPSİNİ DOLDUR
+    - key: prefab_tuto_message_swipe_collect
+      translations:
+      - "<color=#446890>Swipe to Collect all the</color>\n<color=#FF6567>Berries!</color>"
+      - "<color=#446890>Glisse pour collecter toutes les</color>\n<color=#FF6567>baies !</color>"
+      - "<color=#446890>スワイプで集めよう</color>\n<color=#FF6567>全部のベリーを!</color>"
+      - "<color=#446890>스와이프로 다 모아요</color>\n<color=#FF6567>베리!</color>"
+      - "<color=#446890>Geser untuk mengumpulkan semua</color>\n<color=#FF6567>Beri!</color>"
+      - "<color=#446890>Wische, um alle</color>\n<color=#FF6567>Beeren einzusammeln!</color>"
+      - "<color=#446890>Desliza para recoger todas las</color>\n<color=#FF6567>bayas!</color>"
+      - "<color=#446890>Scorri per raccogliere tutte le</color>\n<color=#FF6567>bacche!</color>"
+      - "<color=#446890>Deslize para coletar todas as</color>\n<color=#FF6567>frutinhas!</color>"
+      - "<color=#446890>Свайп, чтобы собрать все</color>\n<color=#FF6567>ягоды!</color>"
+      - "<color=#446890>Kaydırarak tüm</color>\n<color=#FF6567>meyveleri topla!</color>"
+    - key: prefab_tuto_message_deliver_them
+      translations:
+      - "<color=#446890>Deliver them</color>\n<color=#FF6567>quick!</color>"
+      - "<color=#446890>Livre-les</color>\n<color=#FF6567>vite !</color>"
+      - "<color=#446890>運ぼう</color>\n<color=#FF6567>急いで！</color>"
+      - "<color=#446890>가져다 줘요</color>\n<color=#FF6567>어서!</color>"
+      - "<color=#446890>Antar</color>\n<color=#FF6567>cepat!</color>"
+      - "<color=#446890>Bring sie</color>\n<color=#FF6567>schnell!</color>"
+      - "<color=#446890>Llévalas</color>\n<color=#FF6567>rápido!</color>"
+      - "<color=#446890>Portale</color>\n<color=#FF6567>veloce!</color>"
+      - "<color=#446890>Entregue-as</color>\n<color=#FF6567>rápido!</color>"
+      - "<color=#446890>Доставь их</color>\n<color=#FF6567>скорее!</color>"
+      - "<color=#446890>Götür onları</color>\n<color=#FF6567>çabuk!</color>"
+    - key: prefab_tuto_message_collect_all
+      translations:
+      - "<color=#446890>COLLECT ALL FRUITS</color>\n<color=#FF6567>TO MAKE THEM REGROW</color>"
+      - "<color=#446890>RAMASSE TOUS LES FRUITS</color>\n<color=#FF6567>POUR LES FAIRE REPOUSSER</color>"
+      - "<color=#446890>すべてのフルーツを集めて</color>\n<color=#FF6567>もう一度実らせよう</color>"
+      - "<color=#446890>모든 과일을 모아서</color>\n<color=#FF6567>다시 자라게 해요</color>"
+      - "<color=#446890>KUMPULKAN SEMUA BUAH</color>\n<color=#FF6567>AGAR TUMBUH KEMBALI</color>"
+      - "<color=#446890>SAMMLE ALLE FRÜCHTE,</color>\n<color=#FF6567>DAMIT SIE NACHWACHSEN</color>"
+      - "<color=#446890>RECOGE TODAS LAS FRUTAS</color>\n<color=#FF6567>PARA QUE VUELVAN A CRECER</color>"
+      - "<color=#446890>RACCOGLI TUTTI I FRUTTI</color>\n<color=#FF6567>PER FARLI RICRESCERE</color>"
+      - "<color=#446890>COLETE TODAS AS FRUTAS</color>\n<color=#FF6567>PARA ELAS CRESCEREM DE NOVO</color>"
+      - "<color=#446890>СОБЕРИ ВСЕ ФРУКТЫ,</color>\n<color=#FF6567>ЧТОБЫ ОНИ ВЫРОСЛИ СНОВА</color>"
+      - "<color=#446890>TÜM MEYVELERİ TOPLA</color>\n<color=#FF6567>YENİDEN BÜYÜSÜNLER</color>"
+    - key: prefab_tuto_message_be_careful
+      translations:
+      - "<color=#446890>BE CAREFUL NOT TO</color> <color=#FF6567>\nHIT YOURSELF</color>\n<color=#446890>WHEN THE SNAKE GETS LONG!</color> "
+      - "<color=#446890>FAIS ATTENTION DE</color> <color=#FF6567>\nNE PAS TE PERCUTER,</color>\n<color=#446890>QUAND LE SERPENT S'ALLONGE !</color> "
+      - "<color=#446890>気をつけよう</color> <color=#FF6567>\n自分にぶつからないように</color>\n<color=#446890>スネークが長くなったら!</color> "
+      - "<color=#446890>조심해요</color> <color=#FF6567>\n자기와 부딪치지 않게</color>\n<color=#446890>뱀이 길어지면!</color> "
+      - "<color=#446890>HATI-HATI</color> <color=#FF6567>\nJANGAN MENABRAK DIRI</color>\n<color=#446890>SAAT ULAR MEMANJANG!</color> "
+      - "<color=#446890>PASS AUF,</color> <color=#FF6567>\nDICH NICHT SELBST ZU TREFFEN,</color>\n<color=#446890>WENN DIE SCHLANGE LANG WIRD!</color> "
+      - "<color=#446890>TEN CUIDADO DE NO</color> <color=#FF6567>\nCHOCAR CONTIGO</color>\n<color=#446890>CUANDO LA SERPIENTE SE ALARGUE!</color> "
+      - "<color=#446890>ATTENZIONE A NON</color> <color=#FF6567>\nSCONTRARTI,</color>\n<color=#446890>QUANDO IL SERPENTE SI ALLUNGA!</color> "
+      - "<color=#446890>CUIDADO PARA NÃO</color> <color=#FF6567>\nSE BATER</color>\n<color=#446890>QUANDO A COBRA FICAR LONGA!</color> "
+      - "<color=#446890>ОСТОРОЖНО, НЕ</color> <color=#FF6567>\nВРЕЖЬСЯ В СЕБЯ,</color>\n<color=#446890>КОГДА ЗМЕЯ ВЫТЯНЕТСЯ!</color> "
+      - "<color=#446890>DİKKAT</color> <color=#FF6567>\nKENDİNE ÇARPMA</color>\n<color=#446890>YILAN UZADIĞINDA!</color> "
+    - key: prefab_crate_column_next
+      translations:
+      - Next
+      - Suivant
+      - 次へ
+      - 다음
+      - Lanjut
+      - Weiter
+      - Siguiente
+      - Avanti
+      - Próximo
+      - Далее
+      - İleri
+    - key: prefab_booster_panel_unlock_level
+      translations:
+      - lv. 10
+      - niv. 10
+      - Lv. 10
+      - 레벨 10
+      - lvl. 10
+      - Lvl. 10
+      - niv. 10
+      - liv. 10
+      - nív. 10
+      - ур. 10
+      - sev. 10
+    - key: prefab_booster_panel_free
+      translations:
+      - FREE
+      - GRATUIT
+      - 無料
+      - 무료
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRATIS
+      - GRÁTIS
+      - БЕСПЛАТНО
+      - ÜCRETSİZ
+    - key: prefab_booster_tutorial_shuffle
+      translations:
+      - Shuffle
+      - Mélange
+      - シャッフル
+      - 셔플
+      - Acakan
+      - Mix
+      - Mezcla
+      - Mescolata
+      - Mistura
+      - Перемешка
+      - Karıştır
+    - key: prefab_booster_tutorial_confirm_rearrange
+      translations:
+      - Confirm and Randomly rearranges
+      - Confirme et mélange au hasard
+      - 確定してランダムに並べ替え
+      - 확인하고 무작위로 섞기
+      - Konfirmasi dan acak ulang
+      - Bestätigen und zufällig neu anordnen
+      - Confirma y reorganiza al azar
+      - Conferma e rimescola a caso
+      - Confirme e reorganize aleatoriamente
+      - Подтверди и перемешай случайно
+      - Onayla ve rastgele karıştır
+    - key: prefab_booster_purchase_shuffle
+      translations:
+      - Shuffle
+      - Mélange
+      - シャッフル
+      - 셔플
+      - Acakan
+      - Mix
+      - Mezcla
+      - Mescolata
+      - Mistura
+      - Перемешка
+      - Karıştır
+    - key: prefab_booster_purchase_rearrange_all
+      translations:
+      - Randomly rearranges all fruits
+      - Mélange tous les fruits au hasard
+      - フルーツをランダムに並べ替え
+      - 과일을 전부 무작위로 섞어
+      - Acak semua buah
+      - Mischt alle Früchte zufällig
+      - Reorganiza todas las frutas al azar
+      - Rimescola tutti i frutti a caso
+      - Reorganiza todas as frutas aleatoriamente
+      - Перемешает все фрукты случайно
+      - Tüm meyveleri rastgele karıştırır
+    - key: prefab_shop_title
+      translations:
+      - Shop
+      - Boutique
+      - ショップ
+      - 상점
+      - Toko
+      - Shop
+      - Tienda
+      - Negozio
+      - Loja
+      - Магазин
+      - Mağaza
+    - key: prefab_shop_section_special_offers
+      translations:
+      - Special offers
+      - Offres spéciales
+      - 特別オファー
+      - 특별 혜택
+      - Penawaran spesial
+      - Sonderangebote
+      - Ofertas especiales
+      - Offerte speciali
+      - Ofertas especiais
+      - Спецпредложения
+      - Özel teklifler
+    - key: prefab_shop_no_ads
+      translations:
+      - No Ads
+      - Sans pubs
+      - 広告なし
+      - 광고 없음
+      - Tanpa iklan
+      - Keine Werbung
+      - Sin anuncios
+      - Niente pubblicità
+      - Sem anúncios
+      - Без рекламы
+      - Reklamsız
+    - key: prefab_shop_bundle_starter_pack
+      translations:
+      - Starter Pack
+      - Pack Starter
+      - スターターパック
+      - 스타터 팩
+      - Paket Starter
+      - Starter-Pack
+      - Pack Inicial
+      - Pacchetto Starter
+      - Pacote Inicial
+      - Стартовый набор
+      - Başlangıç Paketi
+    - key: prefab_shop_bundle_no_ads_pack
+      translations:
+      - No Ads Pack
+      - Pack Sans Pub
+      - 広告なしパック
+      - 광고 없는 팩
+      - Paket Tanpa Iklan
+      - Werbefrei-Pack
+      - Pack Sin Anuncios
+      - Pacchetto Senza Pubblicità
+      - Pacote Sem Anúncios
+      - Набор без рекламы
+      - Reklamsız Paket
+    - key: prefab_shop_bundle_small_pack
+      translations:
+      - Small Pack
+      - Petit Pack
+      - スモールパック
+      - 스몰 팩
+      - Paket Kecil
+      - Kleines Pack
+      - Pack Pequeño
+      - Pacchetto Piccolo
+      - Pacote Pequeno
+      - Маленький набор
+      - Küçük Paket
+    - key: prefab_shop_bundle_medium_pack
+      translations:
+      - Medium Pack
+      - Pack Moyen
+      - ミディアムパック
+      - 미디엄 팩
+      - Paket Sedang
+      - Mittleres Pack
+      - Pack Mediano
+      - Pacchetto Medio
+      - Pacote Médio
+      - Средний набор
+      - Orta Paket
+    - key: prefab_shop_bundle_large_pack
+      translations:
+      - Large Pack
+      - Grand Pack
+      - ラージパック
+      - 라지 팩
+      - Paket Besar
+      - Großes Pack
+      - Pack Grande
+      - Pacchetto Grande
+      - Pacote Grande
+      - Большой набор
+      - Büyük Paket
+    - key: prefab_shop_bundle_special_offer
+      translations:
+      - Special offer
+      - Offre spéciale
+      - 特別オファー
+      - 특별 혜택
+      - Penawaran spesial
+      - Spezialangebot
+      - Oferta especial
+      - Offerta speciale
+      - Oferta especial
+      - Спецпредложение
+      - Özel teklif
+    - key: prefab_shop_bundle_extra_large
+      translations:
+      - XL Pack
+      - Pack XL
+      - XLパック
+      - XL 팩
+      - Paket XL
+      - XL-Pack
+      - Pack XL
+      - Pacchetto XL
+      - Pacote XL
+      - XL-набор
+      - XL Paket
+    - key: prefab_shop_bundle_xxl_pack
+      translations:
+      - XXL Pack
+      - Pack XXL
+      - XXLパック
+      - XXL 팩
+      - Paket XXL
+      - XXL-Pack
+      - Pack XXL
+      - Pacchetto XXL
+      - Pacote XXL
+      - XXL-набор
+      - XXL Paket
+    - key: prefab_shop_label_free_play_on
+      translations:
+      - Free Play On
+      - Jeu libre activé
+      - フリープレイ オン
+      - 자유 플레이 켬
+      - Main bebas aktif
+      - Freies Spiel ein
+      - Juego libre activado
+      - Gioco libero attivo
+      - Jogo livre ativado
+      - Бесплатный рестарт
+      - Ücretsiz Devam Et
+    - key: prefab_shop_bundle_best_value
+      translations:
+      - Best Value
+      - Meilleure offre
+      - お得
+      - 최고가성비
+      - Penawaran terbaik
+      - Bestes Angebot
+      - Mejor oferta
+      - Migliore offerta
+      - Melhor oferta
+      - Лучшая цена
+      - En iyi fiyat
+    - key: prefab_shop_restore_purchases
+      translations:
+      - RESTORE PURCHASES
+      - RESTAURER LES ACHATS
+      - 購入を復元
+      - 구매 복원
+      - PULIHKAN PEMBELIAN
+      - KÄUFE WIEDERHERSTELLEN
+      - RESTAURAR COMPRAS
+      - RIPRISTINA ACQUISTI
+      - RESTAURAR COMPRAS
+      - ВОССТАНОВИТЬ ПОКУПКИ
+      - SATIN ALMALARI GERİ YÜKLE
+    - key: prefab_shop_purchases_successful
+      translations:
+      - "PURCHASE SUCCESSFULLY\nCOMPLETED!"
+      - "ACHAT EFFECTUÉ\nAVEC SUCCÈS !"
+      - "購入が\n完了しました!"
+      - "구매가\n완료되었어요!"
+      - "PEMBELIAN BERHASIL\nDISELESAIKAN!"
+      - "KAUF ERFOLGREICH\nABGESCHLOSSEN!"
+      - "COMPRA REALIZADA\nCON ÉXITO!"
+      - "ACQUISTO COMPLETATO\nCON SUCCESSO!"
+      - "COMPRA REALIZADA\nCOM SUCESSO!"
+      - "ПОКУПКА УСПЕШНО\nЗАВЕРШЕНА!"
+      - "SATIN ALMA BAŞARIYLA\nTAMAMLANDI!"
+    - key: prefab_victory_screen_victory
+      translations:
+      - VICTORY!
+      - VICTOIRE !
+      - 勝利!
+      - 승리!
+      - MENANG!
+      - SIEG!
+      - VICTORIA!
+      - VITTORIA!
+      - VITÓRIA!
+      - ПОБЕДА!
+      - ZAFER!
+    - key: prefab_victory_bar_new_item
+      translations:
+      - NEW ITEM!
+      - NOUVEL OBJET !
+      - 新アイテム!
+      - 새 아이템
+      - ITEM BARU!
+      - NEUES ITEM!
+      - NUEVO OBJETO!
+      - NUOVO OGGETTO!
+      - NOVO ITEM!
+      - НОВЫЙ ПРЕДМЕТ!
+      - YENİ NESNE!
+    - key: prefab_victory_bar_completed
+      translations:
+      - Completed
+      - Terminé
+      - 完了
+      - 완료
+      - Selesai
+      - Erledigt
+      - Completado
+      - Completato
+      - Concluído
+      - Готово
+      - Tamamlandı
+    - key: prefab_winstreak_label
+      translations:
+      - WINSTREAK
+      - SÉRIE DE VICTOIRES
+      - 連勝
+      - 연승
+      - RENTETAN MENANG
+      - SIEGESSERIE
+      - RACHA DE VICTORIAS
+      - SERIE DI VITTORIE
+      - SEQUÊNCIA DE VITÓRIAS
+      - СЕРИЯ ПОБЕД
+      - GALİBİYET SERİSİ
+    - key: prefab_settings_toggle_on
+      translations:
+      - ON
+      - ACTIVÉ
+      - オン
+      - 켬
+      - AKTIF
+      - EIN
+      - ACTIVADO
+      - ATTIVO
+      - ATIVADO
+      - ВКЛ
+      - AÇIK
+    - key: prefab_settings_toggle_off
+      translations:
+      - OFF
+      - DÉSACTIVÉ
+      - オフ
+      - 끔
+      - NONAKTIF
+      - AUS
+      - DESACTIVADO
+      - DISATTIVO
+      - DESATIVADO
+      - ВЫКЛ
+      - KAPALI
+    - key: prefab_settings_sound_label
+      translations:
+      - SOUND
+      - SON
+      - サウンド
+      - 사운드
+      - SUARA
+      - TON
+      - SONIDO
+      - AUDIO
+      - SOM
+      - ЗВУК
+      - SES
+    - key: prefab_reward_popup_tap_to_claim
+      translations:
+      - TAP TO CLAIM
+      - TOUCHE POUR RÉCLAMER
+      - タップして受け取る
+      - 눌러서 받기
+      - KETUK UNTUK KLAIM
+      - ZUM ABHOLEN TIPPEN
+      - PULSA PARA RECLAMAR
+      - TOCCA PER RISCATTARE
+      - TOQUE PARA RESGATAR
+      - НАЖМИ И ЗАБЕРИ
+      - ALMAK İÇİN DOKUN
+    - key: prefab_chest_tap_to_open
+      translations:
+      - tap to open!
+      - touche pour ouvrir !
+      - タップで開く!
+      - 눌러서 열기!
+      - ketuk untuk buka!
+      - zum Öffnen tippen!
+      - pulsa para abrir!
+      - tocca per aprire!
+      - toque para abrir!
+      - нажми, чтобы открыть!
+      - açmak için dokun!
+    - key: prefab_common_info_popup_message
+      translations:
+      - Message
+      - Message
+      - メッセージ
+      - 메시지
+      - Pesan
+      - Nachricht
+      - Mensaje
+      - Messaggio
+      - Mensagem
+      - Сообщение
+      - Mesaj
+    - key: prefab_common_info_popup_oh_no
+      translations:
+      - Oh No!
+      - Oh non !
+      - うわっ!
+      - 이런!
+      - Aduh!
+      - Oh nein!
+      - Ay, no!
+      - Oh no!
+      - Ah, não!
+      - О нет!
+      - Eyvah!
+    - key: prefab_lose_hold_board
+      translations:
+      - Hold To see The Board
+      - Maintiens pour voir le plateau
+      - 長押しでボードを見る
+      - 꾹 눌러서 보드 보기
+      - Tahan untuk lihat papan
+      - Halten, um das Brett zu sehen
+      - Mantén pulsado para ver el tablero
+      - Tieni premuto per vedere il tabellone
+      - Segure para ver o tabuleiro
+      - Удерживай, чтобы увидеть поле
+      - Tahtayı görmek için basılı tut
+    - key: prefab_victory_popup_unlocked
+      translations:
+      - Unlocked!
+      - Débloqué !
+      - 解放!
+      - 잠금 해제!
+      - Terbuka!
+      - Freigeschaltet!
+      - Desbloqueado!
+      - Sbloccato!
+      - Desbloqueado!
+      - Открыто!
+      - Açıldı!
+    - key: prefab_victory_popup_play_next
+      translations:
+      - Play next level to try it!
+      - Joue le niveau suivant pour l'essayer !
+      - 次のレベルで試してみよう!
+      - 다음 레벨에서 써봐!
+      - Main level berikutnya untuk coba!
+      - Spiel das nächste Level, um es auszuprobieren!
+      - Juega el siguiente nivel para probarlo!
+      - Gioca il prossimo livello per provarlo!
+      - Jogue o próximo nível para experimentar!
+      - Сыграй следующий уровень, чтобы попробовать!
+      - Denemek için sonraki seviyeyi oyna!
+    - key: prefab_victory_popup_laser_trap
+      translations:
+      - LASER TRAP
+      - LASER PIÈGE
+      - トラップレーザー
+      - 함정 레이저
+      - JEBAKAN LASER
+      - FALLENLASER
+      - LÁSER TRAMPA
+      - LASER TRAPPOLA
+      - LASER ARMADILHA
+      - ЛАЗЕР-ЛОВУШКА
+      - TUZAK LAZER
+    - key: prefab_victory_popup_winstreak
+      translations:
+      - WinStreak
+      - Série de victoires
+      - 連勝
+      - 연승
+      - Rentetan menang
+      - Siegesserie
+      - Racha de victorias
+      - Serie di vittorie
+      - Sequência de vitórias
+      - Серия побед
+      - Galibiyet serisi
+    - key: prefab_victory_popup_privacy
+      translations:
+      - PRIVACY
+      - CONFIDENTIALITÉ
+      - プライバシー
+      - 개인정보
+      - PRIVASI
+      - DATENSCHUTZ
+      - PRIVACIDAD
+      - PRIVACY
+      - PRIVACIDADE
+      - КОНФИДЕНЦИАЛЬНОСТЬ
+      - GİZLİLİK
+    - key: prefab_victory_popup_stargazing
+      translations:
+      - STARGAZING
+      - OBSERVATION DES ÉTOILES
+      - 星空観察
+      - 별 보기
+      - LIHAT BINTANG
+      - STERNGUCKEN
+      - OBSERVAR ESTRELLAS
+      - OSSERVAZIONE STELLE
+      - OLHAR AS ESTRELAS
+      - НАБЛЮДЕНИЕ ЗА ЗВЁЗДАМИ
+      - YILDIZ İZLEME
+    - key: prefab_victory_popup_night
+      translations:
+      - NIGHT
+      - NUIT
+      - 夜
+      - 밤
+      - MALAM
+      - NACHT
+      - NOCHE
+      - NOTTE
+      - NOITE
+      - НОЧЬ
+      - GECE
+    - key: prefab_settings_popup_on
+      translations:
+      - ON
+      - ACTIVÉ
+      - オン
+      - 켬
+      - AKTIF
+      - EIN
+      - ACTIVADO
+      - ATTIVO
+      - ATIVADO
+      - ВКЛ
+      - AÇIK
+    - key: prefab_settings_popup_off
+      translations:
+      - OFF
+      - DÉSACTIVÉ
+      - オフ
+      - 끔
+      - NONAKTIF
+      - AUS
+      - DESACTIVADO
+      - DISATTIVO
+      - DESATIVADO
+      - ВЫКЛ
+      - KAPALI
+    - key: prefab_settings_popup_sound
+      translations:
+      - Sound
+      - Son
+      - サウンド
+      - 사운드
+      - Suara
+      - Ton
+      - Sonido
+      - Audio
+      - Som
+      - Звук
+      - Ses
+    - key: prefab_settings_popup_pictogram_assist
+      translations:
+      - Pictogram Assist
+      - Aide pictogrammes
+      - ピクトグラム表示
+      - 픽토그램 도움말
+      - Bantuan piktogram
+      - Piktogramm-Hilfe
+      - Asistencia pictográfica
+      - Aiuto pittogrammi
+      - Ajuda pictograma
+      - Подсказки-пикт.
+      - Piktogram desteği
+    - key: prefab_settings_popup_enter_code
+      translations:
+      - Enter Code...
+      - Entre le code...
+      - コード入力...
+      - 코드 입력...
+      - Masukkan kode...
+      - Code eingeben...
+      - Introduce el código...
+      - Inserisci codice...
+      - Digite o código...
+      - Введи код...
+      - Kod gir...
+    - key: prefab_settings_popup_haptics
+      translations:
+      - Haptics
+      - Vibration
+      - バイブ
+      - 진동
+      - Getaran
+      - Vibration
+      - Vibración
+      - Vibrazione
+      - Vibração
+      - Вибрация
+      - Titreşim
+    - key: prefab_settings_popup_music
+      translations:
+      - Music
+      - Musique
+      - 音楽
+      - 음악
+      - Musik
+      - Musik
+      - Música
+      - Musica
+      - Música
+      - Музыка
+      - Müzik
+    - key: prefab_settings_popup_title
+      translations:
+      - SETTINGS
+      - PARAMÈTRES
+      - 設定
+      - 설정
+      - PENGATURAN
+      - EINSTELLUNGEN
+      - AJUSTES
+      - IMPOSTAZIONI
+      - AJUSTES
+      - НАСТРОЙКИ
+      - AYARLAR
+    - key: prefab_settings_popup_voucher_hint
+      translations:
+      - Please enter your 12 digit voucher code
+      - Entre ton code à 12 chiffres
+      - 12桁のコードを入力してね
+      - 12자리 코드 입력해
+      - Masukkan kode 12 digit
+      - Gib deinen 12-stelligen Code ein
+      - Introduce tu código de 12 dígitos
+      - Inserisci il codice da 12 cifre
+      - Digite seu código de 12 dígitos
+      - Введи 12-значный код
+      - 12 haneli kodunu gir
+    - key: prefab_settings_popup_help_support
+      translations:
+      - Help & support
+      - Aide & support
+      - ヘルプとサポート
+      - 도움말 & 지원
+      - Bantuan & dukungan
+      - Hilfe & Support
+      - Ayuda y soporte
+      - Aiuto e supporto
+      - Ajuda e suporte
+      - Помощь и поддержка
+      - Yardım & destek
+    - key: prefab_settings_popup_terms_privacy
+      translations:
+      - TERMS & PRIVACY
+      - CGU & CONFIDENTIALITÉ
+      - 利用規約とプライバシー
+      - 약관 & 개인정보
+      - SYARAT & PRIVASI
+      - AGB & DATENSCHUTZ
+      - TÉRMINOS Y PRIVACIDAD
+      - TERMINI E PRIVACY
+      - TERMOS E PRIVACIDADE
+      - УСЛОВИЯ И ПРИВАТНОСТЬ
+      - ŞARTLAR & GİZLİLİK
+    - key: prefab_settings_popup_save_progress
+      translations:
+      - Save Progress
+      - Sauvegarder
+      - 進行状況を保存
+      - 진행상황 저장
+      - Simpan kemajuan
+      - Fortschritt speichern
+      - Guardar progreso
+      - Salva progresso
+      - Salvar progresso
+      - Сохранить прогресс
+      - İlerlemeyi kaydet
+    - key: prefab_settings_popup_redeem
+      translations:
+      - REDEEM
+      - UTILISER
+      - 使う
+      - 사용
+      - TUKARKAN
+      - EINLÖSEN
+      - CANJEAR
+      - RISCATTA
+      - RESGATAR
+      - ИСПОЛЬЗОВАТЬ
+      - KULLAN
+    - key: prefab_settings_popup_colorblind_mode
+      translations:
+      - Colorblind Mode
+      - Mode daltonien
+      - 色覚モード
+      - 색맹 모드
+      - Mode buta warna
+      - Farbenblind-Modus
+      - Modo daltónico
+      - Modalità daltonici
+      - Modo daltônico
+      - Режим дальтоника
+      - Renk körü modu
+    - key: prefab_settings_popup_back_to_home
+      translations:
+      - Back to home
+      - Retour à l'accueil
+      - ホームに戻る
+      - 홈으로 돌아가기
+      - Kembali ke beranda
+      - Zurück zum Start
+      - Volver al inicio
+      - Torna alla home
+      - Voltar ao início
+      - На главную
+      - Ana sayfaya dön
+    - key: prefab_settings_popup_alerts
+      translations:
+      - Alerts
+      - Alertes
+      - 通知
+      - 알림
+      - Notifikasi
+      - Benachrichtigungen
+      - Alertas
+      - Avvisi
+      - Alertas
+      - Уведомления
+      - Bildirimler
+    - key: prefab_settings_popup_language
+      translations:
+      - English
+      - Français
+      - 日本語
+      - 한국어
+      - Bahasa Indonesia
+      - Deutsch
+      - Español
+      - Italiano
+      - Português
+      - Русский
+      - Türkçe
+    - key: prefab_ldf_tutorial_popup_feature_unlocked
+      translations:
+      - New feature unlocked!
+      - Nouvelle fonction débloquée !
+      - 新機能が解放!
+      - 새 기능 잠금 해제!
+      - Fitur baru terbuka!
+      - Neue Funktion freigeschaltet!
+      - Nueva función desbloqueada!
+      - Nuova funzione sbloccata!
+      - Nova função desbloqueada!
+      - Открыта новая функция!
+      - Yeni özellik açıldı!
+    - key: prefab_ldf_tutorial_popup_item_unlocked
+      translations:
+      - New item unlocked!
+      - Nouvel objet débloqué !
+      - 新しいアイテムがアンロックされた！
+      - 새 아이템을 얻었어요!
+      - Item baru terbuka!
+      - Neues Objekt freigeschaltet!
+      - ¡Nuevo objeto desbloqueado!
+      - Nuovo oggetto sbloccato!
+      - Novo item desbloqueado!
+      - Новый предмет разблокирован!
+      - Yeni eşya açıldı!
+    - key: prefab_ldf_tutorial_popup_tap_continue
+      translations:
+      - Tap anywhere to continue!
+      - Touche n'importe où pour continuer !
+      - どこかをタップして続行!
+      - 아무 데나 눌러서 계속!
+      - Ketuk di mana saja untuk lanjut!
+      - Irgendwo tippen, um fortzufahren!
+      - Toca donde sea para continuar!
+      - Tocca ovunque per continuare!
+      - Toque em qualquer lugar para continuar!
+      - Нажми где угодно, чтобы продолжить!
+      - Devam için herhangi bir yere dokun!
+    - key: prefab_booster_tutorial_popup_feature_unlocked
+      translations:
+      - New feature unlocked!
+      - Nouvelle fonction débloquée !
+      - 新機能が解放!
+      - 새 기능 잠금 해제!
+      - Fitur baru terbuka!
+      - Neue Funktion freigeschaltet!
+      - Nueva función desbloqueada!
+      - Nuova funzione sbloccata!
+      - Nova função desbloqueada!
+      - Открыта новая функция!
+      - Yeni özellik açıldı!
+    - key: prefab_booster_tutorial_popup_tap_continue
+      translations:
+      - Tap anywhere to continue!
+      - Touche n'importe où pour continuer !
+      - どこかをタップして続行!
+      - 아무 데나 눌러서 계속!
+      - Ketuk di mana saja untuk lanjut!
+      - Irgendwo tippen, um fortzufahren!
+      - Toca donde sea para continuar!
+      - Tocca ovunque per continuare!
+      - Toque em qualquer lugar para continuar!
+      - Нажми где угодно, чтобы продолжить!
+      - Devam için herhangi bir yere dokun!
+    - key: prefab_ads_refill_get_1_life
+      translations:
+      - Get 1
+      - Obtenir 1
+      - 1つゲット
+      - 1개 받기
+      - Ambil 1
+      - 1 holen
+      - Conseguir 1
+      - Ottieni 1
+      - Pegar 1
+      - Получить 1
+      - 1 al
+    - key: prefab_ads_refill_are_you_sure
+      translations:
+      - ARE YOU SURE?
+      - TU ES SÛR ?
+      - 本当にいい?
+      - 정말이야?
+      - YAKIN?
+      - BIST DU SICHER?
+      - SEGURO?
+      - SEI SICURO?
+      - TEM CERTEZA?
+      - ТОЧНО?
+      - EMİN MİSİN?
+    - key: prefab_ads_refill_time_to_next_life
+      translations:
+      - 'Time to next life:'
+      - 'Vie suivante dans :'
+      - '次のライフまで:'
+      - '다음 생명까지:'
+      - 'Nyawa berikut:'
+      - 'Nächstes Leben in:'
+      - 'Próxima vida en:'
+      - 'Prossima vita in:'
+      - 'Próxima vida em:'
+      - 'До следующей жизни:'
+      - 'Sonraki cana:'
+    - key: prefab_ads_refill_refill_all
+      translations:
+      - Refill all
+      - Tout recharger
+      - すべて補充
+      - 전부 충전
+      - Isi semua
+      - Alle auffüllen
+      - Recargar todo
+      - Ricarica tutto
+      - Recarregar tudo
+      - Пополнить все
+      - Hepsini doldur
+    - key: prefab_confirm_quit_continue
+      translations:
+      - CONTINUE
+      - CONTINUER
+      - つづける
+      - 계속
+      - LANJUT
+      - WEITER
+      - CONTINUAR
+      - CONTINUA
+      - CONTINUAR
+      - ПРОДОЛЖИТЬ
+      - DEVAM
+    - key: prefab_confirm_quit_lose_life
+      translations:
+      - You will lose 1 life!
+      - Tu vas perdre 1 vie !
+      - ライフを1つ失うよ!
+      - 생명 1개 잃어!
+      - Kamu kehilangan 1 nyawa!
+      - Du verlierst 1 Leben!
+      - Perderás 1 vida!
+      - Perderai 1 vita!
+      - Você vai perder 1 vida!
+      - Потеряешь 1 жизнь!
+      - 1 can kaybedeceksin!
+    - key: prefab_confirm_quit_are_you_sure
+      translations:
+      - Are you Sure?
+      - Tu es sûr ?
+      - 本当にいい?
+      - 정말이야?
+      - Yakin?
+      - Bist du sicher?
+      - Seguro?
+      - Sei sicuro?
+      - Tem certeza?
+      - Точно?
+      - Emin misin?
+    - key: prefab_confirm_quit_time_to_next_life
+      translations:
+      - 'Time to next life:'
+      - 'Vie suivante dans :'
+      - '次のライフまで:'
+      - '다음 생명까지:'
+      - 'Nyawa berikut:'
+      - 'Nächstes Leben in:'
+      - 'Próxima vida en:'
+      - 'Prossima vita in:'
+      - 'Próxima vida em:'
+      - 'До следующей жизни:'
+      - 'Sonraki cana:'
+    - key: prefab_ingredient_unlock_ok
+      translations:
+      - OK
+      - OK
+      - OK
+      - 확인
+      - OK
+      - OK
+      - OK
+      - OK
+      - OK
+      - ОК
+      - TAMAM
+    - key: prefab_ingredient_unlock_placeholder
+      translations:
+      - BRIDGE
+      - PONT
+      - ブリッジ
+      - 다리
+      - JEMBATAN
+      - BRÜCKE
+      - PUENTE
+      - PONTE
+      - PONTE
+      - МОСТ
+      - KÖPRÜ
+    - key: ldf_bridge_name
+      translations:
+      - Bridge
+      - Pont
+      - ブリッジ
+      - 다리
+      - Jembatan
+      - Brücke
+      - Puente
+      - Ponte
+      - Ponte
+      - Мост
+      - Köprü
+    - key: ldf_gate_name
+      translations:
+      - Gate
+      - Portail
+      - ゲート
+      - 게이트
+      - Gerbang
+      - Tor
+      - Puerta
+      - Cancello
+      - Portão
+      - Ворота
+      - Kapı
+    - key: ldf_arrows_name
+      translations:
+      - Arrows
+      - Flèches
+      - 矢印
+      - 화살표
+      - Panah
+      - Pfeile
+      - Flechas
+      - Frecce
+      - Setas
+      - Стрелки
+      - Oklar
+    - key: ldf_tunnel_name
+      translations:
+      - Tunnel
+      - Tunnel
+      - トンネル
+      - 터널
+      - Terowongan
+      - Tunnel
+      - Túnel
+      - Tunnel
+      - Túnel
+      - Тоннель
+      - Tünel
+    - key: ldf_blocker_name
+      translations:
+      - Wall
+      - Mur
+      - 壁
+      - 벽
+      - Tembok
+      - Mauer
+      - Muro
+      - Muro
+      - Muro
+      - Стена
+      - Duvar
+    - key: ldf_rising_name
+      translations:
+      - Bollard
+      - Borne
+      - ボラード
+      - 볼라드
+      - Tonggak
+      - Poller
+      - Bolardo
+      - Dissuasore
+      - Pilar
+      - Столбик
+      - Direk
+    - key: ldf_swtube_name
+      translations:
+      - Switch Tube
+      - Tube interrupteur
+      - スイッチチューブ
+      - 스위치 튜브
+      - Pipa sakelar
+      - Schalterrohr
+      - Tubo conmutador
+      - Tubo a interruttore
+      - Tubo de interruptor
+      - Тоннель-переключ.
+      - Anahtar tüp
+    - key: ldf_swbridge_name
+      translations:
+      - Switch Bridge
+      - Pont interrupteur
+      - スイッチブリッジ
+      - 스위치 다리
+      - Jembatan sakelar
+      - Schalterbrücke
+      - Puente conmutador
+      - Ponte a interruttore
+      - Ponte de interruptor
+      - Мост-переключ.
+      - Anahtar köprü
+    - key: ldf_bridge_desc
+      translations:
+      - '<color=#8929F6>Cross the road</color> without hitting yourself!'
+      - '<color=#8929F6>Glisse sur la route</color> sans te heurter !'
+      - '<color=#8929F6>道路を滑り抜けろ</color>、ぶつからずに!'
+      - '<color=#8929F6>도로를 미끄러져 건너</color>, 부딪히지 마!'
+      - '<color=#8929F6>Meluncur di jalan</color>, jangan tabrak diri sendiri!'
+      - '<color=#8929F6>Gleite über die Straße</color>, ohne dich selbst zu treffen!'
+      - '<color=#8929F6>Deslízate por la calle</color> sin chocar contigo!'
+      - '<color=#8929F6>Striscia sulla strada</color> senza colpirti!'
+      - '<color=#8929F6>Deslize pela rua</color> sem se machucar!'
+      - '<color=#8929F6>Переползи дорогу</color>, не задев себя!'
+      - '<color=#8929F6>Yoldan süzülerek geç</color>, kendine çarpmadan!'
+    - key: ldf_gate_desc
+      translations:
+      - You can pass them only through <color=#8929F6>one way! </color>
+      - Tu ne peux les traverser que dans <color=#8929F6>un seul sens !</color>
+      - 通れるのは<color=#8929F6>一方通行のみ!</color>
+      - 통과할 수 있는 건 <color=#8929F6>한 방향뿐이에요!</color>
+      - Kamu hanya bisa melewatinya <color=#8929F6>satu arah!</color>
+      - Du kannst sie nur in <color=#8929F6>eine Richtung passieren!</color>
+      - Solo puedes pasar en <color=#8929F6>una dirección!</color>
+      - Puoi attraversarli solo in <color=#8929F6>un senso!</color>
+      - Você só pode passar em <color=#8929F6>uma direção!</color>
+      - Пройти можно только в <color=#8929F6>одну сторону!</color>
+      - Sadece <color=#8929F6>tek yönlü</color> geçebilirsin!
+    - key: ldf_arrows_desc
+      translations:
+      - Makes the road one way, <color=#8929F6>changes the direction</color> when you pass!
+      - Rend la route à sens unique, <color=#8929F6>change la direction</color> quand tu passes !
+      - 一方通行にして、通ると<color=#8929F6>向きが変わるよ!</color>
+      - 길을 일방통행으로 만들고, 지나가면 <color=#8929F6>방향이 바뀌어요!</color>
+      - Membuat jalur jadi satu arah, <color=#8929F6>mengubah arahnya</color> saat kamu lewat!
+      - Macht den Weg zur Einbahnstraße, <color=#8929F6>ändert die Richtung</color>, wenn du passierst!
+      - Convierte la ruta en un solo sentido, <color=#8929F6>cambia el sentido</color> al pasar!
+      - Rende la strada a senso unico, <color=#8929F6>cambia direzione</color> quando passi!
+      - Deixa o caminho em uma direção, <color=#8929F6>muda a direção</color> ao passar!
+      - Делает дорогу односторонней, <color=#8929F6>меняет направление</color>, когда проходишь!
+      - Yolu tek yönlü yapar, geçince <color=#8929F6>yön değiştirir!</color>
+    - key: ldf_tunnel_desc
+      translations:
+      - '<color=#8929F6>Dive</color> in one side, <color=#8929F6>leave</color> from the other!'
+      - '<color=#8929F6>Plonge</color> d''un côté, <color=#8929F6>ressors</color> de l''autre !'
+      - 片側から<color=#8929F6>飛び込んで</color>、もう片側から<color=#8929F6>出よう!</color>
+      - 한쪽으로 <color=#8929F6>들어가서</color> 반대쪽으로 <color=#8929F6>나와요!</color>
+      - '<color=#8929F6>Masuk</color> dari satu sisi, <color=#8929F6>keluar</color> dari sisi lain!'
+      - '<color=#8929F6>Tauche</color> auf einer Seite ein, <color=#8929F6>komm</color> auf der anderen heraus!'
+      - '<color=#8929F6>Entra</color> por un lado, <color=#8929F6>sal</color> por el otro!'
+      - '<color=#8929F6>Tuffati</color> da un lato, <color=#8929F6>esci</color> dall''altro!'
+      - '<color=#8929F6>Mergulhe</color> de um lado, <color=#8929F6>saia</color> do outro!'
+      - '<color=#8929F6>Нырни</color> с одной стороны, <color=#8929F6>выйди</color> с другой!'
+      - Bir taraftan <color=#8929F6>dal</color>, diğer taraftan <color=#8929F6>çık!</color>
+    - key: ldf_blocker_desc
+      translations:
+      - '<color=#8929F6>Complete orders</color> and destroy the blocking walls!'
+      - '<color=#8929F6>Termine les commandes</color> et détruis les murs qui bloquent !'
+      - '<color=#8929F6>注文をクリアして</color>ブロックする壁を壊そう!'
+      - '<color=#8929F6>주문을 완료하고</color> 막고 있는 벽을 부숴요!'
+      - '<color=#8929F6>Selesaikan pesanan</color> dan hancurkan dinding penghalang!'
+      - '<color=#8929F6>Schließe Aufträge ab</color> und zerstöre die blockierenden Wände!'
+      - '<color=#8929F6>Completa los pedidos</color> y destruye los muros que bloquean!'
+      - '<color=#8929F6>Completa gli ordini</color> e distruggi i muri che bloccano!'
+      - '<color=#8929F6>Complete os pedidos</color> e destrua as paredes que bloqueiam!'
+      - '<color=#8929F6>Выполняй заказы</color> и разрушай блокирующие стены!'
+      - '<color=#8929F6>Siparişleri tamamla</color> ve engelleyen duvarları yık!'
+    - key: ldf_rising_desc
+      translations:
+      - '<color=#8929F6>Rises</color> when you pass through, <color=#8929F6>opens</color> back up when you make deliveries!'
+      - '<color=#8929F6>Monte</color> quand tu passes, <color=#8929F6>s''ouvre</color> à nouveau quand tu livres !'
+      - 通ると<color=#8929F6>上がって</color>、配達すると<color=#8929F6>また開く</color>!
+      - 지나가면 <color=#8929F6>올라가고</color>, 배달하면 <color=#8929F6>다시 열려요!</color>
+      - '<color=#8929F6>Naik</color> saat kamu lewat, <color=#8929F6>terbuka</color> lagi saat kamu mengantar!'
+      - '<color=#8929F6>Steigt</color>, wenn du passierst, <color=#8929F6>öffnet sich</color> wieder, wenn du lieferst!'
+      - '<color=#8929F6>Sube</color> al pasar, <color=#8929F6>se abre</color> de nuevo al entregar!'
+      - '<color=#8929F6>Si alza</color> quando passi, <color=#8929F6>si riapre</color> quando consegni!'
+      - '<color=#8929F6>Sobe</color> quando você passa, <color=#8929F6>abre</color> de novo ao entregar!'
+      - '<color=#8929F6>Поднимается</color>, когда проходишь, <color=#8929F6>опускается</color>, когда доставляешь!'
+      - Geçtiğinde <color=#8929F6>yükselir</color>, teslim ederken <color=#8929F6>tekrar açılır!</color>
+    - key: ldf_swtube_desc
+      translations:
+      - Use the crosswalk to hit the switch and toggle the tubes!
+      - Utilise le passage piéton pour activer l'interrupteur et basculer les tubes !
+      - 横断歩道でスイッチを押してチューブを切り替えよう!
+      - 횡단보도로 스위치를 눌러서 튜브를 바꿔!
+      - Pakai zebra cross untuk pencet sakelar dan ubah pipa!
+      - Nutze den Zebrastreifen, um den Schalter zu treffen und die Rohre umzustellen!
+      - Usa el paso de peatones para pulsar el interruptor y cambiar los tubos!
+      - Usa le strisce per colpire l'interruttore e cambiare i tubi!
+      - Use a faixa para apertar o interruptor e trocar os tubos!
+      - Используй переход, чтобы нажать переключатель и сменить тоннели!
+      - Geçidi kullanarak anahtara bas ve tüpleri değiştir!
+    - key: ldf_swbridge_desc
+      translations:
+      - Use the crosswalk to hit the switch and toggle the bridges!
+      - Utilise le passage piéton pour activer l'interrupteur et basculer les ponts !
+      - 横断歩道でスイッチを押してブリッジを切り替えよう!
+      - 횡단보도로 스위치를 눌러서 다리를 바꿔!
+      - Pakai zebra cross untuk pencet sakelar dan ubah jembatan!
+      - Nutze den Zebrastreifen, um den Schalter zu treffen und die Brücken umzustellen!
+      - Usa el paso de peatones para pulsar el interruptor y cambiar los puentes!
+      - Usa le strisce per colpire l'interruttore e cambiare i ponti!
+      - Use a faixa para apertar o interruptor e trocar as pontes!
+      - Используй переход, чтобы нажать переключатель и сменить мосты!
+      - Geçidi kullanarak anahtara bas ve köprüleri değiştir!
+    - key: booster_shuffle_name
+      translations:
+      - Shuffle
+      - Mélange
+      - シャッフル
+      - 셔플
+      - Acakan
+      - Mix
+      - Mezcla
+      - Mescolata
+      - Mistura
+      - Перемешка
+      - Karışım
+    - key: booster_shovel_name
+      translations:
+      - Shovel
+      - Pelle
+      - シャベル
+      - 삽
+      - Sekop
+      - Schaufel
+      - Pala
+      - Pala
+      - Pá
+      - Лопата
+      - Kürek
+    - key: booster_boomerang_name
+      translations:
+      - Boomerang
+      - Boomerang
+      - ブーメラン
+      - 부메랑
+      - Bumerang
+      - Bumerang
+      - Bumerán
+      - Boomerang
+      - Bumerangue
+      - Бумеранг
+      - Bumerang
+    - key: booster_shrink_name
+      translations:
+      - Shrink
+      - Rétrécisseur
+      - シュリンク
+      - 슈링크
+      - Pengecil
+      - Schrumpfer
+      - Reductor
+      - Riduttore
+      - Redutor
+      - Уменьшитель
+      - Küçültücü
+    - key: booster_freeze_name
+      translations:
+      - Freeze
+      - Gel
+      - フリーズ
+      - 프리즈
+      - Bekukan
+      - Einfrieren
+      - Congelar
+      - Congela
+      - Congelar
+      - Заморозка
+      - Dondur
+    - key: booster_swap_crate_name
+      translations:
+      - Swap Crate
+      - Caisse Échange
+      - スワップクレート
+      - 스왑 크레이트
+      - Peti Tukar
+      - Tausch-Kiste
+      - Caja de Cambio
+      - Cassa Scambio
+      - Caixa Troca
+      - Ящик обмена
+      - Takas Sandığı
+    - key: booster_shuffle_use_desc
+      translations:
+      - '<color=#8929F6><size=100%>Randomly rearranges</color></size> the fruits on the board'
+      - '<color=#8929F6><size=100%>Réorganise aléatoirement</color></size> les fruits sur le plateau'
+      - '<color=#8929F6><size=100%>ランダムに並べ替え</color></size> ボードのフルーツを'
+      - '<color=#8929F6><size=100%>무작위로 재배치</color></size> 보드의 과일을'
+      - '<color=#8929F6><size=100%>Mengacak ulang</color></size> buah-buah di papan'
+      - '<color=#8929F6><size=100%>Mischt zufällig</color></size> die Früchte auf dem Brett'
+      - '<color=#8929F6><size=100%>Reorganiza al azar</color></size> las frutas del tablero'
+      - '<color=#8929F6><size=100%>Riorganizza a caso</color></size> i frutti sul tabellone'
+      - '<color=#8929F6><size=100%>Reorganiza aleatoriamente</color></size> as frutas do tabuleiro'
+      - '<color=#8929F6><size=100%>Случайно перемешивает</color></size> фрукты на поле'
+      - '<color=#8929F6><size=100%>Rastgele dizer</color></size> tahtadaki meyveleri'
+    - key: booster_shovel_use_desc_1
+      translations:
+      - "Dig a tunnel</color></size> to escape! \n<color=#8929F6><size=100%> Click a circle </color></size> to select your exit point"
+      - "Creuse un tunnel</color></size> pour t'échapper ! \n<color=#8929F6><size=100%> Clique sur un cercle </color></size> pour choisir ta sortie"
+      - "トンネルを掘ろう</color></size> 脱出するために! \n<color=#8929F6><size=100%> 円をクリック </color></size> 出口を選んで"
+      - "터널을 파요</color></size> 탈출하려면! \n<color=#8929F6><size=100%> 원을 클릭하세요 </color></size> 나갈 곳을 선택해요"
+      - "Gali terowongan</color></size> untuk kabur! \n<color=#8929F6><size=100%> Klik lingkaran </color></size> untuk pilih titik keluar"
+      - "Grab einen Tunnel</color></size> zur Flucht! \n<color=#8929F6><size=100%> Klick auf einen Kreis </color></size> und wähle deinen Ausgang"
+      - "Cava un túnel</color></size> para escapar! \n<color=#8929F6><size=100%> Haz clic en un círculo </color></size> para elegir tu salida"
+      - "Scava un tunnel</color></size> per scappare! \n<color=#8929F6><size=100%> Clicca un cerchio </color></size> per scegliere l'uscita"
+      - "Cave um túnel</color></size> para escapar! \n<color=#8929F6><size=100%> Clique em um círculo </color></size> para escolher a saída"
+      - "Прокопай тоннель</color></size>, чтобы сбежать! \n<color=#8929F6><size=100%> Кликни на кружок </color></size> и выбери выход"
+      - "Bir tünel kaz</color></size> kaçmak için! \n<color=#8929F6><size=100%> Bir daireye tıkla </color></size> çıkış noktanı seç"
+    - key: booster_shovel_use_desc_2
+      translations:
+      - Click a circle to select your exit point
+      - Clique sur un cercle pour choisir ta sortie
+      - 丸をタップして出口を選ぶ
+      - 동그라미 눌러서 출구 선택
+      - Klik lingkaran untuk pilih jalan keluar
+      - Klick einen Kreis, um deinen Ausgang zu wählen
+      - Pulsa un círculo para elegir la salida
+      - Clicca un cerchio per scegliere l'uscita
+      - Clique num círculo para escolher a saída
+      - Нажми на круг, чтобы выбрать выход
+      - Çıkışını seçmek için daireye tıkla
+    - key: booster_boomerang_use_desc
+      translations:
+      - '<color=#8929F6><size=100%>Click Arrow </color></size> to deliver your fruits!'
+      - '<color=#8929F6><size=100%>Clique sur la flèche </color></size> pour livrer tes fruits !'
+      - '<color=#8929F6><size=100%>矢印をクリック </color></size> フルーツを届けよう!'
+      - '<color=#8929F6><size=100%>화살표를 클릭 </color></size> 과일을 배달해요!'
+      - '<color=#8929F6><size=100%>Klik panah </color></size> untuk mengantar buahmu!'
+      - '<color=#8929F6><size=100%>Klick auf den Pfeil </color></size> und liefere deine Früchte!'
+      - '<color=#8929F6><size=100%>Haz clic en la flecha </color></size> para entregar tus frutas!'
+      - '<color=#8929F6><size=100%>Clicca sulla freccia </color></size> per consegnare i frutti!'
+      - '<color=#8929F6><size=100%>Clique na seta </color></size> para entregar suas frutas!'
+      - '<color=#8929F6><size=100%>Кликни на стрелку </color></size> и доставь фрукты!'
+      - '<color=#8929F6><size=100%>Oka tıkla </color></size> meyvelerini teslim et!'
+    - key: booster_boomerang_use_fail
+      translations:
+      - "<color=#8929F6><size=100%>NO FRUITS TO SEND! </color></size> \nTry later"
+      - "<color=#8929F6><size=100%>AUCUN FRUIT À ENVOYER ! </color></size> \nRéessaie plus tard"
+      - "<color=#8929F6><size=100%>送るフルーツなし！</color></size> \n後でね"
+      - "<color=#8929F6><size=100%>보낼 과일 없음! </color></size> \n나중에 해봐"
+      - "<color=#8929F6><size=100%>TIDAK ADA BUAH UNTUK DIKIRIM! </color></size> \nCoba lagi nanti"
+      - "<color=#8929F6><size=100%>KEINE FRÜCHTE ZUM SENDEN! </color></size> \nVersuch's später"
+      - "<color=#8929F6><size=100%>SIN FRUTAS PARA ENVIAR! </color></size> \nInténtalo luego"
+      - "<color=#8929F6><size=100%>NESSUN FRUTTO DA INVIARE! </color></size> \nRiprova più tardi"
+      - "<color=#8929F6><size=100%>SEM FRUTAS PARA ENVIAR! </color></size> \nTente depois"
+      - "<color=#8929F6><size=100%>НЕТ ФРУКТОВ ДЛЯ ОТПРАВКИ! </color></size> \nПопробуй позже"
+      - "<color=#8929F6><size=100%>GÖNDERECEK MEYVE YOK! </color></size> \nSonra dene"
+    - key: booster_shrink_use_desc
+      translations:
+      - '<color=#8929F6><size=100%>Reduces your snake''s length</color></size> by 20% for the whole level'
+      - '<color=#8929F6><size=100%>Réduit la longueur de ton serpent</color></size> de 20 % pour tout le niveau'
+      - '<color=#8929F6><size=100%>スネークの長さを短くする</color></size> レベル中ずっと20%'
+      - '<color=#8929F6><size=100%>뱀의 길이를 줄여요</color></size> 레벨 내내 20%'
+      - '<color=#8929F6><size=100%>Memperpendek ular</color></size> sebesar 20% sepanjang level'
+      - '<color=#8929F6><size=100%>Verkürzt deine Schlange</color></size> um 20% für das ganze Level'
+      - '<color=#8929F6><size=100%>Reduce el largo de tu serpiente</color></size> un 20% en todo el nivel'
+      - '<color=#8929F6><size=100%>Riduce la lunghezza del serpente</color></size> del 20% per tutto il livello'
+      - '<color=#8929F6><size=100%>Reduz o tamanho da sua cobra</color></size> em 20% no nível todo'
+      - '<color=#8929F6><size=100%>Укорачивает змейку</color></size> на 20% на весь уровень'
+      - '<color=#8929F6><size=100%>Yılanını kısaltır</color></size> bütün seviye boyunca 20%'
+    - key: booster_shuffle_buy_desc
+      translations:
+      - Randomly rearranges the fruits
+      - Réduit ta taille de 20 % pour tout le niveau
+      - フルーツをランダムに並べ替え
+      - 과일을 무작위로 섞어
+      - Acak buahnya
+      - Mischt die Früchte zufällig
+      - Reorganiza las frutas al azar
+      - Rimescola i frutti a caso
+      - Reorganiza as frutas aleatoriamente
+      - Перемешает фрукты случайно
+      - Meyveleri rastgele karıştırır
+    - key: booster_shovel_buy_desc
+      translations:
+      - Dig a tunnel to escape
+      - Creuse un tunnel pour t'échapper
+      - トンネルを掘って脱出
+      - 터널 파서 탈출
+      - Gali terowongan untuk lolos
+      - Grab einen Tunnel, um zu entkommen
+      - Cava un túnel para escapar
+      - Scava un tunnel per scappare
+      - Cave um túnel para escapar
+      - Пророй тоннель, чтобы сбежать
+      - Kaçmak için tünel kaz
+    - key: booster_boomerang_buy_desc
+      translations:
+      - Send your fruits
+      - Envoie tes fruits
+      - フルーツを送る
+      - 과일 보내기
+      - Kirim buah
+      - Schick deine Früchte
+      - Envía tus frutas
+      - Manda i frutti
+      - Envie suas frutas
+      - Отправь фрукты
+      - Meyvelerini gönder
+    - key: booster_shrink_buy_desc
+      translations:
+      - Shrink your length by 20%
+      - Rétrécit ta taille de 20 %
+      - 長さを20%短くする
+      - 길이를 20% 줄여
+      - Pendekkan 20%
+      - Verkürzt dich um 20%
+      - Encoge tu longitud un 20%
+      - Riduci la lunghezza del 20%
+      - Encolha seu tamanho em 20%
+      - Уменьшает длину на 20%
+      - Uzunluğunu %20 küçült
+    - key: winscreen_unlocked
+      translations:
+      - Unlocked!
+      - Débloqué !
+      - 解放!
+      - 잠금 해제!
+      - Terbuka!
+      - Freigeschaltet!
+      - Desbloqueado!
+      - Sbloccato!
+      - Desbloqueado!
+      - Открыто!
+      - Açıldı!
+    - key: WinScreen_Play_Next_Try
+      translations:
+      - Play next level to try it!
+      - Joue le niveau suivant pour l'essayer !
+      - 次のレベルで試してみよう!
+      - 다음 레벨에서 써봐!
+      - Main level berikutnya untuk coba!
+      - Spiel das nächste Level, um es auszuprobieren!
+      - Juega el siguiente nivel para probarlo!
+      - Gioca il prossimo livello per provarlo!
+      - Jogue o próximo nível para experimentar!
+      - Сыграй следующий уровень, чтобы попробовать!
+      - Denemek için sonraki seviyeyi oyna!
+    - key: VictoryCap
+      translations:
+      - VICTORY!
+      - VICTOIRE !
+      - 勝利!
+      - 승리!
+      - MENANG!
+      - SIEG!
+      - VICTORIA!
+      - VITTORIA!
+      - VITÓRIA!
+      - ПОБЕДА!
+      - ZAFER!
+    - key: WINSTREAK
+      translations:
+      - WINSTREAK
+      - SÉRIE DE VICTOIRES
+      - 連勝
+      - 연승
+      - RENTETAN MENANG
+      - SIEGESSERIE
+      - RACHA DE VICTORIAS
+      - SERIE DI VITTORIE
+      - SEQUÊNCIA DE VITÓRIAS
+      - СЕРИЯ ПОБЕД
+      - GALİBİYET SERİSİ
+    - key: egp_title
+      translations:
+      - NO WAY OUT!
+      - AUCUNE ISSUE !
+      - 逃げ場なし!
+      - 막혔어!
+      - TERJEPIT!
+      - KEIN AUSWEG!
+      - SIN SALIDA!
+      - NESSUNA VIA D'USCITA!
+      - SEM SAÍDA!
+      - НЕТ ВЫХОДА!
+      - ÇIKIŞ YOK!
+    - key: egp_description
+      translations:
+      - '<color=#FF4945><size=100%>Shorten the tail</color></size> to keep Playing!'
+      - '<color=#FF4945><size=100%>Raccourcis la queue</color></size> pour continuer à jouer !'
+      - '<color=#FF4945><size=100%>しっぽを短くしよう</color></size> プレイを続けるために!'
+      - '<color=#FF4945><size=100%>꼬리를 줄여서</color></size> 계속 플레이해요!'
+      - '<color=#FF4945><size=100%>Perpendek ekor</color></size> untuk terus bermain!'
+      - '<color=#FF4945><size=100%>Verkürze den Schwanz</color></size>, um weiterzuspielen!'
+      - '<color=#FF4945><size=100%>Acorta la cola</color></size> para seguir jugando!'
+      - '<color=#FF4945><size=100%>Accorcia la coda</color></size> per continuare a giocare!'
+      - '<color=#FF4945><size=100%>Encurte a cauda</color></size> para continuar jogando!'
+      - '<color=#FF4945><size=100%>Укороти хвост</color></size>, чтобы продолжить!'
+      - '<color=#FF4945><size=100%>Kuyruğu kısalt</color></size> oynamaya devam et!'
+    - key: egp_button
+      translations:
+      - Play On
+      - Continuer
+      - 続ける
+      - 계속 플레이
+      - Lanjutkan
+      - Weiterspielen
+      - Continuar
+      - Continua
+      - Continuar
+      - Продолжить
+      - Devam et
+    - key: egp_hold
+      translations:
+      - Hold to see the board
+      - Maintiens pour voir le plateau
+      - 長押しでボードを見る
+      - 꾹 눌러서 보드 보기
+      - Tahan untuk lihat papan
+      - Halten, um das Brett zu sehen
+      - Mantén pulsado para ver el tablero
+      - Tieni premuto per vedere il tabellone
+      - Segure para ver o tabuleiro
+      - Удерживай, чтобы увидеть поле
+      - Tahtayı görmek için basılı tut
+    - key: egp_best_value
+      translations:
+      - Best Value
+      - Meilleure offre
+      - お得
+      - 베스트 밸류
+      - Penawaran Terbaik
+      - Bester Preis
+      - Mejor oferta
+      - Miglior offerta
+      - Melhor oferta
+      - Выгодно
+      - En İyi Değer
+    - key: lose_title
+      translations:
+      - Game Over
+      - Game Over
+      - ゲームオーバー
+      - 게임 오버
+      - Game Over
+      - Game Over
+      - Fin del juego
+      - Game Over
+      - Fim de jogo
+      - Конец игры
+      - Oyun bitti
+    - key: lose_button
+      translations:
+      - Try Again
+      - Réessayer
+      - もう一度
+      - 다시 하기
+      - Coba lagi
+      - Erneut versuchen
+      - Reintentar
+      - Riprova
+      - Tentar de novo
+      - Ещё раз
+      - Tekrar dene
+    - key: difficulty_hard
+      translations:
+      - Hard
+      - Difficile
+      - 難しい
+      - 어려움
+      - Sulit
+      - Schwer
+      - Difícil
+      - Difficile
+      - Difícil
+      - Сложно
+      - Zor
+    - key: difficulty_superhard
+      translations:
+      - Superhard
+      - Très difficile
+      - 超難
+      - 초고난도
+      - Sangat sulit
+      - Sehr schwer
+      - Súper difícil
+      - Difficilissimo
+      - Superdifícil
+      - Очень сложно
+      - Çok zor
+    - key: shop_title
+      translations:
+      - Shop
+      - Boutique
+      - ショップ
+      - 상점
+      - Toko
+      - Shop
+      - Tienda
+      - Negozio
+      - Loja
+      - Магазин
+      - Mağaza
+    - key: shop_special_offers
+      translations:
+      - Special offers
+      - Offres spéciales
+      - 特別オファー
+      - 특별 혜택
+      - Penawaran spesial
+      - Sonderangebote
+      - Ofertas especiales
+      - Offerte speciali
+      - Ofertas especiais
+      - Спецпредложения
+      - Özel teklifler
+    - key: shop_bundles
+      translations:
+      - Bundles
+      - Packs
+      - バンドル
+      - 번들
+      - Paket
+      - Pakete
+      - Packs
+      - Pacchetti
+      - Pacotes
+      - Наборы
+      - Paketler
+    - key: shop_coins
+      translations:
+      - Coins
+      - Pièces
+      - コイン
+      - 코인
+      - Koin
+      - Münzen
+      - Monedas
+      - Monete
+      - Moedas
+      - Монеты
+      - Para
+    - key: shop_best_value_badge
+      translations:
+      - Best Value
+      - Meilleure offre
+      - お得
+      - 최고가성비
+      - Penawaran terbaik
+      - Bestes Angebot
+      - Mejor oferta
+      - Migliore offerta
+      - Melhor oferta
+      - Лучшая цена
+      - En iyi fiyat
+    - key: shop_restore_purchases
+      translations:
+      - RESTORE PURCHASES
+      - RESTAURER LES ACHATS
+      - 購入を復元
+      - 구매 복원
+      - PULIHKAN PEMBELIAN
+      - KÄUFE WIEDERHERSTELLEN
+      - RESTAURAR COMPRAS
+      - RIPRISTINA ACQUISTI
+      - RESTAURAR COMPRAS
+      - ВОССТАНОВИТЬ ПОКУПКИ
+      - SATIN ALMALARI GERİ YÜKLE
+    - key: shop_no_ads
+      translations:
+      - No Ads
+      - Sans pubs
+      - 広告なし
+      - 광고 없음
+      - Tanpa iklan
+      - Keine Werbung
+      - Sin anuncios
+      - Niente pubblicità
+      - Sem anúncios
+      - Без рекламы
+      - Reklamsız
+    - key: defeat_extend_description
+      translations:
+      - Add 30 secondes to complete the level!
+      - Ajoute 30 secondes pour finir le niveau !
+      - 30秒追加してレベルクリア!
+      - 30초 더 받고 레벨 완료!
+      - Tambah 30 detik untuk selesaikan level!
+      - 30 Sekunden für das Level holen!
+      - Suma 30 segundos para terminar el nivel!
+      - Aggiungi 30 secondi per finire il livello!
+      - Ganhe 30 segundos para terminar o nível!
+      - +30 секунд, чтобы пройти уровень!
+      - Seviyeyi bitirmek için 30 saniye ekle!
+    - key: settings_alerts
+      translations:
+      - Alerts
+      - Alertes
+      - 通知
+      - 알림
+      - Notifikasi
+      - Benachrichtigungen
+      - Alertas
+      - Avvisi
+      - Alertas
+      - Уведомления
+      - Bildirimler
+    - key: quit_confirm_title
+      translations:
+      - Are you Sure?
+      - Tu es sûr ?
+      - 本当にいい?
+      - 정말이야?
+      - Yakin?
+      - Bist du sicher?
+      - Seguro?
+      - Sei sicuro?
+      - Tem certeza?
+      - Точно?
+      - Emin misin?
+    - key: lives_refill_confirm_title
+      translations:
+      - ARE YOU SURE?
+      - TU ES SÛR ?
+      - 本当にいい?
+      - 정말이야?
+      - YAKIN?
+      - BIST DU SICHER?
+      - SEGURO?
+      - SEI SICURO?
+      - TEM CERTEZA?
+      - ТОЧНО?
+      - EMİN MİSİN?
+    - key: settings_back_to_home
+      translations:
+      - Back to home
+      - Retour à l'accueil
+      - ホームに戻る
+      - 홈으로 돌아가기
+      - Kembali ke beranda
+      - Zurück zum Start
+      - Volver al inicio
+      - Torna alla home
+      - Voltar ao início
+      - На главную
+      - Ana sayfaya dön
+    - key: feature_completed
+      translations:
+      - Completed
+      - Terminé
+      - 完了
+      - 완료
+      - Selesai
+      - Erledigt
+      - Completado
+      - Completato
+      - Concluído
+      - Готово
+      - Tamamlandı
+    - key: defeat_continue
+      translations:
+      - Continue
+      - Continuer
+      - つづける
+      - 계속
+      - Lanjut
+      - Weiter
+      - Continuar
+      - Continua
+      - Continuar
+      - Продолжить
+      - Devam
+    - key: crate_deliver
+      translations:
+      - Deliver
+      - Livrer
+      - 配達
+      - 배달
+      - Kirim
+      - Liefern
+      - Entregar
+      - Consegna
+      - Entregar
+      - Доставить
+      - Teslim et
+    - key: settings_language_english
+      translations:
+      - English
+      - Français
+      - 日本語
+      - 한국어
+      - Bahasa Indonesia
+      - Deutsch
+      - Español
+      - Italiano
+      - Português
+      - Русский
+      - Türkçe
+    - key: settings_enter_code_placeholder
+      translations:
+      - Enter Code...
+      - Entre le code...
+      - コード入力...
+      - 코드 입력...
+      - Masukkan kode...
+      - Code eingeben...
+      - Introduce el código...
+      - Inserisci codice...
+      - Digite o código...
+      - Введи код...
+      - Kod gir...
+    - key: defeat_extend
+      translations:
+      - EXTEND?
+      - PROLONGER ?
+      - 延長する?
+      - 연장할래?
+      - PERPANJANG?
+      - VERLÄNGERN?
+      - AMPLIAR?
+      - PROLUNGARE?
+      - ESTENDER?
+      - ПРОДЛИТЬ?
+      - UZAT?
+    - key: defeat_failed
+      translations:
+      - Failed!
+      - Échec !
+      - 失敗!
+      - 실패!
+      - Gagal!
+      - Gescheitert!
+      - Fallaste!
+      - Fallito!
+      - Falhou!
+      - Провал!
+      - Başarısız!
+    - key: defeat_finished
+      translations:
+      - FINISHED
+      - TERMINÉ
+      - 終了
+      - 끝났어
+      - SELESAI
+      - FERTIG
+      - TERMINADO
+      - FINITO
+      - TERMINADO
+      - ГОТОВО
+      - BİTTİ
+    - key: lives_full
+      translations:
+      - Full
+      - Plein
+      - 満タン
+      - 가득
+      - Penuh
+      - Voll
+      - Llenas
+      - Pieno
+      - Cheio
+      - Полно
+      - Dolu
+    - key: lives_get_one
+      translations:
+      - Get 1
+      - Obtenir 1
+      - 1つゲット
+      - 1개 받기
+      - Ambil 1
+      - 1 holen
+      - Conseguir 1
+      - Ottieni 1
+      - Pegar 1
+      - Получить 1
+      - 1 al
+    - key: tutorial_got_it
+      translations:
+      - GOT IT
+      - COMPRIS
+      - わかった
+      - 알겠어
+      - OKE
+      - VERSTANDEN
+      - ENTENDIDO
+      - OK
+      - ENTENDI
+      - ПОНЯТНО
+      - ANLADIM
+    - key: settings_haptics
+      translations:
+      - Haptics
+      - Vibration
+      - バイブ
+      - 진동
+      - Getaran
+      - Vibration
+      - Vibración
+      - Vibrazione
+      - Vibração
+      - Вибрация
+      - Titreşim
+    - key: settings_help_support
+      translations:
+      - Help & Support
+      - Aide & support
+      - ヘルプとサポート
+      - 도움말 & 지원
+      - Bantuan & dukungan
+      - Hilfe & Support
+      - Ayuda y soporte
+      - Aiuto e supporto
+      - Ajuda e suporte
+      - Помощь и поддержка
+      - Yardım & destek
+    - key: ui_home
+      translations:
+      - HOME
+      - ACCUEIL
+      - ホーム
+      - 홈
+      - BERANDA
+      - START
+      - INICIO
+      - HOME
+      - INÍCIO
+      - ГЛАВНАЯ
+      - ANA SAYFA
+    - key: lives_infinite_for
+      translations:
+      - 'Infinite lives for:'
+      - 'Vies infinies pendant :'
+      - 無限ライフ：
+      - '무한 생명:'
+      - 'Nyawa tak terbatas:'
+      - 'Unendliche Leben für:'
+      - 'Vidas infinitas durante:'
+      - 'Vite infinite per:'
+      - 'Vidas infinitas por:'
+      - 'Бесконечные жизни:'
+      - 'Sınırsız can:'
+    - key: ui_level_label
+      translations:
+      - Level
+      - Niveau
+      - レベル
+      - 레벨
+      - Level
+      - Level
+      - Nivel
+      - Livello
+      - Nível
+      - Уровень
+      - Seviye
+    - key: defeat_level_failed
+      translations:
+      - Level Failed!
+      - Niveau raté !
+      - レベル失敗!
+      - 레벨 실패!
+      - Level gagal!
+      - Level gescheitert!
+      - Nivel fallido!
+      - Livello fallito!
+      - Nível falhou!
+      - Уровень провален!
+      - Seviye başarısız!
+    - key: ui_lives
+      translations:
+      - Lives
+      - Vies
+      - ライフ
+      - 생명
+      - Nyawa
+      - Leben
+      - Vidas
+      - Vite
+      - Vidas
+      - Жизни
+      - Canlar
+    - key: ui_loading
+      translations:
+      - Loading
+      - Chargement
+      - 読み込み中
+      - 로딩 중
+      - Memuat
+      - Lädt
+      - Cargando
+      - Caricamento
+      - Carregando
+      - Загрузка
+      - Yükleniyor
+    - key: popup_message
+      translations:
+      - Message
+      - Message
+      - メッセージ
+      - 메시지
+      - Pesan
+      - Nachricht
+      - Mensaje
+      - Messaggio
+      - Mensagem
+      - Сообщение
+      - Mesaj
+    - key: settings_music
+      translations:
+      - Music
+      - Musique
+      - 音楽
+      - 음악
+      - Musik
+      - Musik
+      - Música
+      - Musica
+      - Música
+      - Музыка
+      - Müzik
+    - key: feature_new
+      translations:
+      - NEW FEATURE
+      - NOUVEAUTÉ
+      - 新機能
+      - 새 기능
+      - FITUR BARU
+      - NEUE FUNKTION
+      - NUEVA FUNCIÓN
+      - NOVITÀ
+      - NOVIDADE
+      - НОВОЕ
+      - YENİ ÖZELLİK
+    - key: feature_new_item
+      translations:
+      - NEW ITEM
+      - NOUVEL OBJET
+      - 新アイテム
+      - 새 아이템
+      - ITEM BARU
+      - NEUES ITEM
+      - NUEVO OBJETO
+      - NUOVO OGGETTO
+      - NOVO ITEM
+      - НОВЫЙ ПРЕДМЕТ
+      - YENİ NESNE
+    - key: ui_next
+      translations:
+      - NEXT
+      - SUIVANT
+      - 次へ
+      - 다음
+      - LANJUT
+      - WEITER
+      - SIGUIENTE
+      - AVANTI
+      - PRÓXIMO
+      - ДАЛЕЕ
+      - İLERİ
+    - key: toggle_off
+      translations:
+      - OFF
+      - DÉSACTIVÉ
+      - オフ
+      - 끔
+      - NONAKTIF
+      - AUS
+      - DESACTIVADO
+      - DISATTIVO
+      - DESATIVADO
+      - ВЫКЛ
+      - KAPALI
+    - key: popup_oh_no
+      translations:
+      - oh no!
+      - oh non !
+      - うわっ!
+      - 이런!
+      - aduh!
+      - oh nein!
+      - ay, no!
+      - oh no!
+      - ah, não!
+      - о нет!
+      - eyvah!
+    - key: ui_ok
+      translations:
+      - OK
+      - OK
+      - OK
+      - 확인
+      - OK
+      - OK
+      - OK
+      - OK
+      - OK
+      - ОК
+      - TAMAM
+    - key: toggle_on
+      translations:
+      - ON
+      - ACTIVÉ
+      - オン
+      - 켬
+      - AKTIF
+      - EIN
+      - ACTIVADO
+      - ATTIVO
+      - ATIVADO
+      - ВКЛ
+      - AÇIK
+    - key: ui_place
+      translations:
+      - Place
+      - Placer
+      - 置く
+      - 놓기
+      - Tempatkan
+      - Platzieren
+      - Colocar
+      - Posiziona
+      - Colocar
+      - Поставить
+      - Yerleştir
+    - key: feature_play_next_level
+      translations:
+      - Play next level to try it!
+      - Joue le niveau suivant pour l'essayer !
+      - 次のレベルで試してみよう!
+      - 다음 레벨에서 써봐!
+      - Main level berikutnya untuk coba!
+      - Spiel das nächste Level, um es auszuprobieren!
+      - Juega el siguiente nivel para probarlo!
+      - Gioca il prossimo livello per provarlo!
+      - Jogue o próximo nível para experimentar!
+      - Сыграй следующий уровень, чтобы попробовать!
+      - Denemek için sonraki seviyeyi oyna!
+    - key: settings_voucher_hint
+      translations:
+      - Please enter your 12 digit voucher code
+      - Entre ton code à 12 chiffres
+      - 12桁のコードを入力してね
+      - 12자리 코드 입력해
+      - Masukkan kode 12 digit
+      - Gib deinen 12-stelligen Code ein
+      - Introduce tu código de 12 dígitos
+      - Inserisci il codice da 12 cifre
+      - Digite seu código de 12 dígitos
+      - Введи 12-значный код
+      - 12 haneli kodunu gir
+    - key: ui_ready
+      translations:
+      - Ready
+      - Prêt
+      - 準備OK
+      - 준비
+      - Siap
+      - Bereit
+      - Listo
+      - Pronto
+      - Pronto
+      - Готово
+      - Hazır
+    - key: settings_redeem
+      translations:
+      - REDEEM
+      - UTILISER
+      - 使う
+      - 사용
+      - TUKARKAN
+      - EINLÖSEN
+      - CANJEAR
+      - RISCATTA
+      - RESGATAR
+      - ИСПОЛЬЗОВАТЬ
+      - KULLAN
+    - key: lives_refill_all
+      translations:
+      - Refill all
+      - Tout recharger
+      - すべて補充
+      - 전부 충전
+      - Isi semua
+      - Alle auffüllen
+      - Recargar todo
+      - Ricarica tutto
+      - Recarregar tudo
+      - Пополнить всё
+      - Hepsini doldur
+    - key: lives_refill_prompt
+      translations:
+      - Refill your lives!
+      - Recharge tes vies !
+      - ライフをチャージ!
+      - 생명 충전해봐!
+      - Isi nyawamu!
+      - Lade deine Leben auf!
+      - Recarga tus vidas!
+      - Ricarica le vite!
+      - Recarregue suas vidas!
+      - Пополни жизни!
+      - Canlarını yenile!
+    - key: defeat_revive
+      translations:
+      - REVIVE?
+      - REVIVRE ?
+      - 復活する?
+      - 부활할래?
+      - HIDUP LAGI?
+      - WIEDERBELEBEN?
+      - REVIVIR?
+      - RIVIVERE?
+      - REVIVER?
+      - ОЖИВИТЬ?
+      - DİRİL?
+    - key: settings_save_progress
+      translations:
+      - Save Progress
+      - Sauvegarder
+      - 進行状況を保存
+      - 진행상황 저장
+      - Simpan kemajuan
+      - Fortschritt speichern
+      - Guardar progreso
+      - Salva progresso
+      - Salvar progresso
+      - Сохранить прогресс
+      - İlerlemeyi kaydet
+    - key: settings_title
+      translations:
+      - SETTINGS
+      - PARAMÈTRES
+      - 設定
+      - 설정
+      - PENGATURAN
+      - EINSTELLUNGEN
+      - AJUSTES
+      - IMPOSTAZIONI
+      - AJUSTES
+      - НАСТРОЙКИ
+      - AYARLAR
+    - key: settings_sound
+      translations:
+      - Sound
+      - Son
+      - サウンド
+      - 사운드
+      - Suara
+      - Ton
+      - Sonido
+      - Audio
+      - Som
+      - Звук
+      - Ses
+    - key: reward_tap_to_close
+      translations:
+      - Tap anywhere to close
+      - Touche n'importe où pour fermer
+      - どこかをタップで閉じる
+      - 아무 데나 눌러서 닫기
+      - Ketuk di mana saja untuk tutup
+      - Irgendwo tippen zum Schließen
+      - Toca donde sea para cerrar
+      - Tocca ovunque per chiudere
+      - Toque em qualquer lugar para fechar
+      - Нажми где угодно, чтобы закрыть
+      - Kapatmak için herhangi bir yere dokun
+    - key: settings_terms_privacy
+      translations:
+      - TERMS & PRIVACY
+      - CGU & CONFIDENTIALITÉ
+      - 利用規約とプライバシー
+      - 약관 & 개인정보
+      - SYARAT & PRIVASI
+      - AGB & DATENSCHUTZ
+      - TÉRMINOS Y PRIVACIDAD
+      - TERMINI E PRIVACY
+      - TERMOS E PRIVACIDADE
+      - УСЛОВИЯ И ПРИВАТНОСТЬ
+      - ŞARTLAR & GİZLİLİK
+    - key: tutorial_swipe_straight
+      translations:
+      - SWIPE STRAIGHT TO MOVE
+      - GLISSE TOUT DROIT POUR AVANCER
+      - まっすぐスワイプして進もう
+      - 똑바로 스와이프해서 이동
+      - GESER LURUS UNTUK BERGERAK
+      - GERADE WISCHEN ZUM BEWEGEN
+      - DESLIZA RECTO PARA MOVER
+      - SCORRI DRITTO PER MUOVERTI
+      - DESLIZE RETO PARA MOVER
+      - СВАЙПНИ ПРЯМО, ЧТОБЫ СКОЛЬЗТИ
+      - HAREKET İÇİN DÜZ KAYDIR
+    - key: tutorial_snake_curves
+      translations:
+      - THE SNAKE FOLLOWS THE CURVES AUTOMATICALLY
+      - LE SERPENT ÉPOUSE LES COURBES TOUT SEUL
+      - ヘビは自動でカーブを滑り抜ける
+      - 뱀은 곡선을 자동으로 미끄러져 가
+      - ULAR MELUNCUR DI BELOKAN OTOMATIS
+      - DIE SCHLANGE GLEITET VON ALLEIN DURCH DIE KURVEN
+      - LA SERPIENTE SE DESLIZA POR LAS CURVAS SOLA
+      - IL SERPENTE SCIVOLA SULLE CURVE DA SOLO
+      - A COBRA DESLIZA PELAS CURVAS SOZINHA
+      - ЗМЕЙКА САМА СКОЛЬЗИТ ПО ИЗГИБАМ
+      - YILAN KIVRIMLARDA OTOMATİK SÜZÜLÜR
+    - key: lives_time_to_next
+      translations:
+      - 'Time to next life:'
+      - 'Vie suivante dans :'
+      - '次のライフまで:'
+      - '다음 생명까지:'
+      - 'Nyawa berikut:'
+      - 'Nächstes Leben in:'
+      - 'Próxima vida en:'
+      - 'Prossima vita in:'
+      - 'Próxima vida em:'
+      - 'До следующей жизни:'
+      - 'Sonraki cana:'
+    - key: tutorial_tip_label
+      translations:
+      - TIP
+      - ASTUCE
+      - ヒント
+      - 꿀팁
+      - TIPS
+      - TIPP
+      - TRUCO
+      - SUGGERIMENTO
+      - DICA
+      - СОВЕТ
+      - İPUCU
+    - key: defeat_try_again
+      translations:
+      - Try Again
+      - Réessayer
+      - もう一度
+      - 다시 하기
+      - Coba lagi
+      - Erneut versuchen
+      - Reintentar
+      - Riprova
+      - Tentar de novo
+      - Ещё раз
+      - Tekrar dene
+    - key: ui_undo
+      translations:
+      - Undo
+      - Annuler
+      - 元に戻す
+      - 되돌리기
+      - Urungkan
+      - Rückgängig
+      - Deshacer
+      - Annulla
+      - Desfazer
+      - Отмена
+      - Geri al
+    - key: lives_unlimited
+      translations:
+      - Unlimited lives!
+      - Vies illimitées !
+      - 無限ライフ!
+      - 무한 생명!
+      - Nyawa tanpa batas!
+      - Unbegrenzte Leben!
+      - Vidas ilimitadas!
+      - Vite illimitate!
+      - Vidas ilimitadas!
+      - Бесконечные жизни!
+      - Sınırsız can!
+    - key: feature_unlocked
+      translations:
+      - Unlocked!
+      - Débloqué !
+      - 解放!
+      - 잠금 해제!
+      - Terbuka!
+      - Freigeschaltet!
+      - Desbloqueado!
+      - Sbloccato!
+      - Desbloqueado!
+      - Открыто!
+      - Açıldı!
+    - key: victory_title
+      translations:
+      - VICTORY!
+      - VICTOIRE !
+      - 勝利!
+      - 승리!
+      - MENANG!
+      - SIEG!
+      - VICTORIA!
+      - VITTORIA!
+      - VITÓRIA!
+      - ПОБЕДА!
+      - ZAFER!
+    - key: victory_watch_ad
+      translations:
+      - WATCH AD
+      - VOIR LA PUB
+      - 広告を見る
+      - 광고 보기
+      - TONTON IKLAN
+      - WERBUNG ANSEHEN
+      - VER ANUNCIO
+      - GUARDA ANNUNCIO
+      - VER ANÚNCIO
+      - СМОТРЕТЬ РЕКЛАМУ
+      - REKLAMI İZLE
+    - key: winstreak_banner
+      translations:
+      - WINSTREAK
+      - SÉRIE DE VICTOIRES
+      - 連勝
+      - 연승
+      - RENTETAN MENANG
+      - SIEGESSERIE
+      - RACHA DE VICTORIAS
+      - SERIE DI VITTORIE
+      - SEQUÊNCIA DE VITÓRIAS
+      - СЕРИЯ ПОБЕД
+      - GALİBİYET SERİSİ
+    - key: booster_unlocked_header
+      translations:
+      - 'You unlocked a Booster:'
+      - 'Tu as débloqué un booster :'
+      - ブースターを解放：
+      - '부스터 잠금 해제:'
+      - 'Kamu buka Booster:'
+      - 'Du hast einen Booster freigeschaltet:'
+      - 'Has desbloqueado un Potenciador:'
+      - 'Hai sbloccato un booster:'
+      - 'Você desbloqueou um Booster:'
+      - 'Открыт усилитель:'
+      - 'Bir Güçlendirici açtın:'
+    - key: lives_lose_warning
+      translations:
+      - You will lose 1 life!
+      - Tu vas perdre 1 vie !
+      - ライフを1つ失うよ!
+      - 생명 1개 잃어!
+      - Kamu kehilangan 1 nyawa!
+      - Du verlierst 1 Leben!
+      - Perderás 1 vida!
+      - Perderai 1 vita!
+      - Você vai perder 1 vida!
+      - Потеряешь 1 жизнь!
+      - 1 can kaybedeceksin!
+    - key: ldf_secretcol_name
+      translations:
+      - Mystery Fruit
+      - Fruit mystère
+      - ミステリーフルーツ
+      - 미스터리 과일
+      - Buah misteri
+      - Mystery-Frucht
+      - Fruta misteriosa
+      - Frutto misterioso
+      - Fruta misteriosa
+      - Загадочный фрукт
+      - Gizem meyvesi
+    - key: ldf_secretcol_desc
+      translations:
+      - Collect the mystery fruits to reveal what's inside!
+      - Récupère les fruits mystères pour découvrir ce qu'il y a dedans !
+      - ミステリーフルーツを集めて中身を確かめよう!
+      - 미스터리 과일을 모아서 안에 뭐가 있는지 확인해!
+      - Kumpulkan buah misteri untuk lihat isinya!
+      - Sammle die Mystery-Früchte, um zu sehen, was drin ist!
+      - Recoge las frutas misteriosas para ver lo que hay dentro!
+      - Raccogli i frutti misteriosi per scoprire cosa c'è dentro!
+      - Colete as frutas misteriosas para ver o que há dentro!
+      - Собирай загадочные фрукты, чтобы узнать, что внутри!
+      - İçinde ne olduğunu görmek için gizem meyvelerini topla!
+    - key: key_hours
+      translations:
+      - h
+      - h
+      - 時
+      - 시
+      - j
+      - h
+      - h
+      - h
+      - h
+      - ч
+      - sa
+    - key: key_minute
+      translations:
+      - m
+      - m
+      - 分
+      - 분
+      - m
+      - m
+      - m
+      - m
+      - m
+      - м
+      - dk
+    - key: key_seconds
+      translations:
+      - s
+      - s
+      - 秒
+      - 초
+      - d
+      - s
+      - s
+      - s
+      - s
+      - с
+      - sn
+    - key: key_days
+      translations:
+      - d
+      - j
+      - 日
+      - 일
+      - h
+      - T
+      - d
+      - g
+      - d
+      - д
+      - g
+    - key: key_weeks
+      translations:
+      - w
+      - s
+      - 週
+      - 주
+      - mg
+      - W
+      - s
+      - s
+      - s
+      - н
+      - h
+    - key: prefab_shop_failed_purchase_desc
+      translations:
+      - YOUR ACCOUNT WASN’T CHARGED!
+      - TON COMPTE N’A PAS ÉTÉ DÉBITÉ !
+      - アカウントに請求はありません!
+      - 결제 안 됐어!
+      - AKUNMU TIDAK DITAGIH!
+      - DEIN KONTO WURDE NICHT BELASTET!
+      - TU CUENTA NO FUE COBRADA!
+      - IL TUO ACCOUNT NON È STATO ADDEBITATO!
+      - SUA CONTA NÃO FOI COBRADA!
+      - ДЕНЬГИ НЕ СПИСАНЫ!
+      - HESABINDAN PARA ÇEKİLMEDİ!
+    - key: prefab_force_update_title
+      translations:
+      - Update Required
+      - Mise à jour requise
+      - アップデートが必要
+      - 업데이트 필요
+      - Pembaruan Diperlukan
+      - Update erforderlich
+      - Actualización requerida
+      - Aggiornamento richiesto
+      - Atualização necessária
+      - Требуется обновление
+      - Güncelleme gerekli
+    - key: prefab_force_update_desc
+      translations:
+      - A new version is available. Please update to continue playing.
+      - Une nouvelle version est dispo. Mets à jour pour continuer à jouer.
+      - 新バージョンが利用可能。アップデートしてプレイを続けよう。
+      - 새 버전이 나왔어. 업데이트하고 계속 플레이해.
+      - Ada versi baru. Update biar bisa lanjut main.
+      - Neue Version verfügbar. Aktualisiere, um weiterzuspielen.
+      - Hay una nueva versión. Actualiza para seguir jugando.
+      - C’è una nuova versione. Aggiorna per continuare a giocare.
+      - Tem uma nova versão. Atualize para continuar jogando.
+      - Доступна новая версия. Обнови, чтобы играть дальше.
+      - Yeni sürüm çıktı. Oynamaya devam etmek için güncelle.
+    - key: prefab_force_update_button
+      translations:
+      - Update
+      - Mettre à jour
+      - アップデート
+      - 업데이트
+      - Perbarui
+      - Aktualisieren
+      - Actualizar
+      - Aggiorna
+      - Atualizar
+      - Обновить
+      - Güncelle
+    - key: prefab_no_internet_connection_desc
+      translations:
+      - NO INTERNET CONNECTION!
+      - PAS DE CONNEXION INTERNET !
+      - インターネット接続なし!
+      - 인터넷 연결 없음!
+      - TIDAK ADA KONEKSI INTERNET!
+      - KEINE INTERNETVERBINDUNG!
+      - SIN CONEXIÓN A INTERNET!
+      - NESSUNA CONNESSIONE INTERNET!
+      - SEM CONEXÃO COM A INTERNET!
+      - НЕТ ПОДКЛЮЧЕНИЯ К ИНТЕРНЕТУ!
+      - İNTERNET BAĞLANTISI YOK!
+    - key: prefab_reward_popup_tap_to_congratulation
+      translations:
+      - CONGRATULATIONS!
+      - FÉLICITATIONS !
+      - おめでとう!
+      - 축하해!
+      - SELAMAT!
+      - GLÜCKWUNSCH!
+      - FELICIDADES!
+      - CONGRATULAZIONI!
+      - PARABÉNS!
+      - ПОЗДРАВЛЯЕМ!
+      - TEBRİKLER!
+    - key: booster_buy_title
+      translations:
+      - Buy
+      - Acheter
+      - 購入
+      - 구매
+      - Beli
+      - Kaufen
+      - Comprar
+      - Acquista
+      - Comprar
+      - Купить
+      - Satın al
+    - key: prefab_button_confirm
+      translations:
+      - Confirm
+      - Confirmer
+      - 決定
+      - 확인
+      - Konfirmasi
+      - Bestätigen
+      - Confirmar
+      - Conferma
+      - Confirmar
+      - Подтвердить
+      - Onayla
+    - key: shop_purchase_fail_title
+      translations:
+      - FAILED!
+      - RATÉ !
+      - 失敗！
+      - 실패！
+      - GAGAL!
+      - FEHLSCHLAG!
+      - ¡FALLIDO!
+      - FALLITO!
+      - FALHOU!
+      - НЕУДАЧА!
+      - BAŞARISIZ!
+    - key: shop_purchase_success_title
+      translations:
+      - COMPLETED!
+      - TERMINÉ !
+      - 完了！
+      - 완료!
+      - SELESAI!
+      - GESCHAFFT!
+      - ¡COMPLETADO!
+      - COMPLETATO!
+      - CONCLUÍDO!
+      - ГОТОВО!
+      - TAMAMLANDI!
+    - key: prefab_reward_popup_restore
+      translations:
+      - REWARDS RESTORED!
+      - RÉCOMPENSES RESTAURÉES !
+      - 報酬が復活！
+      - 보상 복구!
+      - HADIAH KEMBALI!
+      - BELOHNUNGEN ZURÜCK!
+      - ¡RECOMPENSAS RESTAURADAS!
+      - PREMI RIPRISTINATI!
+      - RECOMPENSAS RESTAURADAS!
+      - НАГРАДЫ ВЕРНУЛИСЬ!
+      - ÖDÜLLER GERİ YÜKLENDİ!
+    - key: settings_save_progress_sign_in_fb
+      translations:
+      - Sign in with Facebook
+      - Se connecter avec Facebook
+      - Facebookでログイン
+      - Facebook으로 로그인
+      - Masuk dengan Facebook
+      - Mit Facebook anmelden
+      - Iniciar sesión con Facebook
+      - Accedi con Facebook
+      - Entrar com Facebook
+      - Войти через Facebook
+      - Facebook ile giriş yap
+    - key: settings_save_progress_sign_in_google
+      translations:
+      - Sign in with Google
+      - Se connecter avec Google
+      - Googleでログイン
+      - Google로 로그인
+      - Masuk dengan Google
+      - Mit Google anmelden
+      - Iniciar sesión con Google
+      - Accedi con Google
+      - Entrar com Google
+      - Войти через Google
+      - Google ile giriş yap
+    - key: settings_save_progress_sign_in_apple
+      translations:
+      - Sign in with Apple
+      - Se connecter avec Apple
+      - Appleでサインイン
+      - Apple로 로그인
+      - Masuk dengan Apple
+      - Mit Apple anmelden
+      - Iniciar sesión con Apple
+      - Accedi con Apple
+      - Entrar com Apple
+      - Войти через Apple
+      - Apple ile giriş yap
+    - key: settings_save_progress_sign_in_successful_title
+      translations:
+      - SUCCESS!
+      - SUCCÈS !
+      - 成功！
+      - 성공!
+      - BERHASIL!
+      - ERFOLG!
+      - ¡ÉXITO!
+      - SUCCESSO!
+      - SUCESSO!
+      - УСПЕХ!
+      - BAŞARILI!
+    - key: settings_save_progress_sign_in_failed
+      translations:
+      - OH NO!
+      - OH NON !
+      - やばい！
+      - 이런!
+      - ADUH!
+      - OH NEIN!
+      - ¡AY NO!
+      - OH NO!
+      - AH NÃO!
+      - ОЙ НЕТ!
+      - OLAMAZ!
+    - key: settings_save_progress_sign_out
+      translations:
+      - Sign out
+      - Se déconnecter
+      - サインアウト
+      - 로그아웃
+      - Keluar
+      - Abmelden
+      - Cerrar sesión
+      - Disconnetti
+      - Sair
+      - Выйти
+      - Çıkış yap
+    - key: settings_save_progress_body
+      translations:
+      - Sign in to save your progress!
+      - Connecte-toi pour sauver ta progression !
+      - サインインして進捗を保存しよう！
+      - 로그인하고 진행 상황을 저장해!
+      - Masuk untuk simpan progressmu!
+      - Anmelden und Fortschritt speichern!
+      - ¡Inicia sesión para guardar tu progreso!
+      - Accedi per salvare i tuoi progressi!
+      - Entre para salvar seu progresso!
+      - Войди, чтобы сохранить прогресс!
+      - Oyununu kaydetmek için giriş yap!
+    - key: settings_save_progress_sign_in_successful_fb
+      translations:
+      - Signed in with Facebook!
+      - Connexion Facebook réussie !
+      - Facebookでログインしました！
+      - Facebook으로 로그인됨!
+      - Berhasil masuk dengan Facebook!
+      - Mit Facebook angemeldet!
+      - ¡Sesión iniciada con Facebook!
+      - Accesso effettuato con Facebook!
+      - Entrou via Facebook!
+      - Вход через Facebook выполнен!
+      - Facebook ile giriş yapıldı!
+    - key: settings_save_progress_sign_in_successful_google
+      translations:
+      - Signed in with Google!
+      - Connexion Google réussie !
+      - Googleでログインしました！
+      - Google로 로그인됨!
+      - Berhasil masuk dengan Google!
+      - Mit Google angemeldet!
+      - ¡Sesión iniciada con Google!
+      - Accesso effettuato con Google!
+      - Entrou via Google!
+      - Вход через Google выполнен!
+      - Google ile giriş yapıldı!
+    - key: settings_save_progress_sign_in_successful_apple
+      translations:
+      - Signed in with Apple!
+      - Connexion Apple réussie !
+      - Appleでサインインしました！
+      - Apple로 로그인됨!
+      - Berhasil masuk dengan Apple!
+      - Mit Apple angemeldet!
+      - ¡Sesión iniciada con Apple!
+      - Accesso effettuato con Apple!
+      - Entrou via Apple!
+      - Вход через Apple выполнен!
+      - Apple ile giriş yapıldı!
+    - key: settings_save_progress_sign_in_failed_fb
+      translations:
+      - Facebook sign in failed!
+      - Échec de la connexion Facebook !
+      - Facebookのログインに失敗！
+      - Facebook 로그인 실패!
+      - Login Facebook gagal!
+      - Facebook-Anmeldung fehlgeschlagen!
+      - ¡Error al conectar con Facebook!
+      - Accesso Facebook non riuscito!
+      - Falha no login com Facebook!
+      - Вход через Facebook не удался!
+      - Facebook girişi başarısız!
+    - key: settings_save_progress_sign_in_failed_google
+      translations:
+      - Google sign in failed!
+      - Échec de la connexion Google !
+      - Googleのログインに失敗！
+      - Google 로그인 실패!
+      - Login Google gagal!
+      - Google-Anmeldung fehlgeschlagen!
+      - ¡Error al conectar con Google!
+      - Accesso Google non riuscito!
+      - Falha no login com Google!
+      - Вход через Google не удался!
+      - Google girişi başarısız!
+    - key: settings_save_progress_sign_in_failed_apple
+      translations:
+      - Apple sign in failed!
+      - Échec de la connexion Apple !
+      - Appleのサインインに失敗！
+      - Apple 로그인 실패!
+      - Login Apple gagal!
+      - Apple-Anmeldung fehlgeschlagen!
+      - ¡Error al conectar con Apple!
+      - Accesso Apple non riuscito!
+      - Falha no login com Apple!
+      - Вход через Apple не удался!
+      - Apple girişi başarısız!
+    - key: weekly_adventure_widget_locked
+      translations:
+      - Level {0}
+      - Niv. {0}
+      - レベル {0}
+      - 레벨 {0}
+      - Level {0}
+      - Level {0}
+      - Niv. {0}
+      - Liv. {0}
+      - Nív. {0}
+      - Ур. {0}
+      - Sev. {0}
+    - key: weekly_adventure_widget_claim
+      translations:
+      - Claim
+      - Réclamer
+      - 受け取る
+      - 받기
+      - Klaim
+      - Abholen
+      - Reclamar
+      - Riscatta
+      - Resgatar
+      - Забрать
+      - Al
+    - key: weekly_adventure_widget_locked_desc
+      translations:
+      - Unlock Weekly Adventure from level {0}!
+      - Débloque l'aventure hebdo dès le niv. {0} !
+      - レベル {0} からウィークリーアドベンチャーを解放！
+      - 레벨 {0}부터 주간 어드벤처 잠금 해제!
+      - Buka Petualangan Mingguan dari level {0}!
+      - Wöchentl. Abenteuer ab Level {0} freischalten!
+      - ¡Desbloquea la Aventura Semanal desde el nivel {0}!
+      - Sblocca l'Avventura Sett. dal livello {0}!
+      - Desbloqueie a Aventura Semanal a partir do nível {0}!
+      - Открой Еженед. приключение с уровня {0}!
+      - Seviye {0}'den Haftalık Macera'yı aç!
+    - key: weekly_adventure_widget_unlocked
+      translations:
+      - Weekly Adventure unlocked!
+      - Aventure hebdo débloquée !
+      - ウィークリーアドベンチャー解放！
+      - 주간 어드벤처 잠금 해제!
+      - Petualangan Mingguan terbuka!
+      - Wöchentl. Abenteuer freigeschaltet!
+      - ¡Aventura Semanal desbloqueada!
+      - Avventura Settimanale sbloccata!
+      - Aventura Semanal desbloqueada!
+      - Еженед. приключение открыто!
+      - Haftalık Macera açıldı!
+    - key: weekly_adventure_title_weekly
+      translations:
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+      - Weekly
+    - key: weekly_adventure_title_adventure
+      translations:
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+      - Adventure
+    - key: weekly_adventure_ftue_rules
+      translations:
+      - Rules
+      - Règles
+      - ルール
+      - 규칙
+      - Aturan
+      - Regeln
+      - Reglas
+      - Regole
+      - Regras
+      - Правила
+      - Kurallar
+    - key: weekly_adventure_ftue_1
+      translations:
+      - Complete missions to earn tokens!
+      - Complète des missions pour gagner des jetons !
+      - ミッションをクリアしてトークンをゲット！
+      - 미션 완료하고 토큰 획득!
+      - Selesaikan misi untuk dapat token!
+      - Missionen erfüllen und Tokens verdienen!
+      - ¡Completa misiones para ganar fichas!
+      - Completa le missioni per guadagnare token!
+      - Complete missões para ganhar fichas!
+      - Выполняй миссии и зарабатывай жетоны!
+      - Jeton kazanmak için görevleri tamamla!
+    - key: weekly_adventure_ftue_2
+      translations:
+      - Progress to win adventure chests!
+      - Progresse pour remporter des coffres !
+      - 進めてアドベンチャーチェストをゲット！
+      - 진행해서 어드벤처 상자 획득!
+      - Maju untuk menangkan peti petualangan!
+      - Weiterkommen und Abenteuer-Kisten gewinnen!
+      - ¡Avanza para ganar cofres de aventura!
+      - Avanza per vincere forzieri avventura!
+      - Avance para ganhar baús de aventura!
+      - Прогрессируй и выигрывай сундуки приключений!
+      - İlerleyerek macera sandıkları kazan!
+    - key: weekly_adventure_ftue_3
+      translations:
+      - Collect amazing grand prize!
+      - Décroche l'incroyable grand prix !
+      - すごい大賞をゲットしよう！
+      - 놀라운 대상을 획득해봐!
+      - Dapatkan hadiah utama yang luar biasa!
+      - Hol dir den fantastischen Hauptpreis!
+      - ¡Consigue el increíble gran premio!
+      - Ottieni l'incredibile gran premio!
+      - Conquiste o incrível grande prêmio!
+      - Забери потрясающий главный приз!
+      - İnanılmaz büyük ödülü topla!
+    - key: weekly_adventure_grand_prize
+      translations:
+      - Grand Prize
+      - Grand prix
+      - 大賞
+      - 대상
+      - Hadiah Utama
+      - Hauptpreis
+      - Gran Premio
+      - Gran Premio
+      - Grande Prêmio
+      - Главный приз
+      - Büyük Ödül
+    - key: weekly_adventure_day
+      translations:
+      - Day
+      - Jour
+      - 日目
+      - 일째
+      - Hari
+      - Tag
+      - Día
+      - Giorno
+      - Dia
+      - День
+      - Gün
+    - key: weekly_adventure_locked_task
+      translations:
+      - Unlock at Day {0}!
+      - Disponible au Jour {0} !
+      - '{0}日目に解放！'
+      - '{0}일째에 잠금 해제!'
+      - Buka di Hari {0}!
+      - Tag {0} freischalten!
+      - ¡Disponible el Día {0}!
+      - Disponibile al Giorno {0}!
+      - Disponível no Dia {0}!
+      - Откроется в День {0}!
+      - Gün {0}'de açılır!
+    - key: weekly_adventure_task_login_day
+      translations:
+      - Login 1 Day!
+      - Connecte-toi 1 jour !
+      - 1日ログイン！
+      - 1일 로그인!
+      - Login 1 Hari!
+      - 1 Tag einloggen!
+      - ¡Inicia sesión 1 día!
+      - Accedi 1 giorno!
+      - Faça login 1 dia!
+      - Войди 1 день!
+      - 1 Gün giriş yap!
+    - key: weekly_adventure_task_login_days
+      translations:
+      - Login {0} Days!
+      - Connecte-toi {0} jours !
+      - '{0}日ログイン！'
+      - '{0}일 로그인!'
+      - Login {0} Hari!
+      - '{0} Tage einloggen!'
+      - ¡Inicia sesión {0} días!
+      - Accedi {0} giorni!
+      - Faça login {0} dias!
+      - Войди {0} дней!
+      - '{0} Gün giriş yap!'
+    - key: weekly_adventure_task_win_levels
+      translations:
+      - Win {0} Levels!
+      - Gagne {0} niveaux !
+      - '{0}レベル勝利！'
+      - '{0}레벨 승리!'
+      - Menangkan {0} Level!
+      - '{0} Level gewinnen!'
+      - ¡Gana {0} niveles!
+      - Vinci {0} livelli!
+      - Vença {0} níveis!
+      - Выиграй {0} уровней!
+      - '{0} Seviye kazan!'
+    - key: weekly_adventure_task_win_hard_levels
+      translations:
+      - Win {0} Hard Levels!
+      - Gagne {0} niveaux difficiles !
+      - '{0}難しいレベル勝利！'
+      - '{0}어려운 레벨 승리!'
+      - Menangkan {0} Level Sulit!
+      - '{0} schwere Level gewinnen!'
+      - ¡Gana {0} niveles difíciles!
+      - Vinci {0} livelli difficili!
+      - Vença {0} níveis difíceis!
+      - Выиграй {0} сложных уровней!
+      - '{0} Zor Seviye kazan!'
+    - key: weekly_adventure_task_win_super_hard_levels
+      translations:
+      - Win {0} Super Hard Levels!
+      - Gagne {0} niveaux très difficiles !
+      - '{0}超難レベル勝利！'
+      - '{0}초고난도 레벨 승리!'
+      - Menangkan {0} Level Sangat Sulit!
+      - '{0} sehr schwere Level gewinnen!'
+      - ¡Gana {0} niveles muy difíciles!
+      - Vinci {0} livelli difficilissimi!
+      - Vença {0} níveis superdifíceis!
+      - Выиграй {0} очень сложных уровней!
+      - '{0} Çok Zor Seviye kazan!'
+    - key: weekly_adventure_task_win_streak_levels
+      translations:
+      - Win {0} Levels In A Row!
+      - Gagne {0} niveaux d'affilée !
+      - '{0}レベル連続勝利！'
+      - '{0}레벨 연속 승리!'
+      - Menangkan {0} Level Berturut-turut!
+      - '{0} Level hintereinander gewinnen!'
+      - ¡Gana {0} niveles seguidos!
+      - Vinci {0} livelli di fila!
+      - Vença {0} níveis seguidos!
+      - Выиграй {0} уровней подряд!
+      - '{0} Seviyeyi arka arkaya kazan!'
+    - key: weekly_adventure_task_earn_coins
+      translations:
+      - Earn {0} Coins!
+      - Gagne {0} pièces !
+      - '{0}コイン獲得！'
+      - '{0}코인 획득!'
+      - Kumpulkan {0} Koin!
+      - '{0} Münzen verdienen!'
+      - ¡Gana {0} monedas!
+      - Guadagna {0} monete!
+      - Ganhe {0} moedas!
+      - Заработай {0} монет!
+      - '{0} Para kazan!'
+    - key: weekly_adventure_task_spend_coins
+      translations:
+      - Spend {0} Coins!
+      - Dépense {0} pièces !
+      - '{0}コイン使う！'
+      - '{0}코인 사용!'
+      - Pakai {0} Koin!
+      - '{0} Münzen ausgeben!'
+      - ¡Gasta {0} monedas!
+      - Spendi {0} monete!
+      - Gaste {0} moedas!
+      - Потрать {0} монет!
+      - '{0} Para harca!'
+    - key: weekly_adventure_task_use_booster
+      translations:
+      - Use 1 Booster!
+      - Utilise 1 booster !
+      - ブースターを1個使う！
+      - 부스터 1개 사용!
+      - Pakai 1 Booster!
+      - 1 Booster benutzen!
+      - ¡Usa 1 potenciador!
+      - Usa 1 booster!
+      - Use 1 booster!
+      - Используй 1 усилитель!
+      - 1 Güçlendirici kullan!
+    - key: weekly_adventure_task_use_boosters
+      translations:
+      - Use {0} Boosters!
+      - Utilise {0} boosters !
+      - ブースター{0}個使う！
+      - 부스터 {0}개 사용!
+      - Pakai {0} Booster!
+      - '{0} Booster benutzen!'
+      - ¡Usa {0} potenciadores!
+      - Usa {0} booster!
+      - Use {0} boosters!
+      - Используй {0} усилителей!
+      - '{0} Güçlendirici kullan!'
+    - key: weekly_adventure_task_use_shuffle
+      translations:
+      - Use 1 Shuffle!
+      - Utilise 1 mélange !
+      - シャッフルを1個使う！
+      - 셔플 1개 사용!
+      - Pakai 1 Acakan!
+      - 1 Mix benutzen!
+      - ¡Usa 1 mezcla!
+      - Usa 1 mescolata!
+      - Use 1 mistura!
+      - Используй 1 перемешку!
+      - 1 Karıştır kullan!
+    - key: weekly_adventure_task_use_shuffles
+      translations:
+      - Use {0} Shuffles!
+      - Utilise {0} mélanges !
+      - シャッフル{0}個使う！
+      - 셔플 {0}개 사용!
+      - Pakai {0} Acakan!
+      - '{0} Shuffles benutzen!'
+      - ¡Usa {0} mezclas!
+      - Usa {0} mescolate!
+      - Use {0} misturas!
+      - Используй {0} перемешек!
+      - '{0} Karıştırma kullan!'
+    - key: weekly_adventure_task_use_shovel
+      translations:
+      - Use 1 Shovel!
+      - Utilise 1 pelle !
+      - シャベルを1個使う！
+      - 삽 1개 사용!
+      - Pakai 1 Sekop!
+      - 1 Schaufel benutzen!
+      - ¡Usa 1 pala!
+      - Usa 1 pala!
+      - Use 1 pá!
+      - Используй 1 лопату!
+      - 1 Kürek kullan!
+    - key: weekly_adventure_task_use_shovels
+      translations:
+      - Use {0} Shovels!
+      - Utilise {0} pelles !
+      - シャベルを{0}個使う！
+      - 삽 {0}개 사용!
+      - Pakai {0} Sekop!
+      - '{0} Schaufeln benutzen!'
+      - Usa {0} palas!
+      - Usa {0} pale!
+      - Use {0} pás!
+      - Используй {0} лопат!
+      - '{0} Kürek kullan!'
+    - key: weekly_adventure_task_use_boomerang
+      translations:
+      - Use 1 Boomerang!
+      - Utilise 1 boomerang !
+      - ブーメランを1個使う！
+      - 부메랑 1개 사용!
+      - Pakai 1 Bumerang!
+      - 1 Bumerang benutzen!
+      - ¡Usa 1 búmeran!
+      - Usa 1 boomerang!
+      - Use 1 bumerangue!
+      - Используй 1 бумеранг!
+      - 1 Bumerang kullan!
+    - key: weekly_adventure_task_use_boomerangs
+      translations:
+      - Use {0} Boomerangs!
+      - Utilise {0} boomerangs !
+      - ブーメランを{0}個使う！
+      - 부메랑 {0}개 사용!
+      - Pakai {0} Bumerang!
+      - '{0} Bumerangs benutzen!'
+      - Usa {0} búmerangs!
+      - Usa {0} boomerang!
+      - Use {0} bumerangues!
+      - Используй {0} бумерангов!
+      - '{0} Bumerang kullan!'
+    - key: weekly_adventure_task_use_shrink
+      translations:
+      - Use 1 Shrink!
+      - Utilise 1 rétrécisseur !
+      - シュリンクを1個使う！
+      - 슈링크 1개 사용!
+      - Pakai 1 Pengecil!
+      - 1 Schrumpfer benutzen!
+      - ¡Usa 1 reductor!
+      - Usa 1 riduttore!
+      - Use 1 redutor!
+      - Используй 1 уменьшитель!
+      - 1 Küçültücü kullan!
+    - key: weekly_adventure_task_use_shrinks
+      translations:
+      - Use {0} Shrinks!
+      - Utilise {0} rétrécisseurs !
+      - シュリンクを{0}個使う！
+      - 슈링크 {0}개 사용!
+      - Pakai {0} Pengecil!
+      - '{0} Schrumpfer benutzen!'
+      - Usa {0} reductores!
+      - Usa {0} riduttori!
+      - Use {0} redutores!
+      - Используй {0} уменьшителей!
+      - '{0} Küçültücü kullan!'
+    - key: weekly_adventure_task_coins_for_ad
+      translations:
+      - Multiply Coins by Ads 1 Time!
+      - Multiplie tes pièces avec des pubs 1 fois !
+      - 広告でコインを1回増やす！
+      - 광고로 코인 1회 늘리기!
+      - Gandakan Koin dengan Iklan 1 Kali!
+      - Münzen durch Werbung 1x multiplizieren!
+      - ¡Duplica monedas con 1 anuncio!
+      - Moltiplica le monete con 1 pub!
+      - Multiplique moedas com anúncios 1 vez!
+      - Умножь монеты рекламой 1 раз!
+      - 1 reklam izle, altınlarını katla!
+    - key: weekly_adventure_task_coins_for_ads
+      translations:
+      - Multiply Coins by Ads {0} Times!
+      - Multiplie tes pièces par pub {0} fois !
+      - 広告でコイン{0}回増やす！
+      - 광고로 코인 {0}회 늘리기!
+      - Lipat gandakan Koin dengan Iklan {0} Kali!
+      - Münzen durch Werbung {0}x multiplizieren!
+      - ¡Duplica monedas con {0} anuncios!
+      - Moltiplica le monete con {0} pub!
+      - Multiplique moedas com anúncios {0} vezes!
+      - Умножь монеты рекламой {0} раз!
+      - '{0} reklam izle, altınlarını katla!'
+    - key: weekly_adventure_task_make_a_purchase
+      translations:
+      - Make a purchase!
+      - Fais un achat !
+      - 買い物しよう！
+      - 구매해봐!
+      - Lakukan pembelian!
+      - Mach einen Einkauf!
+      - ¡Haz una compra!
+      - Fai un acquisto!
+      - Faça uma compra!
+      - Соверши покупку!
+      - Alışveriş yap!
+    - key: weekly_adventure_widget_ended
+      translations:
+      - Ended
+      - Terminée
+      - 終了
+      - 종료
+      - Berakhir
+      - Beendet
+      - Terminada
+      - Terminata
+      - Encerrada
+      - Завершено
+      - Bitti
+    - key: popup_offer_regular_low_pack_title
+      translations:
+      - Fresh Pick
+      - Sélection Fraîche
+      - フレッシュチョイス
+      - 신선한 선택
+      - Pilihan Segar
+      - Frische Auswahl
+      - Elección Fresca
+      - Scelta Fresca
+      - Escolha Fresca
+      - Свежий выбор
+      - Taze Seçim
+    - key: popup_offer_regular_medium_pack_title
+      translations:
+      - Quick Bite
+      - Petite Bouchée
+      - クイックバイト
+      - 빠른 한 입
+      - Gigitan Cepat
+      - Kleiner Happen
+      - Bocado Rápido
+      - Morso Veloce
+      - Petisco Rápido
+      - Быстрый перекус
+      - Hızlı Lokma
+    - key: popup_offer_regular_high_pack_title
+      translations:
+      - Golden Harvest
+      - Récolte Dorée
+      - ゴールデンハーベスト
+      - 황금 수확
+      - Panen Emas
+      - Goldene Ernte
+      - Cosecha Dorada
+      - Raccolta d'Oro
+      - Colheita Dourada
+      - Золотой урожай
+      - Altın Hasat
+    - key: popup_offer_regular_noads_pack_title
+      translations:
+      - Clear Path
+      - Chemin Dégagé
+      - クリアパス
+      - 클리어 패스
+      - Jalan Bersih
+      - Freier Weg
+      - Camino Libre
+      - Percorso Libero
+      - Caminho Livre
+      - Открытый путь
+      - Açık Yol
+    - key: popup_offer_special_buy_all_title
+      translations:
+      - Go Big, Go All!
+      - À fond, prends tout !
+      - 大きく全部ゲット！
+      - 크게 가자, 다 가져라!
+      - Ambil Semuanya!
+      - Groß raus, alles her!
+      - ¡A lo grande, todo!
+      - Tutto in una volta!
+      - Vai com tudo!
+      - Всё и сразу!
+      - Büyük oyna, hepsini al!
+    - key: popup_offer_special_ooc_title
+      translations:
+      - Don't Stop Now!
+      - Ne t'arrête pas !
+      - 今すぐ止まるな！
+      - 지금 멈추지 마!
+      - Jangan Berhenti!
+      - Jetzt nicht aufhören!
+      - ¡No te detengas ahora!
+      - Non fermarti adesso!
+      - Não pare agora!
+      - Не останавливайся!
+      - Şimdi Durma!
+    - key: popup_offer_special_buy_all_button
+      translations:
+      - Buy All
+      - Tout acheter
+      - まとめて買う
+      - 전부 구매
+      - Beli Semua
+      - Alles kaufen
+      - Comprar todo
+      - Compra tutto
+      - Comprar tudo
+      - Купить всё
+      - Hepsini Al
+    - key: popup_offer_perc_off_badge
+      translations:
+      - '{0}% Off'
+      - '{0}% OFF'
+      - '{0}%オフ'
+      - '{0}% 할인'
+      - Hemat {0}%
+      - '{0}% Rabatt'
+      - '{0}% OFF'
+      - '{0}% sconto'
+      - '{0}% OFF'
+      - '{0}% скидка'
+      - '%{0} İndirim'
+    - key: popup_offer_perc_more_badge
+      translations:
+      - '{0}% More'
+      - '{0}% de plus'
+      - '{0}%増量'
+      - '{0}% 더'
+      - '{0}% Lebih'
+      - '{0}% mehr'
+      - '{0}% más'
+      - '{0}% in più'
+      - '{0}% a mais'
+      - '{0}% больше'
+      - '%{0} Fazla'
+    - key: popup_offer_perc_value_badge
+      translations:
+      - '{0}% Value'
+      - '{0}% valeur'
+      - '{0}%お得'
+      - '{0}% 가치'
+      - Nilai {0}%
+      - '{0}% Wert'
+      - '{0}% valor'
+      - '{0}% valore'
+      - '{0}% valor'
+      - '{0}% выгода'
+      - '%{0} Değer'
+    - key: prefab_booster_tutorial_popup_booster_unlocked
+      translations:
+      - New Booster Unlocked!
+      - Nouveau Booster débloqué !
+      - 新しいブースター解放！
+      - 새 부스터 해금!
+      - Booster Baru Terbuka!
+      - Neuer Booster freigeschaltet!
+      - ¡Nuevo Potenciador desbloqueado!
+      - Nuovo Booster sbloccato!
+      - Novo Booster desbloqueado!
+      - Новый Усилитель открыт!
+      - Yeni Güçlendirici açıldı!
+    - key: prefab_booster_tutorial_popup_new_booster
+      translations:
+      - NEW BOOSTER!
+      - NOUVEAU BOOSTER !
+      - 新しいブースター!
+      - 새 부스터!
+      - BOOSTER BARU!
+      - NEUER BOOSTER!
+      - NUEVO POTENCIADOR!
+      - NUOVO BOOSTER!
+      - NOVO BOOSTER!
+      - НОВЫЙ УСИЛИТЕЛЬ!
+      - YENİ GÜÇLENDİRİCİ!
+    - key: tutorial_lose_condition
+      translations:
+      - "<color=#446890>WHEN YOU</color> <color=#FF6567>\nHIT YOURSELF</color>\n<color=#446890>YOU WILL LOSE!</color> "
+      - "<color=#446890>QUAND TU</color> <color=#FF6567>\nTE PERCUTES</color>\n<color=#446890>TU PERDRAS !</color>"
+      - "<color=#446890>自分に</color><color=#FF6567>\nぶつかると</color>\n<color=#446890>ゲームオーバー！</color>"
+      - "<color=#446890>자신에게</color><color=#FF6567>\n부딪히면</color>\n<color=#446890>게임 오버!</color>"
+      - "<color=#446890>JIKA KAU</color><color=#FF6567>\nMENABRAK DIRI SENDIRI</color>\n<color=#446890>KAMU KALAH!</color>"
+      - "<color=#446890>WENN DU</color><color=#FF6567>\nDICH SELBST TRIFFST</color>\n<color=#446890>VERLIERST DU!</color>"
+      - "<color=#446890>SI TE</color> <color=#FF6567>\nCHOCAS CONTIGO</color>\n<color=#446890>¡PERDERÁS!</color>"
+      - "<color=#446890>SE TI</color><color=#FF6567>\nCOLPISCI</color>\n<color=#446890>PERDI!</color>"
+      - "<color=#446890>SE VOCÊ</color><color=#FF6567>\nBATER EM SI MESMO</color>\n<color=#446890>VOCÊ PERDE!</color>"
+      - "<color=#446890>ЕСЛИ ТЫ</color><color=#FF6567>\nВРЕЖЕШЬСЯ В СЕБЯ</color>\n<color=#446890>ТЫ ПРОИГРАЕШЬ!</color>"
+      - "<color=#446890>KENDİNE</color><color=#FF6567>\nÇARPARSAN</color>\n<color=#446890>KAYBEDERSİN!</color>"
+    - key: tutorial_combo
+      translations:
+      - "\"<color=#446890>COMPLETE</color> <color=#FF6567>\nMULTIPLE ORDERS AT ONE VISIT</color>\n<color=#446890>AND EARN COINS</color> \""
+      - "<color=#446890>COMPLÈTE</color> <color=#FF6567>\nPLUSIEURS COMMANDES EN UNE VISITE</color>\n<color=#446890>ET GAGNE DES PIÈCES</color>"
+      - "<color=#446890>1回で</color><color=#FF6567>\n複数の注文を完了</color>\n<color=#446890>してコインを獲得</color>"
+      - "<color=#446890>한 번에</color><color=#FF6567>\n여러 주문 완료하고</color>\n<color=#446890>코인 획득</color>"
+      - "<color=#446890>SELESAIKAN</color><color=#FF6567>\nBEBERAPA PESANAN DALAM SATU KUNJUNGAN</color>\n<color=#446890>DAN DAPATKAN KOIN</color>"
+      - "<color=#446890>SCHLIESSE</color><color=#FF6567>\nMEHRERE BESTELLUNGEN IN\\nEINEM BESUCH AB</color>\n<color=#446890>UND VERDIENE MÜNZEN</color>"
+      - "<color=#446890>COMPLETA</color><color=#FF6567>\nVARIOS PEDIDOS EN UNA VISITA</color>\n<color=#446890>Y GANA MONEDAS</color>"
+      - "<color=#446890>COMPLETA</color><color=#FF6567>\nPIÙ ORDINI IN UNA VISITA</color>\n<color=#446890>E GUADAGNA MONETE</color>"
+      - "<color=#446890>COMPLETE</color><color=#FF6567>\nVÁRIOS PEDIDOS EM UMA VISITA</color>\n<color=#446890>E GANHE MOEDAS</color>"
+      - "<color=#446890>ВЫПОЛНЯЙ</color><color=#FF6567>\nНЕСКОЛЬКО ЗАКАЗОВ ЗА ВИЗИТ</color>\n<color=#446890>И ЗАРАБАТЫВАЙ МОНЕТЫ</color>"
+      - "<color=#446890>BİR ZİYARETTE</color><color=#FF6567>\nBİRDEN FAZLA SİPARİŞİ TAMAMLA</color>\n<color=#446890>VE PARA KAZAN</color>"
+    - key: core_streak_intro_body
+      translations:
+      - Win <color=#8929F6>{0}</color> levels to activate <color=#8929F6>D.A.S.H. Boost</color> !
+      - Gagne <color=#8929F6>{0}</color> niveaux pour activer <color=#8929F6>D.A.S.H. Élan</color> !
+      - '<color=#8929F6>{0}</color>レベル勝利で<color=#8929F6>D.A.S.H. ブースト</color>を発動!'
+      - '<color=#8929F6>{0}</color>레벨 클리어로 <color=#8929F6>D.A.S.H. 부스트</color> 활성화!'
+      - Menangkan <color=#8929F6>{0}</color> level untuk mengaktifkan <color=#8929F6>D.A.S.H. Dorongan</color>!
+      - Gewinne <color=#8929F6>{0}</color> Level, um <color=#8929F6>D.A.S.H. Schub</color> zu aktivieren!
+      - Gana <color=#8929F6>{0}</color> niveles para activar <color=#8929F6>D.A.S.H. Impulso</color>!
+      - Vinci <color=#8929F6>{0}</color> livelli per attivare <color=#8929F6>D.A.S.H. Potenziamento</color>!
+      - Vença <color=#8929F6>{0}</color> níveis para ativar <color=#8929F6>D.A.S.H. Impulso</color>!
+      - Выиграй <color=#8929F6>{0}</color> уровней чтобы активировать <color=#8929F6>D.A.S.H. Буст</color>!
+      - '<color=#8929F6>{0}</color> seviye kazan ve <color=#8929F6>D.A.S.H. Gücü</color>''nü etkinleştir!'
+    - key: core_streak_intro_title
+      translations:
+      - D.A.S.H. Boost
+      - D.A.S.H. Élan
+      - D.A.S.H. ブースト
+      - D.A.S.H. 부스트
+      - D.A.S.H. Dorongan
+      - D.A.S.H. Schub
+      - D.A.S.H. Impulso
+      - D.A.S.H. Potenziamento
+      - D.A.S.H. Impulso
+      - D.A.S.H. Буст
+      - D.A.S.H. Gücü
+    - key: loss_aversion_core_streak
+      translations:
+      - You will lose your <color=#8929F6>D.A.S.H. Boost</color> !
+      - Tu vas perdre ton <color=#8929F6>D.A.S.H. Élan</color> !
+      - '<color=#8929F6>D.A.S.H. ブースト</color>を失うよ!'
+      - '<color=#8929F6>D.A.S.H. 부스트</color>를 잃게 돼!'
+      - Kamu akan kehilangan <color=#8929F6>D.A.S.H. Dorongan</color>-mu!
+      - Du verlierst deinen <color=#8929F6>D.A.S.H. Schub</color>!
+      - Perderás tu <color=#8929F6>D.A.S.H. Impulso</color>!
+      - çalıştı
+      - Você vai perder seu <color=#8929F6>D.A.S.H. Impulso</color>!
+      - Ты потеряешь свой <color=#8929F6>D.A.S.H. Буст</color>!
+      - '<color=#8929F6>D.A.S.H. Gücü</color>''nü kaybedeceksin!'
+    - key: combo_1_text_option_1
+      translations:
+      - Nice!
+      - Sympa !
+      - ナイス!
+      - 굿!
+      - Bagus!
+      - Cool!
+      - Bien!
+      - Bene!
+      - Bom!
+      - Класс!
+      - Güzel!
+    - key: combo_1_text_option_2
+      translations:
+      - Great!
+      - Génial !
+      - いいね!
+      - 좋아!
+      - Mantap!
+      - Klasse!
+      - Genial!
+      - Forte!
+      - Ótimo!
+      - Отлично!
+      - Harika!
+    - key: combo_1_text_option_3
+      translations:
+      - Tasty!
+      - Délicieux !
+      - 美味しい!
+      - 맛있어!
+      - Enak!
+      - Lecker!
+      - Delicioso!
+      - Grande!
+      - Delicioso!
+      - Вкусно!
+      - Lezzetli!
+    - key: combo_1_text_option_4
+      translations:
+      - Wow!
+      - Ouah !
+      - わぉ!
+      - 와!
+      - Wow!
+      - Wow!
+      - Wow!
+      - Wow!
+      - Uau!
+      - Вау!
+      - Vay!
+    - key: combo_1_text_option_5
+      translations:
+      - Crunchy!
+      - Croquant !
+      - サクサク!
+      - 바삭!
+      - Renyah!
+      - Knackig!
+      - Crujiente!
+      - Croccante!
+      - Crocante!
+      - Хрустяще!
+      - Çıtır!
+    - key: combo_2_text_option_1
+      translations:
+      - Succulent!
+      - Succulent !
+      - 絶品!
+      - 끝내줘!
+      - Lezat!
+      - Köstlich!
+      - Suculento!
+      - Succulente!
+      - Suculento!
+      - Сочно!
+      - Enfes!
+    - key: combo_2_text_option_2
+      translations:
+      - Scrumptious!
+      - Savoureux !
+      - 絶妙!
+      - 환상이야!
+      - Sedap!
+      - Himmlisch!
+      - Riquísimo!
+      - Squisito!
+      - Saboroso!
+      - Объедение!
+      - Nefis!
+    - key: combo_2_text_option_3
+      translations:
+      - Exquisite!
+      - Exquis !
+      - 極上!
+      - 황홀해!
+      - Istimewa!
+      - Exquisit!
+      - Exquisito!
+      - Saporito!
+      - Refinado!
+      - Изысканно!
+      - Mükemmel!
+    - key: combo_2_text_option_4
+      translations:
+      - Sublime!
+      - Sublime !
+      - 至高!
+      - 최고야!
+      - Luar biasa!
+      - Sublim!
+      - Sublime!
+      - Sublime!
+      - Sublime!
+      - Великолепно!
+      - Muhteşem!
+    - key: combo_3_text_option_1
+      translations:
+      - Legendary!
+      - Légendaire !
+      - 伝説!
+      - 전설이야!
+      - Legendaris!
+      - Legendär!
+      - Legendario!
+      - Leggendario!
+      - Lendário!
+      - Легендарно!
+      - Efsanevi!
+    - key: combo_3_text_option_2
+      translations:
+      - Divine!
+      - Divin !
+      - 神業!
+      - 신이야!
+      - Surgawi!
+      - Göttlich!
+      - Divino!
+      - Incredibile!
+      - Divino!
+      - Божественно!
+      - Harikulade!
+    - key: combo_3_text_option_3
+      translations:
+      - Snacky!
+      - Snacky !
+      - スナッキー!
+      - 스내키!
+      - Snacky!
+      - Snacky!
+      - Snacky!
+      - Super snack!
+      - Snacky!
+      - Мега снэк!
+      - Snacky!
+    - key: combo_3_text_option_4
+      translations:
+      - 'Holy Snack! '
+      - Sacré snack !
+      - なんてスナック!
+      - 이런 스낵!
+      - Astaga, snack!
+      - Heiliger Snack!
+      - Vaya snack!
+      - Snack geniale!
+      - Nossa, snack!
+      - Святой снэк!
+      - Snack Aşkına!
+    - key: popup_offer_banner_popular_badge
+      translations:
+      - Popular!
+      - Populaire !
+      - 人気!
+      - 인기!
+      - Populer!
+      - Beliebt!
+      - Popular!
+      - Popolare!
+      - Popular!
+      - Популярно!
+      - Popüler!
+    - key: popup_offer_banner_bestoffer_badge
+      translations:
+      - Best Offer!
+      - Meilleure offre !
+      - おすすめ!
+      - 최고 혜택!
+      - Penawaran Terbaik!
+      - Bestes Angebot!
+      - Mejor Oferta!
+      - Miglior Offerta!
+      - Melhor Oferta!
+      - Лучшая акция!
+      - En İyi Teklif!
+    - key: popup_offer_banner_bestvalue_badge
+      translations:
+      - Best Value!
+      - Meilleure offre !
+      - お得!
+      - 최고가성비!
+      - Nilai Terbaik!
+      - Bester Wert!
+      - Mejor Valor!
+      - Miglior Valore!
+      - Melhor Valor!
+      - Лучшая цена!
+      - En İyi Değer!
+    - key: combo_value_label
+      translations:
+      - combo!
+      - combo !
+      - コンボ!
+      - 콤보!
+      - kombo!
+      - Combo!
+      - combo!
+      - combo!
+      - combo!
+      - комбо!
+      - kombo!
+    - key: Notification_Lives_Title
+      translations:
+      - Your lives are full! ❤️
+      - Tes vies sont pleines ! ❤️
+      - ライフが満タン！ ❤️
+      - 라이프가 가득 찼어! ❤️
+      - Nyawamu penuh! ❤️
+      - Deine Leben sind voll! ❤️
+      - Tus vidas están llenas! ❤️
+      - Le tue vite sono piene! ❤️
+      - Suas vidas estão cheias! ❤️
+      - Жизни полны! ❤️
+      - Canların dolu! ❤️
+    - key: Notification_Lives_Description
+      translations:
+      - Your snake is warmed up and ready! 🐍
+      - Ton serpent est échauffé et prêt ! 🐍
+      - ヘビが準備できてるよ！🐍
+      - 뱀이 준비 완료! 🐍
+      - Ularmu sudah pemanasan dan siap! 🐍
+      - Deine Schlange ist aufgewärmt und bereit! 🐍
+      - Tu serpiente está lista! 🐍
+      - Il tuo serpente è pronto! 🐍
+      - Sua cobra está aquecida e pronta! 🐍
+      - Змейка размялась и готова! 🐍
+      - Yılanın ısındı ve hazır! 🐍
+    - key: Notification_2Hour_Title
+      translations:
+      - Deliveries are waiting! 📦
+      - Des livraisons t'attendent ! 📦
+      - 配達が待ってるよ！📦
+      - 배달이 기다리고 있어! 📦
+      - Pengiriman sedang menunggu! 📦
+      - Lieferungen warten! 📦
+      - Las entregas te esperan! 📦
+      - Le consegne ti aspettano! 📦
+      - Entregas esperando por você! 📦
+      - Доставки ждут! 📦
+      - Teslimatlar bekliyor! 📦
+    - key: Notification_2Hour_Description
+      translations:
+      - Your fruits won't deliver themselves 🐍
+      - Tes fruits ne vont pas se livrer tout seuls 🐍
+      - フルーツは自分で届けないよ🐍
+      - 과일이 알아서 배달되진 않아 🐍
+      - Buahmu tidak akan mengantar dirinya sendiri 🐍
+      - Deine Früchte liefern sich nicht von selbst 🐍
+      - Tus frutas no se van a entregar solas 🐍
+      - La tua frutta non si consegna da sola 🐍
+      - Suas frutas não vão se entregar sozinhas 🐍
+      - Фрукты сами себя не доставят 🐍
+      - Meyvelerin kendini teslim etmeyecek 🐍
+    - key: Notification_Day1_Title
+      translations:
+      - Your rewards are piling up! 🍀
+      - Tes récompenses s'accumulent ! 🍀
+      - 報酬がたまってるよ！🍀
+      - 보상이 쌓이고 있어! 🍀
+      - Hadiahmu menumpuk! 🍀
+      - Deine Belohnungen stapeln sich! 🍀
+      - Tus recompensas se acumulan! 🍀
+      - I tuoi premi si accumulano! 🍀
+      - Suas recompensas estão acumulando! 🍀
+      - Награды копятся! 🍀
+      - Ödüllerin birikiyor! 🍀
+    - key: Notification_Day1_Description
+      translations:
+      - Come collect before they roll away 🐍
+      - Viens récupérer avant que ça roule 🐍
+      - 転がる前に集めに来て！🐍
+      - 굴러가기 전에 모으러 와 🐍
+      - Ayo kumpulkan sebelum menggelinding pergi 🐍
+      - Hol sie ab, bevor sie wegrollen 🐍
+      - Ven a recogerlas antes de que rueden 🐍
+      - Vieni a raccoglierli prima che rotolino via 🐍
+      - Venha coletar antes que rolem para longe 🐍
+      - Собери, пока не укатились 🐍
+      - Yuvarlanıp gitmeden gel topla 🐍
+    - key: Notification_Day2_Title
+      translations:
+      - Fresh fruits need a dasher! 🍒
+      - Les fruits frais ont besoin d'un livreur ! 🍒
+      - 新鮮なフルーツに配達員が必要！🍒
+      - 신선한 과일에 배달원이 필요해! 🍒
+      - Buah segar butuh pengantar! 🍒
+      - Frische Früchte brauchen einen Kurier! 🍒
+      - Las frutas frescas necesitan un repartidor! 🍒
+      - La frutta fresca ha bisogno di un corriere! 🍒
+      - Frutas frescas precisam de um entregador! 🍒
+      - Свежим фруктам нужен курьер! 🍒
+      - Taze meyvelerin bir kuryeye ihtiyacı var! 🍒
+    - key: Notification_Day2_Description
+      translations:
+      - Pick up where you left off 🐍
+      - Reprends là où tu en étais 🐍
+      - 続きをやろう🐍
+      - 멈춘 곳에서 다시 시작해 🐍
+      - Lanjutkan dari tempat terakhir 🐍
+      - Mach weiter, wo du aufgehört hast 🐍
+      - Retoma donde lo dejaste 🐍
+      - Riprendi da dove avevi lasciato 🐍
+      - Continue de onde parou 🐍
+      - Возвращайся в игру 🐍
+      - Kaldığın yerden devam et 🐍
+    - key: Notification_Day3_Title
+      translations:
+      - Your snake is getting bored! 🐍
+      - Ton serpent s'ennuie ! 🐍
+      - ヘビが退屈してるよ！🐍
+      - 뱀이 지루해하고 있어! 🐍
+      - Ularmu mulai bosan! 🐍
+      - Deine Schlange langweilt sich! 🐍
+      - Tu serpiente se está aburriendo! 🐍
+      - Il tuo serpente si sta annoiando! 🐍
+      - Sua cobra está ficando entediada! 🐍
+      - Змейке скучно! 🐍
+      - Yılanın sıkılıyor! 🐍
+    - key: Notification_Day3_Description
+      translations:
+      - It's been practicing solo but prefers a partner 🤝
+      - Il s'entraîne en solo mais préfère un partenaire 🤝
+      - ひとりで練習してるけど、仲間が好きなんだって🤝
+      - 혼자 연습했지만 파트너가 더 좋대 🤝
+      - Sudah latihan sendiri tapi lebih suka punya teman 🤝
+      - Sie hat allein geübt, aber hätte lieber einen Partner 🤝
+      - Ha estado practicando a solas pero prefiere compañía 🤝
+      - Si è allenato da solo ma preferisce un compagno 🤝
+      - Está treinando sozinha mas prefere companhia 🤝
+      - Тренируется в одиночку, но предпочитает компанию 🤝
+      - Tek başına antrenman yaptı ama bir partner tercih ediyor 🤝
+    - key: Notification_Day7_Title
+      translations:
+      - Your snake misses you! 🐍
+      - Tu manques à ton serpent ! 🐍
+      - ヘビが寂しがってるよ！ 🐍
+      - 뱀이 보고 싶어해! 🐍
+      - Ularmu merindukanmu! 🐍
+      - Deine Schlange vermisst dich! 🐍
+      - Tu serpiente te extraña! 🐍
+      - Il tuo serpente sente la tua mancanza! 🐍
+      - Sua cobra está com saudade! 🐍
+      - Змейка скучает по тебе! 🐍
+      - Yılanın seni özledi! 🐍
+    - key: Notification_Day7_Description
+      translations:
+      - It's been napping without you 💤
+      - Il fait la sieste sans toi 💤
+      - あなたなしでお昼寝してたよ 💤
+      - 너 없이 낮잠 자고 있었어 💤
+      - Tidur siang tanpamu 💤
+      - Sie hat ohne dich ein Nickerchen gemacht 💤
+      - Ha dormido la siesta sin ti 💤
+      - Ha fatto un pisolino senza di te 💤
+      - Tirou uma soneca sem você 💤
+      - Она дремлет без тебя 💤
+      - Sensiz şekerleme yapıyordu 💤
+    - key: Notification_Day14_Title
+      translations:
+      - Long time no see! 👀
+      - Ça fait longtemps ! 👀
+      - 久しぶり！ 👀
+      - 오랜만이야! 👀
+      - Lama tidak bertemu! 👀
+      - Lange nicht gesehen! 👀
+      - Cuánto tiempo! 👀
+      - Quanto tempo! 👀
+      - Quanto tempo! 👀
+      - Давно не виделись! 👀
+      - Uzun zamandır görüşmedik! 👀
+    - key: Notification_Day14_Description
+      translations:
+      - Your snake has been practicing new moves 🐍
+      - Ton serpent a appris de nouveaux mouvements 🐍
+      - ヘビが新しい技を練習してたよ 🐍
+      - 뱀이 새로운 기술을 연습했어 🐍
+      - Ularmu sudah latihan gerakan baru 🐍
+      - Deine Schlange hat neue Moves geübt 🐍
+      - Tu serpiente ha estado practicando nuevos movimientos 🐍
+      - Il tuo serpente ha provato nuove mosse 🐍
+      - Sua cobra andou praticando novos movimentos 🐍
+      - Змейка разучила новые приёмы 🐍
+      - Yılanın yeni hareketler çalıştı 🐍
+    - key: Notification_Day21_Title
+      translations:
+      - New levels are waiting! 🍇
+      - De nouveaux niveaux t'attendent ! 🍇
+      - 新しいレベルが待ってるよ！ 🍇
+      - 새로운 레벨이 기다리고 있어! 🍇
+      - Level baru sedang menunggu! 🍇
+      - Neue Level warten! 🍇
+      - Nuevos niveles te esperan! 🍇
+      - Nuovi livelli ti aspettano! 🍇
+      - Novos níveis esperando por você! 🍇
+      - Новые уровни ждут! 🍇
+      - Yeni seviyeler bekliyor! 🍇
+    - key: Notification_Day21_Description
+      translations:
+      - Your snake redecorated while you were away 🐍
+      - Ton serpent a redécoré pendant ton absence 🐍
+      - 留守中にヘビが模様替えしたよ 🐍
+      - 네가 없는 동안 뱀이 꾸며놨어 🐍
+      - Ularmu mendekorasi ulang selama kamu pergi 🐍
+      - Deine Schlange hat umdekoriert, während du weg warst 🐍
+      - Tu serpiente redecoró mientras no estabas 🐍
+      - Il tuo serpente ha riarredato mentre eri via 🐍
+      - Sua cobra redecorou enquanto você estava fora 🐍
+      - Змейка сделала ремонт, пока тебя не было 🐍
+      - Yılanın sen yokken yeniden dekore etti 🐍
+    - key: Notification_Day30_Title
+      translations:
+      - Did you miss me? 🐍
+      - Je t'ai manqué ? 🐍
+      - 寂しかった？ 🐍
+      - 보고 싶었어? 🐍
+      - Kamu kangen aku? 🐍
+      - Hast du mich vermisst? 🐍
+      - Me extrañaste? 🐍
+      - Ti manco? 🐍
+      - Sentiu minha falta? 🐍
+      - Скучаешь по мне? 🐍
+      - Beni özledin mi? 🐍
+    - key: Notification_Day30_Description
+      translations:
+      - Your snake is still here ready to dash!
+      - Ton serpent est toujours là, prêt à foncer !
+      - ヘビはまだここ、ダッシュの準備はOK！
+      - 뱀이 아직 여기 있어, 달릴 준비 완료!
+      - Ularmu masih di sini siap melaju!
+      - Deine Schlange ist noch da und bereit loszudüsen!
+      - Tu serpiente sigue aquí lista para correr!
+      - Il tuo serpente è ancora qui pronto a scattare!
+      - Sua cobra ainda está aqui pronta para correr!
+      - Змейка всё ещё здесь и готова мчаться!
+      - Yılanın hâlâ burada, koşmaya hazır!
+    - key: Notification_WeeklyTasksStart_Title
+      translations:
+      - Weekly tasks are live! 💪
+      - Les missions hebdo sont là ! 💪
+      - ウィークリータスク開始！ 💪
+      - 주간 과제가 시작됐어! 💪
+      - Tugas mingguan sudah aktif! 💪
+      - Wöchentliche Aufgaben sind da! 💪
+      - Las tareas semanales están activas! 💪
+      - Le missioni settimanali sono attive! 💪
+      - Tarefas semanais estão ativas! 💪
+      - Еженедельные задания начались! 💪
+      - Haftalık görevler başladı! 💪
+    - key: Notification_WeeklyTasksStart_Description
+      translations:
+      - Rumor has it the rewards are juicy 🍎
+      - Il paraît que les récompenses sont savoureuses 🍎
+      - 報酬がジューシーって噂だよ 🍎
+      - 보상이 짱이라는 소문이 있어 🍎
+      - Katanya hadiahnya menggiurkan 🍎
+      - Die Belohnungen sollen richtig saftig sein 🍎
+      - Dicen que las recompensas están jugosas 🍎
+      - Si dice che i premi siano succosi 🍎
+      - Dizem que as recompensas estão suculentas 🍎
+      - Говорят, награды сочные 🍎
+      - Ödüllerin lezzetli olduğu söyleniyor 🍎
+    - key: Notification_WeeklyTasksTimeRemaining_Title
+      translations:
+      - Last chance! 🚨
+      - Dernière chance ! 🚨
+      - ラストチャンス！ 🚨
+      - 마지막 기회! 🚨
+      - Kesempatan terakhir! 🚨
+      - Letzte Chance! 🚨
+      - Última oportunidad! 🚨
+      - Ultima chance! 🚨
+      - Última chance! 🚨
+      - Последний шанс! 🚨
+      - Son şans! 🚨
+    - key: Notification_WeeklyTasksTimeRemaining_Description
+      translations:
+      - 1 day left and your tasks are giving you side-eye 👀
+      - Plus qu'1 jour et tes missions te regardent de travers 👀
+      - 残り1日、タスクがこっち見てるよ 👀
+      - 1일 남았는데 과제가 눈치 주고 있어 👀
+      - Sisa 1 hari dan tugasmu melirikmu 👀
+      - Noch 1 Tag und deine Aufgaben werfen dir Blicke zu 👀
+      - Queda 1 día y tus tareas te miran de reojo 👀
+      - Manca 1 giorno e le tue missioni ti guardano storto 👀
+      - Falta 1 dia e suas tarefas estão de olho em você 👀
+      - Остался 1 день, и задания косо на тебя смотрят 👀
+      - 1 gün kaldı ve görevlerin sana yan bakıyor 👀
+    - key: Notification_WeeklyTasksEnd_Title
+      translations:
+      - You crushed it! 🏆
+      - Tu as tout déchiré ! 🏆
+      - やったね！ 🏆
+      - 해냈어! 🏆
+      - Kamu hebat! 🏆
+      - Du hast es geschafft! 🏆
+      - Lo aplastaste! 🏆
+      - Alla grande! 🏆
+      - Arrasou! 🏆
+      - Молодец! 🏆
+      - Harikasın! 🏆
+    - key: Notification_WeeklyTasksEnd_Description
+      translations:
+      - Now come grab what you earned 🎁
+      - Viens récupérer ce que tu as mérité 🎁
+      - 稼いだ報酬を取りに来よう 🎁
+      - 벌어들인 보상 받으러 와 🎁
+      - Ayo ambil yang sudah kamu dapatkan 🎁
+      - Hol dir jetzt, was du verdient hast 🎁
+      - Ven a recoger lo que ganaste 🎁
+      - Vieni a ritirare quello che hai guadagnato 🎁
+      - Venha pegar o que você ganhou 🎁
+      - Забери заслуженную награду 🎁
+      - Gel, kazandığını al 🎁
+    - key: play_button_level_number
+      translations:
+      - Level {0}
+      - Niveau {0}
+      - レベル {0}
+      - 레벨 {0}
+      - Level {0}
+      - Level {0}
+      - Nivel {0}
+      - Livello {0}
+      - Nível {0}
+      - Уровень {0}
+      - Seviye {0}
+    - key: state_offline
+      translations:
+      - Offline
+      - Hors ligne
+      - オフライン
+      - 오프라인
+      - Offline
+      - Offline
+      - Sin conexión
+      - Offline
+      - Offline
+      - Оффлайн
+      - Çevrimdışı

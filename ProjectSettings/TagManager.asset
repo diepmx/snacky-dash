@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Pill
+  - Enemy
+  - BridgeLRCollider
+  - BridgeUDCollider
+  - Chunk
+  - Door
+  - Portal
+  - DoorExit
+  - BlockingAccess
+  - EndLine
+  - Tunnel
+  - Blocker
+  - Multiplier
+  - BlockBoss
+  - BossBlock
+  - NoPillsCollider
+  - WallProtectionFireBall
+  - Shield
+  - FallTrigger
+  - BigPill
+  - Hole
+  - GolfBall
+  - GolfBall_Trail
+  - MovableWall
+  - PillMaster
+  - TutoHand
+  - SwitchAiguillage
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Pill
+  - Enemy
+  - Tongue
+  - Chunk
+  - TunnelZone
+  - ArrowCannon
+  - BridgeLayer
+  - Tutorial
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  m_RenderingLayers:
+  - Default

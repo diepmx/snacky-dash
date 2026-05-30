@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!200 &20000000
+ShaderVariantCollection:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ShaderVariants
+  m_Shaders:
+  - first: {fileID: 4800000, guid: 6831b3ce72b44d745890788a11e41f3c, type: 3}
+    second:
+      variants:
+      - keywords: COLOR_FILTER
+        passType: 0
+      - keywords: COLOR_FILTER EDGE_SHINY
+        passType: 0
+      - keywords: EDGE_SHINY
+        passType: 0
+      - keywords: TRANSITION_FADE
+        passType: 0
+      - keywords: TRANSITION_SHINY
+        passType: 0
