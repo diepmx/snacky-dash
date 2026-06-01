@@ -10,6 +10,11 @@ public class GameplaySandbox : MonoBehaviour
     [Tooltip("Tên file JSON màn chơi trong Resources/levelmaps/ (ví dụ: 11004_v1)")]
     public string levelMapName = "6070_v2";
 
+    [Header("Sandbox Viewer")]
+    public Camera targetCamera;
+    public float cameraPadding = 1.5f;
+    public bool showLevelSwitcher = true;
+
     [Header("Prefabs & Resources")]
     public GameObject snakeHeadPrefab;
     public GameObject snakeTailPrefab;
@@ -51,6 +56,10 @@ public class GameplaySandbox : MonoBehaviour
     private Dictionary<int, string> tiledIdToResourcePath = new Dictionary<int, string>();
     private Dictionary<Vector2Int, GameObject> spawnedPills = new Dictionary<Vector2Int, GameObject>();
     private int tilesetFirstGid = 1;
+    private GameObject boardContainer;
+    private string[] availableLevelNames = new string[0];
+    private int selectedLevelIndex = -1;
+    private string levelInput = "";
 
     // Trạng thái Rắn
     private GameObject snakeHead;
@@ -78,11 +87,13 @@ public class GameplaySandbox : MonoBehaviour
     {
         // 1. Tự động parse YAML database để có map GID -> ResourcePath
         ParseTileDefinitionDatabase();
+        LoadAvailableLevelNames();
     }
 
     private void Start()
     {
         // 2. Load và tạo Level
+        levelInput = levelMapName;
         LoadLevel();
     }
 
@@ -90,9 +101,28 @@ public class GameplaySandbox : MonoBehaviour
     {
         // 3. Nhận diện thao tác điều khiển
         HandleInput();
+        HandleSandboxShortcuts();
     }
 
     // 1. Tự động parse YAML Database
+    private void LoadAvailableLevelNames()
+    {
+        TextAsset[] levelMaps = Resources.LoadAll<TextAsset>("levelmaps");
+        List<string> names = new List<string>();
+
+        foreach (TextAsset levelMap in levelMaps)
+        {
+            if (levelMap != null)
+            {
+                names.Add(levelMap.name);
+            }
+        }
+
+        names.Sort(CompareLevelNames);
+        availableLevelNames = names.ToArray();
+        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+    }
+
     private void ParseTileDefinitionDatabase()
     {
         string dbPath = Path.Combine(Application.dataPath, "MonoBehaviour/TileDefinitionDatabase.asset");
@@ -160,19 +190,23 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        activeMap = JsonUtility.FromJson<TiledMap>(mapText.text);
-        if (activeMap == null || activeMap.layers == null)
+        TiledMap parsedMap = JsonUtility.FromJson<TiledMap>(mapText.text);
+        if (parsedMap == null || parsedMap.layers == null)
         {
             Debug.LogError("Lỗi parse map JSON.");
             return;
         }
+
+        StopAllCoroutines();
+        ClearCurrentLevel();
+        activeMap = parsedMap;
 
         tilesetFirstGid = activeMap.tilesets != null && activeMap.tilesets.Count > 0
             ? Mathf.Max(1, activeMap.tilesets[0].firstgid)
             : 1;
 
         // Tạo container cha để gọn Hierarchy
-        GameObject boardContainer = new GameObject("GameBoard");
+        boardContainer = new GameObject("GameBoard");
 
         TiledLayer spawnLayer = activeMap.layers.Find(l => l.name == "spawn");
 
@@ -227,6 +261,53 @@ public class GameplaySandbox : MonoBehaviour
         // Khởi tạo lịch sử vị trí của rắn tại điểm xuất phát
         snakePositionsHistory.Add(snakeGridPos);
         UpdateTailVisuals();
+        FitCameraToLevel();
+        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        levelInput = levelMapName;
+    }
+
+    private void ClearCurrentLevel()
+    {
+        isMoving = false;
+        moveDir = Vector2Int.zero;
+        activeMap = null;
+        gridMap.Clear();
+        spawnMap.Clear();
+        tunnelPairs.Clear();
+        tunnelExitDirections.Clear();
+        snakePositionsHistory.Clear();
+
+        foreach (GameObject pill in spawnedPills.Values)
+        {
+            if (pill != null)
+            {
+                Destroy(pill);
+            }
+        }
+        spawnedPills.Clear();
+
+        foreach (GameObject segment in tailSegments)
+        {
+            if (segment != null)
+            {
+                Destroy(segment);
+            }
+        }
+        tailSegments.Clear();
+
+        requiredTailLength = 3;
+
+        if (snakeHead != null)
+        {
+            Destroy(snakeHead);
+            snakeHead = null;
+        }
+
+        if (boardContainer != null)
+        {
+            Destroy(boardContainer);
+            boardContainer = null;
+        }
     }
 
     private int ResolveTiledId(int rawGid)
@@ -253,6 +334,171 @@ public class GameplaySandbox : MonoBehaviour
                 
                 // Reset Z rotation nếu hầm chui để hướng đúng
                 AdjustTunnelRotation(gid, spawnedTile);
+            }
+        }
+    }
+
+    private void FitCameraToLevel()
+    {
+        if (activeMap == null)
+        {
+            return;
+        }
+
+        Camera cam = targetCamera != null ? targetCamera : Camera.main;
+        if (cam == null)
+        {
+            Debug.LogWarning("Sandbox camera fit skipped because no camera is assigned and no MainCamera exists.");
+            return;
+        }
+
+        targetCamera = cam;
+
+        float width = Mathf.Max(1, activeMap.width);
+        float height = Mathf.Max(1, activeMap.height);
+        Vector3 center = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        float aspect = Mathf.Max(0.01f, cam.aspect);
+        float verticalSize = (height * 0.5f) + cameraPadding;
+        float horizontalSize = ((width * 0.5f) + cameraPadding) / aspect;
+
+        cam.orthographic = true;
+        cam.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
+        cam.transform.position = new Vector3(center.x, center.y, -10f);
+        cam.transform.rotation = Quaternion.identity;
+    }
+
+    private void HandleSandboxShortcuts()
+    {
+        if (Input.GetKeyDown(KeyCode.PageUp) || Input.GetKeyDown(KeyCode.LeftBracket))
+        {
+            LoadAdjacentLevel(-1);
+        }
+        else if (Input.GetKeyDown(KeyCode.PageDown) || Input.GetKeyDown(KeyCode.RightBracket))
+        {
+            LoadAdjacentLevel(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            LoadLevel();
+        }
+        else if (Input.GetKeyDown(KeyCode.F))
+        {
+            FitCameraToLevel();
+        }
+    }
+
+    private void LoadAdjacentLevel(int delta)
+    {
+        if (availableLevelNames == null || availableLevelNames.Length == 0)
+        {
+            return;
+        }
+
+        int currentIndex = selectedLevelIndex >= 0
+            ? selectedLevelIndex
+            : Array.IndexOf(availableLevelNames, levelMapName);
+
+        if (currentIndex < 0)
+        {
+            currentIndex = 0;
+        }
+
+        int nextIndex = Mathf.Clamp(currentIndex + delta, 0, availableLevelNames.Length - 1);
+        if (nextIndex == currentIndex)
+        {
+            return;
+        }
+
+        levelMapName = availableLevelNames[nextIndex];
+        LoadLevel();
+    }
+
+    private void OnGUI()
+    {
+        if (!showLevelSwitcher)
+        {
+            return;
+        }
+
+        GUILayout.BeginArea(new Rect(12f, 12f, 340f, 132f), GUI.skin.box);
+        GUILayout.Label("Sandbox Level");
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Prev", GUILayout.Width(70f)))
+        {
+            LoadAdjacentLevel(-1);
+        }
+        if (GUILayout.Button("Next", GUILayout.Width(70f)))
+        {
+            LoadAdjacentLevel(1);
+        }
+        if (GUILayout.Button("Reload", GUILayout.Width(80f)))
+        {
+            LoadLevel();
+        }
+        if (GUILayout.Button("Fit", GUILayout.Width(60f)))
+        {
+            FitCameraToLevel();
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Map", GUILayout.Width(38f));
+        levelInput = GUILayout.TextField(levelInput ?? string.Empty, GUILayout.Width(190f));
+        if (GUILayout.Button("Load", GUILayout.Width(70f)))
+        {
+            string trimmedInput = levelInput != null ? levelInput.Trim() : string.Empty;
+            if (!string.IsNullOrEmpty(trimmedInput))
+            {
+                levelMapName = trimmedInput;
+                LoadLevel();
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        string indexText = selectedLevelIndex >= 0 && availableLevelNames.Length > 0
+            ? $"{selectedLevelIndex + 1}/{availableLevelNames.Length}"
+            : "-";
+        GUILayout.Label($"{levelMapName} ({indexText})");
+        GUILayout.EndArea();
+    }
+
+    private static int CompareLevelNames(string a, string b)
+    {
+        ParseLevelName(a, out int numberA, out int versionA);
+        ParseLevelName(b, out int numberB, out int versionB);
+
+        int numberCompare = numberA.CompareTo(numberB);
+        if (numberCompare != 0)
+        {
+            return numberCompare;
+        }
+
+        int versionCompare = versionA.CompareTo(versionB);
+        return versionCompare != 0 ? versionCompare : string.CompareOrdinal(a, b);
+    }
+
+    private static void ParseLevelName(string value, out int number, out int version)
+    {
+        number = int.MaxValue;
+        version = int.MaxValue;
+
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        string[] parts = value.Split(new[] { "_v" }, StringSplitOptions.None);
+        if (!int.TryParse(parts[0], out number))
+        {
+            number = int.MaxValue;
+        }
+
+        if (parts.Length > 1)
+        {
+            if (!int.TryParse(parts[1], out version))
+            {
+                version = int.MaxValue;
             }
         }
     }
@@ -620,6 +866,11 @@ public class GameplaySandbox : MonoBehaviour
     // 8. Thuật toán di chuyển & Cập nhật khớp Đuôi (Tail Follower)
     private void UpdateTailVisuals()
     {
+        if (snakeHead == null)
+        {
+            return;
+        }
+
         // Giới hạn chiều dài thực tế tối đa của đuôi theo lịch sử di chuyển
         int targetTailCount = Mathf.Min(requiredTailLength, snakePositionsHistory.Count - 1);
 
@@ -663,6 +914,11 @@ public class GameplaySandbox : MonoBehaviour
     // Tiện ích xoay khớp đầu rắn
     private void RotateHead(Vector2Int dir)
     {
+        if (snakeHead == null)
+        {
+            return;
+        }
+
         if (dir == Vector2Int.up) snakeHead.transform.rotation = Quaternion.Euler(0, 0, 90);
         else if (dir == Vector2Int.down) snakeHead.transform.rotation = Quaternion.Euler(0, 0, 270);
         else if (dir == Vector2Int.left) snakeHead.transform.rotation = Quaternion.Euler(0, 0, 180);

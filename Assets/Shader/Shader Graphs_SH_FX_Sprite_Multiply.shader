@@ -2,7 +2,7 @@ Shader "Shader Graphs/SH_FX_Sprite_Multiply"
 {
     Properties
     {
-        [NoScaleOffset] _MainTex ("_MainTex", 2D)    = "white" {}
+        [PerRendererData] [NoScaleOffset] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color                   ("_Color",   Color) = (1,1,1,1)
     }
 
@@ -69,7 +69,12 @@ Shader "Shader Graphs/SH_FX_Sprite_Multiply"
             float4 frag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
-                return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv) * _Color * IN.color;
+                float4 sprite = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                float4 tint = _Color * IN.color;
+                float shadowMask = saturate(sprite.a * tint.a);
+                float3 shadowColor = min(tint.rgb, float3(0.75, 0.75, 0.75));
+                float3 multiplyColor = lerp(float3(1.0, 1.0, 1.0), shadowColor, shadowMask);
+                return float4(multiplyColor, 1.0);
             }
             ENDHLSL
         }
