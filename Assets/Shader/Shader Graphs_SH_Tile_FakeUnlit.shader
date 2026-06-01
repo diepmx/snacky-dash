@@ -1,5 +1,7 @@
-Shader "Shader Graphs/SH_Tile_FakeUnlit" {
-    Properties {
+Shader "Shader Graphs/SH_Tile_FakeUnlit"
+{
+    Properties
+    {
         _Main_Color_1 ("Main_Color_1", Color) = (1,0,0,1)
         _Main_Color_2 ("Main_Color_2", Color) = (0,0.4149446,1,1)
         _Main_Color_3 ("Main_Color_3", Color) = (1,1,1,0)
@@ -18,228 +20,144 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit" {
         _Overlay_Color ("Overlay_Color", Color) = (1,1,1,0)
     }
 
-    // === URP-Compatible SubShader ===
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline"="UniversalPipeline" }
-        Cull Back ZWrite On
+    SubShader
+    {
+        Tags
+        {
+            "RenderType" = "Opaque"
+            "Queue" = "Geometry"
+            "RenderPipeline" = "UniversalPipeline"
+        }
 
-        Pass {
-            Name "UniversalForward"
-            Tags { "LightMode"="UniversalForward" }
+        Cull Back
+        ZWrite On
+        ZTest LEqual
+
+        Pass
+        {
+            Name "Unlit"
 
             HLSLPROGRAM
+            #pragma target 2.0
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct appdata {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-            };
-
-            struct v2f {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float3 worldPos : TEXCOORD1;
-                float3 worldNormal : TEXCOORD2;
-            };
-
             CBUFFER_START(UnityPerMaterial)
-                half4 _Main_Color_1;
-                half4 _Main_Color_2;
-                half4 _Main_Color_3;
-                half4 _Side_Color;
-                half4 _Shadow_Color;
-                half4 _Overlay_Color;
-                half _Overlay_Tiling;
-                half _Overlay_Strength;
-                half _Shadow_Strength;
-                half _Side_Height_Top;
-                half _Side_Height_Bottom;
+                float4 _Main_Color_1;
+                float4 _Main_Color_2;
+                float4 _Main_Color_3;
+                float4 _Side_Color;
+                float4 _Shadow_Color;
+                float4 _Overlay_Color;
+                float  _Overlay_Tiling;
+                float  _Overlay_Strength;
+                float  _Shadow_Strength;
+                float  _Side_Height_Top;
+                float  _Side_Height_Bottom;
+                float  _Shadow_Edge_1;
+                float  _Shadow_Edge_2;
+                float  _Shadow_Steps;
+                float  _Overlay_Rotation;
             CBUFFER_END
 
             TEXTURE2D(_Overlay_Texture);
             SAMPLER(sampler_Overlay_Texture);
 
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = TransformObjectToHClip(v.vertex.xyz);
-                o.uv = v.uv;
-                o.worldPos = TransformObjectToWorld(v.vertex.xyz);
-                o.worldNormal = TransformObjectToWorldNormal(v.normal);
-                return o;
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv         : TEXCOORD0;
+                float3 normalOS   : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv         : TEXCOORD0;
+                float3 positionWS : TEXCOORD1;
+                float3 normalWS   : TEXCOORD2;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv         = IN.uv;
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.normalWS   = TransformObjectToWorldNormal(IN.normalOS);
+                return OUT;
             }
 
-            half4 frag(v2f i) : SV_Target {
-                half topMask = saturate(i.uv.y);
-                half4 baseColor = lerp(_Main_Color_1, _Main_Color_2, topMask);
-                baseColor = lerp(baseColor, _Main_Color_3, _Main_Color_3.a);
-                half sideMask = saturate((i.worldPos.y - _Side_Height_Top) / max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
-                half4 c = lerp(_Side_Color, baseColor, sideMask);
-                half4 overlay = SAMPLE_TEXTURE2D(_Overlay_Texture, sampler_Overlay_Texture, i.uv * max(_Overlay_Tiling, 0.001)) * _Overlay_Color;
-                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a);
-                half shade = saturate(1.0 - abs(i.worldNormal.y));
-                c.rgb = lerp(c.rgb, c.rgb * _Shadow_Color.rgb, saturate(_Shadow_Strength) * shade * _Shadow_Color.a);
-                c.a = 1;
+            float4 frag(Varyings IN) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(IN);
+
+                float topMask   = saturate(IN.uv.y);
+                float4 base     = lerp(_Main_Color_1, _Main_Color_2, topMask);
+                base            = lerp(base, _Main_Color_3, _Main_Color_3.a);
+
+                float sideMask  = saturate((IN.positionWS.y - _Side_Height_Top) /
+                                   max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
+                float4 c        = lerp(_Side_Color, base, sideMask);
+
+                float4 overlay  = SAMPLE_TEXTURE2D(_Overlay_Texture, sampler_Overlay_Texture,
+                                   IN.uv * max(_Overlay_Tiling, 0.001)) * _Overlay_Color;
+                c.rgb           = lerp(c.rgb, overlay.rgb,
+                                   saturate(_Overlay_Strength) * overlay.a);
+
+                float shade     = saturate(1.0 - abs(IN.normalWS.y));
+                c.rgb           = lerp(c.rgb, c.rgb * _Shadow_Color.rgb,
+                                   saturate(_Shadow_Strength) * shade * _Shadow_Color.a);
+                c.a             = 1.0;
                 return c;
             }
             ENDHLSL
         }
 
-        // SRPDefaultUnlit pass for scene selection/picking
-        Pass {
-            Name "SRPDefaultUnlit"
-            Tags { "LightMode"="SRPDefaultUnlit" }
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            struct appdata {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-            };
-
-            struct v2f {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float3 worldPos : TEXCOORD1;
-                float3 worldNormal : TEXCOORD2;
-            };
-
-            CBUFFER_START(UnityPerMaterial)
-                half4 _Main_Color_1;
-                half4 _Main_Color_2;
-                half4 _Main_Color_3;
-                half4 _Side_Color;
-                half4 _Shadow_Color;
-                half4 _Overlay_Color;
-                half _Overlay_Tiling;
-                half _Overlay_Strength;
-                half _Shadow_Strength;
-                half _Side_Height_Top;
-                half _Side_Height_Bottom;
-            CBUFFER_END
-
-            TEXTURE2D(_Overlay_Texture);
-            SAMPLER(sampler_Overlay_Texture);
-
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = TransformObjectToHClip(v.vertex.xyz);
-                o.uv = v.uv;
-                o.worldPos = TransformObjectToWorld(v.vertex.xyz);
-                o.worldNormal = TransformObjectToWorldNormal(v.normal);
-                return o;
-            }
-
-            half4 frag(v2f i) : SV_Target {
-                half topMask = saturate(i.uv.y);
-                half4 baseColor = lerp(_Main_Color_1, _Main_Color_2, topMask);
-                baseColor = lerp(baseColor, _Main_Color_3, _Main_Color_3.a);
-                half sideMask = saturate((i.worldPos.y - _Side_Height_Top) / max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
-                half4 c = lerp(_Side_Color, baseColor, sideMask);
-                half4 overlay = SAMPLE_TEXTURE2D(_Overlay_Texture, sampler_Overlay_Texture, i.uv * max(_Overlay_Tiling, 0.001)) * _Overlay_Color;
-                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a);
-                half shade = saturate(1.0 - abs(i.worldNormal.y));
-                c.rgb = lerp(c.rgb, c.rgb * _Shadow_Color.rgb, saturate(_Shadow_Strength) * shade * _Shadow_Color.a);
-                c.a = 1;
-                return c;
-            }
-            ENDHLSL
-        }
-
-        // DepthOnly pass required by URP
-        Pass {
+        Pass
+        {
             Name "DepthOnly"
-            Tags { "LightMode"="DepthOnly" }
-            ColorMask 0
+            Tags { "LightMode" = "DepthOnly" }
+            ColorMask R
             ZWrite On
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma target 2.0
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+            #pragma multi_compile_instancing
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
+        }
 
-            struct appdata { float4 vertex : POSITION; };
-            struct v2f { float4 pos : SV_POSITION; };
+        Pass
+        {
+            Name "DepthNormalsOnly"
+            Tags { "LightMode" = "DepthNormalsOnly" }
+            ZWrite On
 
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = TransformObjectToHClip(v.vertex.xyz);
-                return o;
-            }
-            half4 frag(v2f i) : SV_Target { return 0; }
+            HLSLPROGRAM
+            #pragma target 2.0
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+            #pragma multi_compile_instancing
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
     }
 
-    // === Built-in fallback SubShader (for older pipelines) ===
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Back ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-
-            struct appdata {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-            };
-
-            struct v2f {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float3 worldPos : TEXCOORD1;
-                float3 worldNormal : TEXCOORD2;
-            };
-
-            fixed4 _Main_Color_1;
-            fixed4 _Main_Color_2;
-            fixed4 _Main_Color_3;
-            fixed4 _Side_Color;
-            fixed4 _Shadow_Color;
-            sampler2D _Overlay_Texture;
-            half _Overlay_Tiling;
-            half _Overlay_Strength;
-            fixed4 _Overlay_Color;
-            half _Shadow_Strength;
-            half _Side_Height_Top;
-            half _Side_Height_Bottom;
-
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                o.worldNormal = UnityObjectToWorldNormal(v.normal);
-                return o;
-            }
-
-            fixed4 frag(v2f i) : SV_Target {
-                half topMask = saturate(i.uv.y);
-                fixed4 baseColor = lerp(_Main_Color_1, _Main_Color_2, topMask);
-                baseColor = lerp(baseColor, _Main_Color_3, _Main_Color_3.a);
-                half sideMask = saturate((i.worldPos.y - _Side_Height_Top) / max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
-                fixed4 c = lerp(_Side_Color, baseColor, sideMask);
-                fixed4 overlay = tex2D(_Overlay_Texture, i.uv * max(_Overlay_Tiling, 0.001)) * _Overlay_Color;
-                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a);
-                half shade = saturate(1.0 - abs(i.worldNormal.y));
-                c.rgb = lerp(c.rgb, c.rgb * _Shadow_Color.rgb, saturate(_Shadow_Strength) * shade * _Shadow_Color.a);
-                c.a = 1;
-                return c;
-            }
-            ENDCG
-        }
-    }
-    Fallback "Universal Render Pipeline/Unlit"
+    Fallback "Hidden/Universal Render Pipeline/FallbackError"
 }

@@ -1,126 +1,96 @@
-Shader "Shader Graphs/SH_FakeUnlit_Color" {
-    Properties {
-        _Color ("Color", Color) = (0,0.8915043,1,1)
-        _Smoothness ("Smoothness", Range(0, 1)) = 0
-        _ShadowColor ("ShadowColor", Color) = (0,0,0,0)
+Shader "Shader Graphs/SH_FakeUnlit_Color"
+{
+    Properties
+    {
+        _Color       ("Color",       Color)          = (0,0.8915043,1,1)
+        _Smoothness  ("Smoothness",  Range(0, 1))    = 0
+        _ShadowColor ("ShadowColor", Color)          = (0,0,0,0)
     }
 
-    // === URP-Compatible SubShader ===
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline"="UniversalPipeline" }
-        Cull Back ZWrite On
+    SubShader
+    {
+        Tags
+        {
+            "RenderType"    = "Opaque"
+            "Queue"         = "Geometry"
+            "RenderPipeline" = "UniversalPipeline"
+        }
 
-        Pass {
-            Name "UniversalForward"
-            Tags { "LightMode"="UniversalForward" }
+        Cull Back
+        ZWrite On
+        ZTest LEqual
+
+        Pass
+        {
+            Name "Unlit"
 
             HLSLPROGRAM
+            #pragma target 2.0
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct appdata { float4 vertex : POSITION; half4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; half4 color : COLOR; };
-
             CBUFFER_START(UnityPerMaterial)
-                half4 _Color;
-                half4 _ShadowColor;
-                half _Smoothness;
+                float4 _Color;
+                float4 _ShadowColor;
+                float  _Smoothness;
             CBUFFER_END
 
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = TransformObjectToHClip(v.vertex.xyz);
-                o.color = v.color;
-                return o;
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float4 color      : COLOR;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float4 color      : COLOR;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.color      = IN.color;
+                return OUT;
             }
 
-            half4 frag(v2f i) : SV_Target {
-                half4 c = _Color * i.color;
-                c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
+            float4 frag(Varyings IN) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(IN);
+                float4 c = _Color * IN.color;
+                c.rgb    = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
+                c.a      = 1.0;
                 return c;
             }
             ENDHLSL
         }
 
-        Pass {
-            Name "SRPDefaultUnlit"
-            Tags { "LightMode"="SRPDefaultUnlit" }
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            struct appdata { float4 vertex : POSITION; half4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; half4 color : COLOR; };
-
-            CBUFFER_START(UnityPerMaterial)
-                half4 _Color;
-                half4 _ShadowColor;
-                half _Smoothness;
-            CBUFFER_END
-
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = TransformObjectToHClip(v.vertex.xyz);
-                o.color = v.color;
-                return o;
-            }
-
-            half4 frag(v2f i) : SV_Target {
-                half4 c = _Color * i.color;
-                c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
-                return c;
-            }
-            ENDHLSL
-        }
-
-        Pass {
+        Pass
+        {
             Name "DepthOnly"
-            Tags { "LightMode"="DepthOnly" }
-            ColorMask 0 ZWrite On
+            Tags { "LightMode" = "DepthOnly" }
+            ColorMask R
+            ZWrite On
 
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma target 2.0
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+            #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            struct appdata { float4 vertex : POSITION; };
-            struct v2f { float4 pos : SV_POSITION; };
-            v2f vert(appdata v) { v2f o; o.pos = TransformObjectToHClip(v.vertex.xyz); return o; }
-            half4 frag(v2f i) : SV_Target { return 0; }
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
             ENDHLSL
         }
     }
 
-    // === Built-in fallback ===
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Back ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; fixed4 color : COLOR; };
-            fixed4 _Color;
-            fixed4 _ShadowColor;
-            v2f vert(appdata v) {
-                v2f o;
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.color = v.color;
-                return o;
-            }
-            fixed4 frag(v2f i) : SV_Target {
-                fixed4 c = _Color * i.color;
-                c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
-                return c;
-            }
-            ENDCG
-        }
-    }
-    Fallback "Universal Render Pipeline/Unlit"
+    Fallback "Hidden/Universal Render Pipeline/FallbackError"
 }
