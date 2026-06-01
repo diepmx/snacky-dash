@@ -1,25 +1,34 @@
-﻿Shader "Hidden/Universal Render Pipeline/XR/XRMirrorView" {
-    Properties {
-        _MainTex ("Texture", 2D) = "white" {}
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-        _BaseColor ("Base Color", Color) = (1,1,1,1)
-    }
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Off ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _BaseColor;
-            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color; return o; }
-            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * _Color * _BaseColor * i.color; }
-            ENDCG
+Shader "Hidden/Universal Render Pipeline/XR/XRMirrorView"
+{
+    SubShader
+    {
+        Tags{ "RenderPipeline" = "UniversalPipeline" }
+
+        HLSLINCLUDE
+            // Foveated rendering currently not supported in dxc on metal
+            #pragma never_use_dxc metal
+        ENDHLSL
+
+        Pass
+        {
+            ZWrite Off ZTest Always Blend Off Cull Off
+
+            HLSLPROGRAM
+                #pragma vertex VertQuad
+                #pragma fragment FragBilinear
+                #pragma multi_compile_local_fragment _ HDR_COLORSPACE_CONVERSION_AND_ENCODING
+                #pragma multi_compile_fragment _ DISABLE_TEXTURE2D_X_ARRAY
+
+                #if defined(DISABLE_TEXTURE2D_X_ARRAY)
+                #define SRC_TEXTURE2D_X_ARRAY 0
+                #else
+                #define SRC_TEXTURE2D_X_ARRAY 1
+                #endif
+                #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
+                #include "Packages/com.unity.render-pipelines.universal/Shaders/XR/XRMirrorView.hlsl"
+            ENDHLSL
         }
     }
+
     Fallback Off
 }

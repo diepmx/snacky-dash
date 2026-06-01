@@ -1,25 +1,41 @@
-﻿Shader "Hidden/Universal/CoreBlitColorAndDepth" {
-    Properties {
-        _MainTex ("Texture", 2D) = "white" {}
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-        _BaseColor ("Base Color", Color) = (1,1,1,1)
-    }
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Off ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _BaseColor;
-            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color; return o; }
-            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * _Color * _BaseColor * i.color; }
-            ENDCG
+Shader "Hidden/Universal/CoreBlitColorAndDepth"
+{
+    HLSLINCLUDE
+        #pragma target 2.0
+        #pragma editor_sync_compilation
+        // Core.hlsl for XR dependencies
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/BlitColorAndDepth.hlsl"
+    ENDHLSL
+
+    SubShader
+    {
+        Tags{ "RenderPipeline" = "UniversalPipeline" }
+
+        // 0: Color Only
+        Pass
+        {
+            ZWrite Off ZTest Always Blend Off Cull Off
+            Name "ColorOnly"
+
+            HLSLPROGRAM
+                #pragma vertex Vert
+                #pragma fragment FragColorOnly
+            ENDHLSL
+        }
+
+        // 1:  Color Only and Depth
+        Pass
+        {
+            ZWrite On ZTest Always Blend Off Cull Off
+            Name "ColorAndDepth"
+
+            HLSLPROGRAM
+                #pragma vertex Vert
+                #pragma fragment FragColorAndDepth
+            ENDHLSL
         }
     }
+
     Fallback Off
 }

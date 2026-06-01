@@ -1,25 +1,27 @@
-﻿Shader "Hidden/Universal Render Pipeline/CopyDepth" {
-    Properties {
-        _MainTex ("Texture", 2D) = "white" {}
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-        _BaseColor ("Base Color", Color) = (1,1,1,1)
-    }
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Off ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
+Shader "Hidden/Universal Render Pipeline/CopyDepth"
+{
+    SubShader
+    {
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"}
+
+        Pass
+        {
+            Name "CopyDepth"
+            ZTest Always
+            ZWrite[_ZWrite]
+            ColorMask R
+            Cull Off
+
+            HLSLPROGRAM
+            #pragma vertex Vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _BaseColor;
-            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color; return o; }
-            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * _Color * _BaseColor * i.color; }
-            ENDCG
+
+            #pragma multi_compile _ _DEPTH_MSAA_2 _DEPTH_MSAA_4 _DEPTH_MSAA_8
+            #pragma multi_compile _ _OUTPUT_DEPTH
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Utils/CopyDepthPass.hlsl"
+
+            ENDHLSL
         }
     }
-    Fallback Off
 }

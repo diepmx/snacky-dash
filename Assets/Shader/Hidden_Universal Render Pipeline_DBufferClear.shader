@@ -1,25 +1,42 @@
-﻿Shader "Hidden/Universal Render Pipeline/DBufferClear" {
-    Properties {
-        _MainTex ("Texture", 2D) = "white" {}
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-        _BaseColor ("Base Color", Color) = (1,1,1,1)
-    }
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Off ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _BaseColor;
-            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color; return o; }
-            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * _Color * _BaseColor * i.color; }
-            ENDCG
+Shader "Hidden/Universal Render Pipeline/DBufferClear"
+{
+    SubShader
+    {
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"}
+        LOD 100
+
+        Pass
+        {
+            Name "DBufferClear"
+            ZTest Always
+            ZWrite Off
+            Cull Off
+
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment Fragment
+            #pragma multi_compile_fragment _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DBuffer.hlsl"
+
+            void Fragment(
+                Varyings input,
+                OUTPUT_DBUFFER(outDBuffer))
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+                outDBuffer0 = half4(0, 0, 0, 1);
+#if defined(_DBUFFER_MRT3) || defined(_DBUFFER_MRT2)
+                outDBuffer1 = half4(0.5f, 0.5f, 0.5f, 1);
+#endif
+#if defined(_DBUFFER_MRT3)
+                outDBuffer2 = half4(0, 0, 0, 1);
+#endif
+            }
+            ENDHLSL
         }
     }
-    Fallback Off
 }

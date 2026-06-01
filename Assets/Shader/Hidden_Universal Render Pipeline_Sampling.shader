@@ -1,25 +1,45 @@
-﻿Shader "Hidden/Universal Render Pipeline/Sampling" {
-    Properties {
-        _MainTex ("Texture", 2D) = "white" {}
-        _BaseMap ("Base Map", 2D) = "white" {}
-        _Color ("Color", Color) = (1,1,1,1)
-        _BaseColor ("Base Color", Color) = (1,1,1,1)
-    }
-    SubShader {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
-        Cull Off ZWrite On
-        Pass {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
-            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _BaseColor;
-            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color; return o; }
-            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * _Color * _BaseColor * i.color; }
-            ENDCG
+Shader "Hidden/Universal Render Pipeline/Sampling"
+{
+    SubShader
+    {
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"}
+        LOD 100
+
+        // 0 - Downsample - Box filtering
+        Pass
+        {
+            Name "BoxDownsample"
+            ZTest Always
+            ZWrite Off
+            Cull Off
+
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment FragBoxDownsample
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
+
+            SAMPLER(sampler_BlitTexture);
+
+            float _SampleOffset;
+
+            half4 FragBoxDownsample(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+                float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+                float4 d = _BlitTexture_TexelSize.xyxy * float4(-_SampleOffset, -_SampleOffset, _SampleOffset, _SampleOffset);
+
+                half4 s;
+                s =  SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv + d.xy);
+                s += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv + d.zy);
+                s += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv + d.xw);
+                s += SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, uv + d.zw);
+
+                return s * 0.25h;
+            }
+            ENDHLSL
         }
     }
-    Fallback Off
 }
