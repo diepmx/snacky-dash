@@ -850,8 +850,9 @@ public class GameplaySandbox : MonoBehaviour
             snakeGridPos = gridPos;
             targetGridPos = gridPos;
         }
-        // 277 = pill_spawn_point (generic), 371-377 = spawn theo loại fruit cụ thể
-        else if (gid == 277 || (gid >= 371 && gid <= 377))
+        // 277 = pill_spawn_point, 276 = not_pills_spawn_tile (vẫn spawn fruit từ wave data)
+        // 371-377 = spawn theo loại fruit cụ thể trong spawn layer
+        else if (gid == 277 || gid == 276 || (gid >= 371 && gid <= 377))
         {
             SpawnFruitAtCell(gid, gridPos, worldPos);
         }
