@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using JuicedUp.Features.Core;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace LevelViewer
 {
@@ -85,6 +90,165 @@ namespace LevelViewer
         public int[] LdfData;
         public List<int[]> SpawnLayers = new List<int[]>();
         public List<string> SpawnLayerNames = new List<string>();
+    }
+
+    public sealed class LevelViewerTileDefinitionLookup
+    {
+        private readonly Dictionary<int, TileDefinitionDatabase.Entry> _byTiledId =
+            new Dictionary<int, TileDefinitionDatabase.Entry>();
+
+        public bool IsLoaded => _byTiledId.Count > 0;
+
+        public static LevelViewerTileDefinitionLookup Load()
+        {
+            var lookup = new LevelViewerTileDefinitionLookup();
+            var db = LoadDatabase();
+            if (db == null)
+            {
+                Debug.LogWarning("[LevelViewer] TileDefinitionDatabase asset was not found; using fallback hardcoded mappings.");
+                return lookup;
+            }
+
+            var entriesField = typeof(TileDefinitionDatabase).GetField("entries", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (entriesField?.GetValue(db) is List<TileDefinitionDatabase.Entry> entries)
+            {
+                foreach (var entry in entries)
+                {
+                    if (entry == null || entry.tiledId == 0) continue;
+                    lookup._byTiledId[entry.tiledId] = entry;
+                }
+            }
+
+            Debug.Log($"[LevelViewer] Loaded {lookup._byTiledId.Count} tile definitions from {db.name}.");
+            return lookup;
+        }
+
+        public bool TryGet(int tiledId, out TileDefinitionDatabase.Entry entry)
+        {
+            return _byTiledId.TryGetValue(tiledId, out entry);
+        }
+
+        public string GetCoverPath(int tiledId)
+        {
+            if (TryGet(tiledId, out var entry) && !string.IsNullOrWhiteSpace(entry.coverPrefabResourcePath))
+                return NormalizeResourcePath(entry.coverPrefabResourcePath);
+
+            var fallback = TilePrefabMapping.Get(tiledId);
+            return NormalizeResourcePath(fallback.CoverPrefabPath);
+        }
+
+        public TileDisplayInfo GetDisplayInfo(int tiledId)
+        {
+            if (!TryGet(tiledId, out var entry))
+                return TileIdMapping.Get(tiledId);
+
+            var fallback = TileIdMapping.Get(tiledId);
+            return new TileDisplayInfo(
+                string.IsNullOrWhiteSpace(entry.name) ? fallback.Name : entry.name.Trim(),
+                MapCategory(entry, fallback.Category),
+                TileIdMapping.GetCategoryColor(MapCategory(entry, fallback.Category)),
+                fallback.Label);
+        }
+
+        private static TileDisplayCategory MapCategory(TileDefinitionDatabase.Entry entry, TileDisplayCategory fallback)
+        {
+            switch (entry.tileType)
+            {
+                case TileType.RoadRightLeft:
+                case TileType.RoadUpDown:
+                    return TileDisplayCategory.Path;
+                case TileType.RoadRightLeftNoPill:
+                case TileType.RoadUpDownNoPill:
+                    return TileDisplayCategory.PathNoPill;
+                case TileType.CornerUpRight:
+                case TileType.CornerDownRight:
+                case TileType.CornerUpLeft:
+                case TileType.CornerDownLeft:
+                    return TileDisplayCategory.Corner;
+                case TileType.Stop:
+                case TileType.CrossRoad:
+                case TileType.Stop_CRATE:
+                case TileType.Stop_CRATE_0:
+                case TileType.Stop_CRATE_1:
+                case TileType.Stop_CRATE_2:
+                    return TileDisplayCategory.Stop;
+                case TileType.Tunnel:
+                    return TileDisplayCategory.Tunnel;
+                case TileType.FlippingArrowLeft:
+                case TileType.FlippingArrowRight:
+                case TileType.FlippingArrowDown:
+                case TileType.FlippingArrowUp:
+                    return TileDisplayCategory.Arrow;
+                case TileType.FixedArrowLeft:
+                case TileType.FixedArrowRight:
+                case TileType.FixedArrowDown:
+                case TileType.FixedArrowUp:
+                    return TileDisplayCategory.FixedArrow;
+                case TileType.BridgeUD:
+                case TileType.BridgeLR:
+                    return TileDisplayCategory.Bridge;
+                case TileType.BridgeSwitchable:
+                case TileType.BridgeSwitchableLR:
+                case TileType.BridgeSwitchableUD:
+                    return TileDisplayCategory.SwitchBridge;
+                case TileType.Aiguillage_Left_Down_Open:
+                case TileType.Aiguillage_Left_Down:
+                case TileType.Aiguillage_Right_Down_Open:
+                case TileType.Aiguillage_Right_Down:
+                case TileType.Aiguillage_Right_U_D:
+                case TileType.Aiguillage_Left_U_D:
+                case TileType.Aiguillage_Up_R_L:
+                case TileType.Aiguillage_DOWN_R_L:
+                case TileType.Aiguillage_Left_Up:
+                case TileType.Aiguillage_Right_Up:
+                case TileType.Aiguillage_Right_Up_Open:
+                case TileType.Aiguillage_Left_Up_Open:
+                    return TileDisplayCategory.Turnout;
+                case TileType.Wall:
+                    return TileDisplayCategory.DestructibleWall;
+                case TileType.Plot:
+                    return TileDisplayCategory.RisingBlock;
+                case TileType.PlayerStartPosition:
+                    return TileDisplayCategory.PlayerStart;
+                case TileType.PillSpawnPoint:
+                    return TileDisplayCategory.PillSpawn;
+                case TileType.NonPillSpawnPlace:
+                    return TileDisplayCategory.NoPillSpawn;
+                case TileType.PathConnectionBoat:
+                    return TileDisplayCategory.Connection;
+                case TileType.SecretCollectible:
+                    return TileDisplayCategory.SecretCollectible;
+                case TileType.Empty:
+                    if (entry.category == TileCategory.Grass) return TileDisplayCategory.Grass;
+                    return fallback;
+                default:
+                    return fallback;
+            }
+        }
+
+        private static string NormalizeResourcePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return null;
+            return path.Trim()
+                .Replace('\\', '/')
+                .Replace("TilesCovers/", "tilescovers/")
+                .Replace("GridTile/", "gridtile/")
+                .Replace("LDFs/", "ldfs/");
+        }
+
+        private static TileDefinitionDatabase LoadDatabase()
+        {
+#if UNITY_EDITOR
+            var guids = AssetDatabase.FindAssets("t:TileDefinitionDatabase");
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var db = AssetDatabase.LoadAssetAtPath<TileDefinitionDatabase>(path);
+                if (db != null) return db;
+            }
+#endif
+            return Resources.Load<TileDefinitionDatabase>("TileDefinitionDatabase");
+        }
     }
 
     public static class TiledMapParser
@@ -326,6 +490,13 @@ namespace LevelViewer
 
             // === Spawn marker IDs (seen in spawn layers) ===
             Add(282, "SpawnMarker", TileDisplayCategory.PillSpawn, COL_PILLSPAWN, "SP");
+            Add(371, "Spawn_Strawberry", TileDisplayCategory.PillSpawn, new Color32(240, 70, 90, 255), "S");
+            Add(372, "Spawn_Blueberry", TileDisplayCategory.PillSpawn, new Color32(70, 110, 230, 255), "B");
+            Add(373, "Spawn_Banana", TileDisplayCategory.PillSpawn, new Color32(250, 210, 70, 255), "Ba");
+            Add(374, "Spawn_Pear", TileDisplayCategory.PillSpawn, new Color32(170, 220, 80, 255), "Pe");
+            Add(375, "Spawn_Apple", TileDisplayCategory.PillSpawn, new Color32(90, 200, 70, 255), "A");
+            Add(376, "Spawn_Carrot", TileDisplayCategory.PillSpawn, new Color32(250, 130, 40, 255), "C");
+            Add(377, "Spawn_Eggplant", TileDisplayCategory.PillSpawn, new Color32(150, 70, 210, 255), "E");
         }
 
         public static Color32 GetCategoryColor(TileDisplayCategory cat)

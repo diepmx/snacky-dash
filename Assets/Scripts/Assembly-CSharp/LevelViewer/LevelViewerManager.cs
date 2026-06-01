@@ -24,7 +24,7 @@ namespace LevelViewer
         private Vector2 _infoScroll;
         private bool _showMapLayer = true;
         private bool _showLdfLayer = true;
-        private bool _showSpawnLayer;
+        private bool _showSpawnLayer = true;
         private string _searchFilter = "";
         private bool _initialized;
 
@@ -337,7 +337,7 @@ namespace LevelViewer
 
             // Level count
             var filtered = GetFilteredLevels();
-            GUILayout.Label($"Levels: {filtered.Count}", _smallLabelStyle);
+            GUILayout.Label($"Levels: {filtered.Count}  |  Lv. {GetCohortLevelNumber(_currentLevelData)}", _smallLabelStyle);
 
             GUILayout.Space(4);
 
@@ -346,7 +346,7 @@ namespace LevelViewer
             for (int i = 0; i < filtered.Count; i++)
             {
                 var level = filtered[i];
-                string label = level != null ? level.name : "(null)";
+                string label = FormatLevelLabel(level);
                 bool isSelected = (i == _selectedLevelIndex);
                 var style = isSelected ? _levelBtnSelectedStyle : _levelBtnStyle;
 
@@ -486,6 +486,7 @@ namespace LevelViewer
             if (_currentLevelData != null)
             {
                 InfoRow("Name", _currentLevelData.name);
+                InfoRow("Player Level", GetCohortLevelNumber(_currentLevelData).ToString());
                 InfoRow("Crates", _currentLevelData.cratesTotal.ToString());
                 InfoRow("Difficulty", _currentLevelData.difficulty.ToString());
                 InfoRow("Diff Score", _currentLevelData.difficultyScore.ToString());
@@ -630,6 +631,24 @@ namespace LevelViewer
             }
             GUILayout.EndHorizontal();
             return selected;
+        }
+
+        private int GetCohortLevelNumber(LevelDataSO level)
+        {
+            if (level == null || _cohorts == null || _selectedCohortIndex < 0 || _selectedCohortIndex >= _cohorts.Length)
+                return 0;
+
+            var levels = _cohorts[_selectedCohortIndex].levels;
+            if (levels == null) return 0;
+
+            int index = levels.IndexOf(level);
+            return index >= 0 ? index + 1 : _selectedLevelIndex + 1;
+        }
+
+        private string FormatLevelLabel(LevelDataSO level)
+        {
+            if (level == null) return "(null)";
+            return $"Lv {GetCohortLevelNumber(level):000}  {level.name}";
         }
 
         private void OnDestroy()
