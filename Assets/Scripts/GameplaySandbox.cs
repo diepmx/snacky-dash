@@ -11,8 +11,8 @@ using UnityEditor;
 public class GameplaySandbox : MonoBehaviour
 {
     [Header("Level Configuration")]
-    [Tooltip("Tên file JSON màn chơi trong Resources/levelmaps/ (ví dụ: 11004_v1)")]
-    public string levelMapName = "6070_v2";
+    [Tooltip("Tên file JSON màn chơi trong Resources/levelmaps/ (ví dụ: 11004_v1). Để trống để tự động load level đầu tiên của cohort.")]
+    public string levelMapName = "";
     public bool useCohortOrder = true;
     public string cohortResourceName = "test-a-co";
 
@@ -27,6 +27,8 @@ public class GameplaySandbox : MonoBehaviour
     public Color gameBackgroundColor = new Color(0.58310264f, 1f, 0.5424528f, 1f);
     public Color grassBackgroundColor = new Color(0.38f, 0.72f, 0.28f, 1f);
     public float backgroundMargin = 20f;
+    [Tooltip("Gán sẵn GameObject Ground_BG trong scene để thay thế material trực tiếp. Nếu để trống sẽ tự động tạo Quad lúc runtime.")]
+    public MeshRenderer backgroundOverride;
 
     [Header("Prefabs & Resources")]
     public GameObject snakeHeadPrefab;
@@ -62,7 +64,6 @@ public class GameplaySandbox : MonoBehaviour
         public string source;
     }
 
-    // Trạng thái game
     private TiledMap activeMap;
     private Dictionary<Vector2Int, int> gridMap = new Dictionary<Vector2Int, int>();
     private Dictionary<Vector2Int, int> spawnMap = new Dictionary<Vector2Int, int>();
@@ -78,6 +79,10 @@ public class GameplaySandbox : MonoBehaviour
     private string[] availableLevelNames = new string[0];
     private int selectedLevelIndex = -1;
     private string levelInput = "";
+
+    // Cohort switching
+    private LevelCohortSO[] allCohorts = new LevelCohortSO[0];
+    private int activeCohortIndex = 0;
 
     // Fruit spawn - wave 1
     private List<PillKind> wave1SpawnKinds = new List<PillKind>();
@@ -132,11 +137,34 @@ public class GameplaySandbox : MonoBehaviour
     // 1. Tự động parse YAML Database
     private void LoadAvailableLevelNames()
     {
+        // Load toàn bộ cohort list
+        LevelCohortSO[] loadedCohorts = Resources.LoadAll<LevelCohortSO>("cohorts");
+        if (loadedCohorts != null && loadedCohorts.Length > 0)
+        {
+            // Sort theo tên để nhất quán
+            System.Array.Sort(loadedCohorts, (a, b) => string.CompareOrdinal(a != null ? a.name : "", b != null ? b.name : ""));
+            allCohorts = loadedCohorts;
+        }
+
         TextAsset[] levelMaps = Resources.LoadAll<TextAsset>("levelmaps");
         List<string> names = new List<string>();
         List<LevelDataSO> levelData = new List<LevelDataSO>();
 
         activeCohort = LoadConfiguredCohort();
+
+        // Sync activeCohortIndex với activeCohort
+        if (activeCohort != null && allCohorts.Length > 0)
+        {
+            for (int i = 0; i < allCohorts.Length; i++)
+            {
+                if (allCohorts[i] == activeCohort)
+                {
+                    activeCohortIndex = i;
+                    break;
+                }
+            }
+        }
+
         if (useCohortOrder && activeCohort != null && activeCohort.levels != null && activeCohort.levels.Count > 0)
         {
             foreach (LevelDataSO level in activeCohort.levels)
@@ -152,6 +180,8 @@ public class GameplaySandbox : MonoBehaviour
 
             availableLevelNames = names.ToArray();
             availableLevelData = levelData.ToArray();
+
+            // Nếu levelMapName rỗng hoặc không tìm thấy → start tại level đầu tiên
             selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
             if (selectedLevelIndex < 0 && availableLevelNames.Length > 0)
             {
@@ -174,6 +204,11 @@ public class GameplaySandbox : MonoBehaviour
         availableLevelNames = names.ToArray();
         availableLevelData = new LevelDataSO[availableLevelNames.Length];
         selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        if (selectedLevelIndex < 0 && availableLevelNames.Length > 0)
+        {
+            selectedLevelIndex = 0;
+            levelMapName = availableLevelNames[0];
+        }
     }
 
     private LevelCohortSO LoadConfiguredCohort()
@@ -192,23 +227,61 @@ public class GameplaySandbox : MonoBehaviour
             }
         }
 
+        // Fallback: dùng cohort đầu tiên tìm được
         LevelCohortSO[] cohorts = Resources.LoadAll<LevelCohortSO>("cohorts");
-        foreach (LevelCohortSO cohort in cohorts)
+        if (cohorts != null && cohorts.Length > 0)
         {
-            if (cohort == null)
+            // Ưu tiên tìm đúng tên
+            foreach (LevelCohortSO cohort in cohorts)
             {
-                continue;
+                if (cohort == null) continue;
+                if (string.Equals(cohort.name, cohortResourceName, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(cohort.cohortName, cohortResourceName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return cohort;
+                }
             }
-
-            if (string.Equals(cohort.name, cohortResourceName, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(cohort.cohortName, cohortResourceName, StringComparison.OrdinalIgnoreCase))
-            {
-                return cohort;
-            }
+            Debug.LogWarning($"Sandbox cohort '{cohortResourceName}' was not found. Falling back to first available cohort.");
+            return cohorts[0];
         }
 
-        Debug.LogWarning($"Sandbox cohort '{cohortResourceName}' was not found. Falling back to sorted levelmaps.");
+        Debug.LogWarning("No cohorts found in Resources/cohorts/. Falling back to sorted levelmaps.");
         return null;
+    }
+
+    /// <summary>
+    /// Đổi sang cohort khác theo delta (-1 = prev, +1 = next), reset về level đầu tiên.
+    /// </summary>
+    private void SwitchCohort(int delta)
+    {
+        if (allCohorts == null || allCohorts.Length == 0) return;
+
+        activeCohortIndex = Mathf.Clamp(activeCohortIndex + delta, 0, allCohorts.Length - 1);
+        LevelCohortSO targetCohort = allCohorts[activeCohortIndex];
+        if (targetCohort == null) return;
+
+        cohortResourceName = targetCohort.name;
+        activeCohort = targetCohort;
+
+        // Rebuild level list từ cohort mới
+        List<string> names = new List<string>();
+        List<LevelDataSO> levelData = new List<LevelDataSO>();
+        foreach (LevelDataSO level in activeCohort.levels)
+        {
+            if (level == null) continue;
+            names.Add(level.name);
+            levelData.Add(level);
+        }
+        availableLevelNames = names.ToArray();
+        availableLevelData = levelData.ToArray();
+
+        // Reset về level đầu tiên
+        selectedLevelIndex = 0;
+        if (availableLevelNames.Length > 0)
+        {
+            levelMapName = availableLevelNames[0];
+            LoadLevel();
+        }
     }
 
     private void ParseTileDefinitionDatabase()
@@ -311,15 +384,17 @@ public class GameplaySandbox : MonoBehaviour
         wave1SpawnKinds = BuildWave1SpawnKinds();
         wave1SpawnKindIndex = 0;
 
-        TiledLayer spawnLayer = activeMap.layers.Find(l => l.name == "spawn");
+        // Tìm spawn layer đầu tiên: ưu tiên "spawn1", nếu không có thì "spawn"
+        TiledLayer spawnLayer = GetFirstSpawnLayer();
 
         // Dựng bản đồ từ tất cả layer tile gameplay, gồm map + ldf/obstacle layers.
+        // Skip TẤT CẢ spawn layers (spawn, spawn1, spawn2, ...)
         foreach (TiledLayer mapLayer in activeMap.layers)
         {
-            if (mapLayer == null || mapLayer.data == null || mapLayer.name == "spawn" || mapLayer.name.StartsWith("spawn", StringComparison.OrdinalIgnoreCase))
-            {
+            if (mapLayer == null || mapLayer.data == null)
                 continue;
-            }
+            if (IsSpawnLayer(mapLayer.name))
+                continue;
 
             for (int y = 0; y < activeMap.height; y++)
             {
@@ -361,9 +436,12 @@ public class GameplaySandbox : MonoBehaviour
             }
         }
 
-        // Khởi tạo lịch sử vị trí của rắn tại điểm xuất phát
-        snakePositionsHistory.Add(snakeGridPos);
-        UpdateTailVisuals();
+        // Khởi tạo lịch sử vị trí rắn chỉ khi có snake (không bắt buộc để fruit spawn)
+        if (snakeHead != null)
+        {
+            snakePositionsHistory.Add(snakeGridPos);
+            UpdateTailVisuals();
+        }
         FitCameraToLevel();
         selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
         currentLevelData = GetLevelDataAt(selectedLevelIndex);
@@ -417,8 +495,16 @@ public class GameplaySandbox : MonoBehaviour
 
         if (backgroundContainer != null)
         {
-            Destroy(backgroundContainer);
-            backgroundContainer = null;
+            // Không destroy nếu đó là object được gán sẵn trong scene
+            if (backgroundOverride != null && backgroundContainer == backgroundOverride.gameObject)
+            {
+                backgroundContainer = null; // chỉ unlink, không destroy
+            }
+            else
+            {
+                Destroy(backgroundContainer);
+                backgroundContainer = null;
+            }
         }
 
         // Dọn materials fruit đã tạo lúc runtime
@@ -427,6 +513,46 @@ public class GameplaySandbox : MonoBehaviour
             if (mat != null) Destroy(mat);
         }
         runtimeFruitMats.Clear();
+    }
+
+    /// <summary>
+    /// Kiểm tra xem tên layer có phải là spawn layer không (spawn, spawn1, spawn2, ...).
+    /// </summary>
+    private static bool IsSpawnLayer(string layerName)
+    {
+        if (string.IsNullOrEmpty(layerName)) return false;
+        return layerName.Equals("spawn", StringComparison.OrdinalIgnoreCase)
+            || (layerName.StartsWith("spawn", StringComparison.OrdinalIgnoreCase)
+                && layerName.Length > 5
+                && char.IsDigit(layerName[5]));
+    }
+
+    /// <summary>
+    /// Tìm spawn layer đầu tiên để xử lý wave 1:
+    /// Ưu tiên "spawn1" > "spawn" > "spawn2" > ...
+    /// Lý do: Level cũ dùng "spawn", level mới dùng "spawn1", "spawn2", ...
+    /// Wave đầu tiên luôn là "spawn" hoặc "spawn1".
+    /// </summary>
+    private TiledLayer GetFirstSpawnLayer()
+    {
+        if (activeMap?.layers == null) return null;
+
+        TiledLayer spawnExact = null;   // "spawn"
+        TiledLayer spawn1 = null;       // "spawn1"
+
+        foreach (TiledLayer layer in activeMap.layers)
+        {
+            if (layer == null || layer.data == null) continue;
+            string name = layer.name ?? string.Empty;
+
+            if (name.Equals("spawn", StringComparison.OrdinalIgnoreCase))
+                spawnExact = layer;
+            else if (name.Equals("spawn1", StringComparison.OrdinalIgnoreCase))
+                spawn1 = layer;
+        }
+
+        // "spawn1" ưu tiên hơn "spawn" vì level mới dùng numbered scheme
+        return spawn1 ?? spawnExact;
     }
 
     private int ResolveTiledId(int rawGid)
@@ -439,6 +565,7 @@ public class GameplaySandbox : MonoBehaviour
         // Tiled stores global IDs. TileDefinitionDatabase stores local tiledId values.
         return rawGid - tilesetFirstGid;
     }
+
 
     private void InstantiateTileVisual(int gid, Vector2Int gridPos, Transform parent)
     {
@@ -494,30 +621,72 @@ public class GameplaySandbox : MonoBehaviour
     {
         if (!showGameBackground)
         {
+            if (backgroundContainer != null && backgroundContainer != (backgroundOverride != null ? backgroundOverride.gameObject : null))
+                backgroundContainer.SetActive(false);
             return;
         }
 
-        if (backgroundContainer == null)
+        // Nếu người dùng gán sẵn background trong scene, dùng nó thay vì tạo mới
+        if (backgroundOverride != null)
+        {
+            backgroundContainer = backgroundOverride.gameObject;
+            backgroundContainer.SetActive(true);
+        }
+        else if (backgroundContainer == null)
         {
             backgroundContainer = GameObject.CreatePrimitive(PrimitiveType.Quad);
             backgroundContainer.name = "Ground_BG";
             Collider col = backgroundContainer.GetComponent<Collider>();
-            if (col != null)
-            {
-                Destroy(col);
-            }
+            if (col != null) Destroy(col);
         }
 
-        // z = 0.1f đặt background ngay sau tiles (giống LevelViewer3D dùng z = 0.03f cho ground)
-        // Tiles ở z = 0f, background ở z dương nhỏ = phía sau camera orthographic
-        backgroundContainer.transform.position = new Vector3(center.x, center.y, 0.1f);
-        backgroundContainer.transform.rotation = Quaternion.identity;
-        backgroundContainer.transform.localScale = new Vector3(width + backgroundMargin * 2f, height + backgroundMargin * 2f, 1f);
+        // Rotation: Quad phải nằm NGANG (-90° trục X) để shader SH_Tile_FakeUnlit
+        // phát hiện đúng "top face" qua world-space normal hướng Y+ (giống Game scene)
+        // Position: center XY của map, z từ backgroundOverride.transform.position.z nếu có
+        float bgZ = backgroundOverride != null
+            ? backgroundOverride.transform.position.z
+            : 0.1f;
+        backgroundContainer.transform.position = new Vector3(center.x, center.y, bgZ);
 
-        MeshRenderer renderer = backgroundContainer.GetComponent<MeshRenderer>();
+        if (backgroundOverride != null)
+        {
+            // Giữ nguyên rotation đã set trong scene (Inspector)
+            // Scale: vì Quad nằm ngang (-90° X), truc X = East/West, truc Z = North/South
+            // Dùng XZ scale: localScale.x = width, localScale.z = height
+            backgroundContainer.transform.localScale = new Vector3(
+                width + backgroundMargin * 2f,
+                backgroundContainer.transform.localScale.y,
+                height + backgroundMargin * 2f
+            );
+        }
+        else
+        {
+            // Quad mới tạo: set rotation -90° X rồi scale XZ
+            backgroundContainer.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+            backgroundContainer.transform.localScale = new Vector3(
+                width + backgroundMargin * 2f,
+                1f,
+                height + backgroundMargin * 2f
+            );
+        }
+
+        MeshRenderer renderer = backgroundOverride != null
+            ? backgroundOverride
+            : backgroundContainer.GetComponent<MeshRenderer>();
+
         if (renderer != null)
         {
-            renderer.sharedMaterial = GetBackgroundMaterial(width, height);
+            // Nếu đang dùng backgroundOverride, chỉ cập nhật scale/position, không ghi đè material
+            if (backgroundOverride == null)
+            {
+                renderer.sharedMaterial = GetBackgroundMaterial(width, height);
+            }
+            else
+            {
+                // Vẫn scale texture nếu material có property
+                if (renderer.sharedMaterial != null)
+                    SetBackgroundTextureScale(width, height);
+            }
         }
     }
 
@@ -643,10 +812,29 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        float panelHeight = showLevelInfo ? 292f : 156f;
+        float panelHeight = showLevelInfo ? 318f : 182f;
         GUILayout.BeginArea(new Rect(12f, 12f, 360f, panelHeight), GUI.skin.box);
         GUILayout.Label("Sandbox Level");
 
+        // --- Cohort switcher ---
+        GUILayout.BeginHorizontal();
+        GUI.enabled = allCohorts != null && allCohorts.Length > 1 && activeCohortIndex > 0;
+        if (GUILayout.Button("◄", GUILayout.Width(28f)))
+            SwitchCohort(-1);
+        GUI.enabled = true;
+
+        string cohortDisplay = activeCohort != null
+            ? $"{activeCohort.cohortName}  [{activeCohortIndex + 1}/{(allCohorts != null ? allCohorts.Length : 1)}]"
+            : "levelmaps";
+        GUILayout.Label(cohortDisplay);
+
+        GUI.enabled = allCohorts != null && allCohorts.Length > 1 && activeCohortIndex < allCohorts.Length - 1;
+        if (GUILayout.Button("►", GUILayout.Width(28f)))
+            SwitchCohort(1);
+        GUI.enabled = true;
+        GUILayout.EndHorizontal();
+
+        // --- Level switcher ---
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Prev", GUILayout.Width(70f)))
         {
@@ -683,9 +871,7 @@ public class GameplaySandbox : MonoBehaviour
         string indexText = selectedLevelIndex >= 0 && availableLevelNames.Length > 0
             ? $"{selectedLevelIndex + 1}/{availableLevelNames.Length}"
             : "-";
-        string cohortText = activeCohort != null ? activeCohort.cohortName : "levelmaps";
         GUILayout.Label($"{FormatLevelLabel(currentLevelData)} ({indexText})");
-        GUILayout.Label($"Cohort: {cohortText}");
 
         if (showLevelInfo && currentLevelData != null)
         {
