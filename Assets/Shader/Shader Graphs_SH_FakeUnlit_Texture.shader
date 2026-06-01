@@ -2,12 +2,12 @@ Shader "Shader Graphs/SH_FakeUnlit_Texture"
 {
     Properties
     {
-        [NoScaleOffset] _Texture     ("Texture",     2D)          = "white" {}
-        _Saturation                  ("Saturation",  Float)       = 1
-        _Smoothness                  ("Smoothness",  Range(0, 1)) = 0
-        _ShadowColor                 ("ShadowColor", Color)       = (0,0,0,0)
-        _Color                       ("Color",       Color)       = (1,1,1,1)
-        _BaseColor                   ("BaseColor",   Color)       = (1,1,1,1)
+        [NoScaleOffset] _Texture ("Texture",     2D)          = "white" {}
+        _Saturation              ("Saturation",  Float)       = 1
+        _Smoothness              ("Smoothness",  Range(0, 1)) = 0
+        _ShadowColor             ("ShadowColor", Color)       = (0,0,0,0)
+        _Color                   ("Color",       Color)       = (1,1,1,1)
+        _BaseColor               ("BaseColor",   Color)       = (1,1,1,1)
     }
 
     SubShader
@@ -18,7 +18,6 @@ Shader "Shader Graphs/SH_FakeUnlit_Texture"
             "Queue"         = "Geometry"
             "RenderPipeline" = "UniversalPipeline"
         }
-
         Cull Back
         ZWrite On
         ZTest LEqual
@@ -50,15 +49,15 @@ Shader "Shader Graphs/SH_FakeUnlit_Texture"
             {
                 float4 positionOS : POSITION;
                 float2 uv         : TEXCOORD0;
-                float4 color      : COLOR;
+                float4 vertexColor : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
-                float4 positionCS : SV_POSITION;
-                float2 uv         : TEXCOORD0;
-                float4 color      : COLOR;
+                float4 positionCS  : SV_POSITION;
+                float2 uv          : TEXCOORD0;
+                float4 vertexColor : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -67,21 +66,22 @@ Shader "Shader Graphs/SH_FakeUnlit_Texture"
                 Varyings OUT;
                 UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv         = IN.uv;
-                OUT.color      = IN.color;
+                OUT.positionCS  = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv          = IN.uv;
+                // clamp vertex color so meshes without vertex color don't go black
+                OUT.vertexColor = max(IN.vertexColor, float4(1,1,1,1));
                 return OUT;
             }
 
             float4 frag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
-                float4 c    = SAMPLE_TEXTURE2D(_Texture, sampler_Texture, IN.uv)
-                              * _Color * _BaseColor * IN.color;
-                float luma  = dot(c.rgb, float3(0.299, 0.587, 0.114));
-                c.rgb       = lerp(luma.xxx, c.rgb, _Saturation);
-                c.rgb       = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
-                c.a         = 1.0;
+                float4 c   = SAMPLE_TEXTURE2D(_Texture, sampler_Texture, IN.uv)
+                             * _Color * _BaseColor * IN.vertexColor;
+                float luma = dot(c.rgb, float3(0.299, 0.587, 0.114));
+                c.rgb      = lerp(luma.xxx, c.rgb, _Saturation);
+                c.rgb      = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
+                c.a        = 1.0;
                 return c;
             }
             ENDHLSL
@@ -93,15 +93,24 @@ Shader "Shader Graphs/SH_FakeUnlit_Texture"
             Tags { "LightMode" = "DepthOnly" }
             ColorMask R
             ZWrite On
+            ZTest LEqual
+            Cull Back
 
             HLSLPROGRAM
             #pragma target 2.0
-            #pragma vertex DepthOnlyVertex
-            #pragma fragment DepthOnlyFragment
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
             #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            struct DepthAttribs  { float4 positionOS : POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
+            struct DepthVaryings { float4 positionCS : SV_POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
+            DepthVaryings DepthVert(DepthAttribs IN) {
+                DepthVaryings OUT;
+                UNITY_SETUP_INSTANCE_ID(IN); UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                return OUT;
+            }
+            float DepthFrag(DepthVaryings IN) : SV_Target { return 0; }
             ENDHLSL
         }
     }

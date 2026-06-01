@@ -2,9 +2,9 @@ Shader "Shader Graphs/SH_FakeUnlit_Color"
 {
     Properties
     {
-        _Color       ("Color",       Color)          = (0,0.8915043,1,1)
-        _Smoothness  ("Smoothness",  Range(0, 1))    = 0
-        _ShadowColor ("ShadowColor", Color)          = (0,0,0,0)
+        _Color       ("Color",       Color)       = (0,0.8915043,1,1)
+        _Smoothness  ("Smoothness",  Range(0, 1)) = 0
+        _ShadowColor ("ShadowColor", Color)       = (0,0,0,0)
     }
 
     SubShader
@@ -20,6 +20,7 @@ Shader "Shader Graphs/SH_FakeUnlit_Color"
         ZWrite On
         ZTest LEqual
 
+        // ─── Main Unlit pass ───────────────────────────────────────────
         Pass
         {
             Name "Unlit"
@@ -41,14 +42,14 @@ Shader "Shader Graphs/SH_FakeUnlit_Color"
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float4 color      : COLOR;
+                float4 vertexColor : COLOR;      // vertex color (may be white=(1,1,1,1) if none)
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
-                float4 positionCS : SV_POSITION;
-                float4 color      : COLOR;
+                float4 positionCS  : SV_POSITION;
+                float4 vertexColor : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -57,15 +58,17 @@ Shader "Shader Graphs/SH_FakeUnlit_Color"
                 Varyings OUT;
                 UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.color      = IN.color;
+                OUT.positionCS  = TransformObjectToHClip(IN.positionOS.xyz);
+                // If mesh has no vertex color data, Unity sets it to (0,0,0,0).
+                // We clamp so black vertex color doesn't kill the material color.
+                OUT.vertexColor = max(IN.vertexColor, float4(1,1,1,1));
                 return OUT;
             }
 
             float4 frag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
-                float4 c = _Color * IN.color;
+                float4 c = _Color * IN.vertexColor;
                 c.rgb    = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
                 c.a      = 1.0;
                 return c;
@@ -73,21 +76,36 @@ Shader "Shader Graphs/SH_FakeUnlit_Color"
             ENDHLSL
         }
 
+        // ─── DepthOnly (self-contained, no UnlitInput conflict) ────────
         Pass
         {
             Name "DepthOnly"
             Tags { "LightMode" = "DepthOnly" }
             ColorMask R
             ZWrite On
+            ZTest LEqual
+            Cull Back
 
             HLSLPROGRAM
             #pragma target 2.0
-            #pragma vertex DepthOnlyVertex
-            #pragma fragment DepthOnlyFragment
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
             #pragma multi_compile_instancing
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+
+            struct DepthAttribs  { float4 positionOS : POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
+            struct DepthVaryings { float4 positionCS : SV_POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
+
+            DepthVaryings DepthVert(DepthAttribs IN)
+            {
+                DepthVaryings OUT;
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                return OUT;
+            }
+            float DepthFrag(DepthVaryings IN) : SV_Target { return 0; }
             ENDHLSL
         }
     }
