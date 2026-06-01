@@ -3,17 +3,29 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class GameplaySandbox : MonoBehaviour
 {
     [Header("Level Configuration")]
     [Tooltip("Tên file JSON màn chơi trong Resources/levelmaps/ (ví dụ: 11004_v1)")]
     public string levelMapName = "6070_v2";
+    public bool useCohortOrder = true;
+    public string cohortResourceName = "test-a-co";
 
     [Header("Sandbox Viewer")]
     public Camera targetCamera;
     public float cameraPadding = 1.5f;
     public bool showLevelSwitcher = true;
+    public bool showLevelInfo = true;
+
+    [Header("Background")]
+    public bool showGameBackground = true;
+    public Color gameBackgroundColor = new Color(0.58310264f, 1f, 0.5424528f, 1f);
+    public Color grassBackgroundColor = new Color(0.38f, 0.72f, 0.28f, 1f);
+    public float backgroundMargin = 20f;
 
     [Header("Prefabs & Resources")]
     public GameObject snakeHeadPrefab;
@@ -57,6 +69,11 @@ public class GameplaySandbox : MonoBehaviour
     private Dictionary<Vector2Int, GameObject> spawnedPills = new Dictionary<Vector2Int, GameObject>();
     private int tilesetFirstGid = 1;
     private GameObject boardContainer;
+    private GameObject backgroundContainer;
+    private Material backgroundMaterial;
+    private LevelCohortSO activeCohort;
+    private LevelDataSO[] availableLevelData = new LevelDataSO[0];
+    private LevelDataSO currentLevelData;
     private string[] availableLevelNames = new string[0];
     private int selectedLevelIndex = -1;
     private string levelInput = "";
@@ -109,18 +126,81 @@ public class GameplaySandbox : MonoBehaviour
     {
         TextAsset[] levelMaps = Resources.LoadAll<TextAsset>("levelmaps");
         List<string> names = new List<string>();
+        List<LevelDataSO> levelData = new List<LevelDataSO>();
+
+        activeCohort = LoadConfiguredCohort();
+        if (useCohortOrder && activeCohort != null && activeCohort.levels != null && activeCohort.levels.Count > 0)
+        {
+            foreach (LevelDataSO level in activeCohort.levels)
+            {
+                if (level == null)
+                {
+                    continue;
+                }
+
+                names.Add(level.name);
+                levelData.Add(level);
+            }
+
+            availableLevelNames = names.ToArray();
+            availableLevelData = levelData.ToArray();
+            selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+            if (selectedLevelIndex < 0 && availableLevelNames.Length > 0)
+            {
+                selectedLevelIndex = 0;
+                levelMapName = availableLevelNames[0];
+            }
+            return;
+        }
 
         foreach (TextAsset levelMap in levelMaps)
         {
             if (levelMap != null)
             {
                 names.Add(levelMap.name);
+                levelData.Add(null);
             }
         }
 
         names.Sort(CompareLevelNames);
         availableLevelNames = names.ToArray();
+        availableLevelData = new LevelDataSO[availableLevelNames.Length];
         selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+    }
+
+    private LevelCohortSO LoadConfiguredCohort()
+    {
+        if (!useCohortOrder)
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(cohortResourceName))
+        {
+            LevelCohortSO cohort = Resources.Load<LevelCohortSO>("cohorts/" + cohortResourceName.Trim());
+            if (cohort != null)
+            {
+                return cohort;
+            }
+        }
+
+        LevelCohortSO[] cohorts = Resources.LoadAll<LevelCohortSO>("cohorts");
+        foreach (LevelCohortSO cohort in cohorts)
+        {
+            if (cohort == null)
+            {
+                continue;
+            }
+
+            if (string.Equals(cohort.name, cohortResourceName, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(cohort.cohortName, cohortResourceName, StringComparison.OrdinalIgnoreCase))
+            {
+                return cohort;
+            }
+        }
+
+        Debug.LogWarning($"Sandbox cohort '{cohortResourceName}' was not found. Falling back to sorted levelmaps.");
+        return null;
     }
 
     private void ParseTileDefinitionDatabase()
@@ -183,6 +263,9 @@ public class GameplaySandbox : MonoBehaviour
     // 2. Load và tạo Level từ JSON
     private void LoadLevel()
     {
+        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        currentLevelData = GetLevelDataAt(selectedLevelIndex);
+
         TextAsset mapText = Resources.Load<TextAsset>("levelmaps/" + levelMapName);
         if (mapText == null)
         {
@@ -263,6 +346,7 @@ public class GameplaySandbox : MonoBehaviour
         UpdateTailVisuals();
         FitCameraToLevel();
         selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        currentLevelData = GetLevelDataAt(selectedLevelIndex);
         levelInput = levelMapName;
     }
 
@@ -307,6 +391,12 @@ public class GameplaySandbox : MonoBehaviour
         {
             Destroy(boardContainer);
             boardContainer = null;
+        }
+
+        if (backgroundContainer != null)
+        {
+            Destroy(backgroundContainer);
+            backgroundContainer = null;
         }
     }
 
@@ -362,9 +452,111 @@ public class GameplaySandbox : MonoBehaviour
         float horizontalSize = ((width * 0.5f) + cameraPadding) / aspect;
 
         cam.orthographic = true;
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = gameBackgroundColor;
         cam.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
         cam.transform.position = new Vector3(center.x, center.y, -10f);
         cam.transform.rotation = Quaternion.identity;
+
+        UpdateBackground(center, width, height);
+    }
+
+    private void UpdateBackground(Vector3 center, float width, float height)
+    {
+        if (!showGameBackground)
+        {
+            return;
+        }
+
+        if (backgroundContainer == null)
+        {
+            backgroundContainer = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            backgroundContainer.name = "Ground_BG";
+            Collider col = backgroundContainer.GetComponent<Collider>();
+            if (col != null)
+            {
+                Destroy(col);
+            }
+        }
+
+        backgroundContainer.transform.position = new Vector3(center.x, center.y, 50f);
+        backgroundContainer.transform.rotation = Quaternion.identity;
+        backgroundContainer.transform.localScale = new Vector3(width + backgroundMargin * 2f, height + backgroundMargin * 2f, 1f);
+
+        MeshRenderer renderer = backgroundContainer.GetComponent<MeshRenderer>();
+        if (renderer != null)
+        {
+            renderer.sharedMaterial = GetBackgroundMaterial(width, height);
+        }
+    }
+
+    private Material GetBackgroundMaterial(float width, float height)
+    {
+        if (backgroundMaterial != null)
+        {
+            SetBackgroundTextureScale(width, height);
+            return backgroundMaterial;
+        }
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null)
+        {
+            shader = Shader.Find("Unlit/Texture");
+        }
+        if (shader == null)
+        {
+            shader = Shader.Find("Sprites/Default");
+        }
+
+        backgroundMaterial = new Material(shader);
+        backgroundMaterial.name = "Sandbox_Ground_BG_Runtime";
+        SetMaterialColor(backgroundMaterial, grassBackgroundColor);
+
+#if UNITY_EDITOR
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Texture2D/Platform_Grass.png");
+        if (texture != null)
+        {
+            texture.wrapMode = TextureWrapMode.Repeat;
+            SetMaterialTexture(backgroundMaterial, texture);
+        }
+#endif
+
+        SetBackgroundTextureScale(width, height);
+        return backgroundMaterial;
+    }
+
+    private void SetBackgroundTextureScale(float width, float height)
+    {
+        if (backgroundMaterial == null)
+        {
+            return;
+        }
+
+        Vector2 scale = new Vector2((width + backgroundMargin * 2f) / 2.56f, (height + backgroundMargin * 2f) / 2.56f);
+        if (backgroundMaterial.HasProperty("_BaseMap")) backgroundMaterial.SetTextureScale("_BaseMap", scale);
+        if (backgroundMaterial.HasProperty("_MainTex")) backgroundMaterial.SetTextureScale("_MainTex", scale);
+    }
+
+    private static void SetMaterialColor(Material mat, Color color)
+    {
+        if (mat == null)
+        {
+            return;
+        }
+
+        if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+        if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
+    }
+
+    private static void SetMaterialTexture(Material mat, Texture texture)
+    {
+        if (mat == null || texture == null)
+        {
+            return;
+        }
+
+        if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", texture);
+        if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", texture);
     }
 
     private void HandleSandboxShortcuts()
@@ -420,7 +612,8 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        GUILayout.BeginArea(new Rect(12f, 12f, 340f, 132f), GUI.skin.box);
+        float panelHeight = showLevelInfo ? 292f : 156f;
+        GUILayout.BeginArea(new Rect(12f, 12f, 360f, panelHeight), GUI.skin.box);
         GUILayout.Label("Sandbox Level");
 
         GUILayout.BeginHorizontal();
@@ -459,8 +652,53 @@ public class GameplaySandbox : MonoBehaviour
         string indexText = selectedLevelIndex >= 0 && availableLevelNames.Length > 0
             ? $"{selectedLevelIndex + 1}/{availableLevelNames.Length}"
             : "-";
-        GUILayout.Label($"{levelMapName} ({indexText})");
+        string cohortText = activeCohort != null ? activeCohort.cohortName : "levelmaps";
+        GUILayout.Label($"{FormatLevelLabel(currentLevelData)} ({indexText})");
+        GUILayout.Label($"Cohort: {cohortText}");
+
+        if (showLevelInfo && currentLevelData != null)
+        {
+            GUILayout.Space(4);
+            GUILayout.Label("Level Data");
+            InfoRow("Crates", currentLevelData.cratesTotal.ToString());
+            InfoRow("Difficulty", currentLevelData.difficulty.ToString());
+            InfoRow("Diff Score", currentLevelData.difficultyScore.ToString());
+            InfoRow("Speed", currentLevelData.speedPlayer.ToString("F1"));
+            InfoRow("Rising Block", currentLevelData.risingBlockDeliveriesToLower.ToString());
+            InfoRow("Wall HP", currentLevelData.destructibleWallHealth.ToString());
+            InfoRow("Seed Random", currentLevelData.usingSeedRandom ? currentLevelData.seedRandom.ToString() : "Off");
+        }
+
         GUILayout.EndArea();
+    }
+
+    private LevelDataSO GetLevelDataAt(int index)
+    {
+        if (availableLevelData == null || index < 0 || index >= availableLevelData.Length)
+        {
+            return null;
+        }
+
+        return availableLevelData[index];
+    }
+
+    private string FormatLevelLabel(LevelDataSO level)
+    {
+        int levelNumber = selectedLevelIndex >= 0 ? selectedLevelIndex + 1 : 0;
+        if (level != null)
+        {
+            return $"Lv {levelNumber:000}  {level.name}";
+        }
+
+        return levelNumber > 0 ? $"Lv {levelNumber:000}  {levelMapName}" : levelMapName;
+    }
+
+    private void InfoRow(string label, string value)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(label + ":", GUILayout.Width(96f));
+        GUILayout.Label(value);
+        GUILayout.EndHorizontal();
     }
 
     private static int CompareLevelNames(string a, string b)
@@ -932,5 +1170,14 @@ public class GameplaySandbox : MonoBehaviour
         else if (dirToFront == Vector2Int.down) seg.transform.rotation = Quaternion.Euler(0, 0, 270);
         else if (dirToFront == Vector2Int.left) seg.transform.rotation = Quaternion.Euler(0, 0, 180);
         else if (dirToFront == Vector2Int.right) seg.transform.rotation = Quaternion.Euler(0, 0, 0);
+    }
+
+    private void OnDestroy()
+    {
+        if (backgroundMaterial != null)
+        {
+            Destroy(backgroundMaterial);
+            backgroundMaterial = null;
+        }
     }
 }
