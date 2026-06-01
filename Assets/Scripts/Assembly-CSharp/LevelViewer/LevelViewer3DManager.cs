@@ -39,7 +39,7 @@ namespace LevelViewer
         private Vector2 _levelListScroll;
         private Vector2 _infoScroll;
         private bool _showMapLayer = true;
-        private bool _showLdfLayer = true;
+        private bool _showLdfLayer = false;
         private bool _showSpawnLayer = true;
         private bool _showFirstSpawnWaveOnly = true;
         private string _searchFilter = "";
@@ -69,19 +69,19 @@ namespace LevelViewer
             _mainCamera = Camera.main;
             if (_mainCamera == null) _mainCamera = FindFirstObjectByType<Camera>();
 
-            // Setup camera for a front-on orthographic view of prefab-authored XY tiles.
+            // Use the same front-facing perspective setup as the gameplay sandbox so mesh depth reads correctly.
             if (_mainCamera != null)
             {
                 if (_mainCamera.GetComponent<UniversalAdditionalCameraData>() == null)
                     _mainCamera.gameObject.AddComponent<UniversalAdditionalCameraData>();
 
-                _mainCamera.orthographic = true;
+                _mainCamera.orthographic = false;
                 _mainCamera.transform.rotation = Quaternion.identity;
-                _mainCamera.orthographicSize = _cameraZoom;
+                _mainCamera.fieldOfView = 32f;
                 _mainCamera.backgroundColor = BG_COLOR;
                 _mainCamera.clearFlags = CameraClearFlags.SolidColor;
                 _mainCamera.nearClipPlane = 0.1f;
-                _mainCamera.farClipPlane = 100;
+                _mainCamera.farClipPlane = 200;
             }
 
             // Prepare shared materials
@@ -112,6 +112,7 @@ namespace LevelViewer
             _grassGroundMat = new Material(_unlitShader);
             _grassGroundMat.name = "GrassMat_Runtime";
             SetMatColor(_grassGroundMat, GRASS_COLOR);
+            SetGrassTexture(_grassGroundMat);
             SetCullOff(_grassGroundMat);
 
             _fallbackMatTemplate = new Material(_unlitShader);
@@ -169,6 +170,30 @@ namespace LevelViewer
             if (mat.HasProperty("_Color"))     mat.SetColor("_Color",     color);
         }
 
+        private static void SetMatTexture(Material mat, Texture texture)
+        {
+            if (texture == null) return;
+            if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", texture);
+            if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", texture);
+        }
+
+        private static void SetMatTextureScale(Material mat, Vector2 scale)
+        {
+            if (mat.HasProperty("_BaseMap")) mat.SetTextureScale("_BaseMap", scale);
+            if (mat.HasProperty("_MainTex")) mat.SetTextureScale("_MainTex", scale);
+        }
+
+        private static void SetGrassTexture(Material mat)
+        {
+#if UNITY_EDITOR
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Texture2D/Platform_Grass.png");
+            if (texture == null) return;
+
+            texture.wrapMode = TextureWrapMode.Repeat;
+            SetMatTexture(mat, texture);
+#endif
+        }
+
         private static void SetCullOff(Material mat)
         {
             if (mat == null) return;
@@ -194,7 +219,16 @@ namespace LevelViewer
                 if (Mathf.Abs(scroll) > 0.001f)
                 {
                     _cameraZoom = Mathf.Clamp(_cameraZoom - scroll * _cameraZoom * 0.5f, 2f, 60f);
-                    _mainCamera.orthographicSize = _cameraZoom;
+                    if (_mainCamera.orthographic)
+                    {
+                        _mainCamera.orthographicSize = _cameraZoom;
+                    }
+                    else
+                    {
+                        var pos = _mainCamera.transform.position;
+                        pos.z = -_cameraZoom;
+                        _mainCamera.transform.position = pos;
+                    }
                 }
 
                 if (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
@@ -224,9 +258,14 @@ namespace LevelViewer
             if (_mainCamera == null || _currentParsed == null) return;
             float centerX = (_currentParsed.Width - 1) * 0.5f;
             float centerY = -(_currentParsed.Height - 1) * 0.5f;
-            _mainCamera.transform.position = new Vector3(centerX, centerY, -20f);
-            _cameraZoom = Mathf.Max(_currentParsed.Width, _currentParsed.Height) * 0.6f;
-            _mainCamera.orthographicSize = _cameraZoom;
+            _cameraZoom = Mathf.Clamp(Mathf.Max(_currentParsed.Width, _currentParsed.Height) * 1.55f, 10f, 60f);
+            _mainCamera.transform.rotation = Quaternion.identity;
+            _mainCamera.transform.position = new Vector3(centerX, centerY, -_cameraZoom);
+
+            if (_mainCamera.orthographic)
+                _mainCamera.orthographicSize = Mathf.Max(_currentParsed.Width, _currentParsed.Height) * 0.6f;
+            else
+                _mainCamera.fieldOfView = 32f;
         }
 
         // --- Data Loading ---
@@ -367,7 +406,7 @@ namespace LevelViewer
             groundGO.transform.position = new Vector3(
                 (gridW - 1) * 0.5f,
                 -(gridH - 1) * 0.5f,
-                0.1f
+                0.03f
             );
             groundGO.transform.rotation = Quaternion.identity;
             groundGO.transform.localScale = new Vector3(gridW + margin * 2, gridH + margin * 2, 1f);
@@ -376,7 +415,11 @@ namespace LevelViewer
             if (col != null) Destroy(col);
 
             var renderer = groundGO.GetComponent<MeshRenderer>();
-            if (renderer != null) renderer.sharedMaterial = _grassGroundMat;
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = _grassGroundMat;
+                SetMatTextureScale(_grassGroundMat, new Vector2((gridW + margin * 2) / 2.56f, (gridH + margin * 2) / 2.56f));
+            }
         }
 
         private void BuildLayerObjects(int[] data, int gridW, int gridH, Transform parent, float yOffset, bool isMapLayer)
@@ -534,11 +577,11 @@ namespace LevelViewer
             var prefab = LoadEditorPrefabByName("PillMaster");
             if (prefab != null)
             {
-                var instance = Instantiate(prefab, new Vector3(x, y, z - 0.04f), Quaternion.identity, parent);
+                var instance = Instantiate(prefab, new Vector3(x, y, z - 0.08f), Quaternion.identity, parent);
                 instance.name = $"Pill_{kind}_{gx}_{gy}";
                 instance.transform.localScale = Vector3.one;
-                ActivatePillKind(instance, kind);
                 FixPrefabMaterials(instance);
+                ActivatePillKind(instance, kind);
                 return;
             }
 
@@ -568,12 +611,31 @@ namespace LevelViewer
         private static void ActivatePillKind(GameObject instance, PillKind kind)
         {
             var shapes = instance.GetComponentsInChildren<PillColorShape>(true);
+
+            foreach (var shape in shapes)
+                shape.gameObject.SetActive(false);
+
+            foreach (var transform in instance.GetComponentsInChildren<Transform>(true))
+            {
+                if (transform.name == "Calibrators" || transform.name == "SecreteCollectibleParent")
+                    transform.gameObject.SetActive(false);
+            }
+
             foreach (var shape in shapes)
             {
-                bool active = shape.pillKind == kind;
-                shape.gameObject.SetActive(active);
-                if (active) ActivateParentsUntil(shape.transform, instance.transform);
+                if (shape.pillKind != kind) continue;
+
+                shape.gameObject.SetActive(true);
+                ActivateParentsUntil(shape.transform, instance.transform);
+                DisableRendererOnShapeRoot(shape);
             }
+        }
+
+        private static void DisableRendererOnShapeRoot(PillColorShape shape)
+        {
+            var renderer = shape.GetComponent<Renderer>();
+            if (renderer != null)
+                renderer.enabled = false;
         }
 
         private static void ActivateParentsUntil(Transform child, Transform root)
