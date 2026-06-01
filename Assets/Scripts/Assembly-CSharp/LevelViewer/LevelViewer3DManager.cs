@@ -21,6 +21,11 @@ namespace LevelViewer
         private Material _grassGroundMat;
         private Material _fallbackMatTemplate;
 
+        // --- Material Fix System ---
+        private Shader _unlitShader;
+        private readonly Dictionary<Material, Material> _fixedMatCache = new Dictionary<Material, Material>();
+        private readonly List<Material> _runtimeMats = new List<Material>();
+
         // --- UI State ---
         private Vector2 _levelListScroll;
         private Vector2 _infoScroll;
@@ -79,14 +84,129 @@ namespace LevelViewer
 
         private void PrepareMaterials()
         {
-            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            if (shader == null) shader = Shader.Find("Unlit/Color");
+            // Find the best available unlit shader for this URP project
+            _unlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (_unlitShader == null) _unlitShader = Shader.Find("Unlit/Color");
+            if (_unlitShader == null) _unlitShader = Shader.Find("Standard");
 
-            _grassGroundMat = new Material(shader);
-            _grassGroundMat.color = GRASS_COLOR;
-            if (_grassGroundMat.HasProperty("_BaseColor")) _grassGroundMat.SetColor("_BaseColor", GRASS_COLOR);
+            if (_unlitShader == null)
+            {
+                Debug.LogError("[LevelViewer3D] Could not find any usable shader!");
+                return;
+            }
 
-            _fallbackMatTemplate = new Material(shader);
+            _grassGroundMat = new Material(_unlitShader);
+            _grassGroundMat.name = "GrassMat_Runtime";
+            SetMatColor(_grassGroundMat, GRASS_COLOR);
+
+            _fallbackMatTemplate = new Material(_unlitShader);
+            _fallbackMatTemplate.name = "FallbackMat_Runtime";
+        }
+
+        /// <summary>
+        /// After a prefab is instantiated, replace every material on every renderer
+        /// with a clean URP/Unlit material that copies color from the original.
+        /// This bypasses all shader compatibility issues.
+        /// </summary>
+        private void FixPrefabMaterials(GameObject instance)
+        {
+            if (_unlitShader == null) return;
+
+            foreach (var renderer in instance.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer == null) continue;
+
+                var mats = renderer.sharedMaterials;
+                bool changed = false;
+                var newMats = new Material[mats.Length];
+
+                for (int m = 0; m < mats.Length; m++)
+                {
+                    var orig = mats[m];
+                    if (orig == null)
+                    {
+                        newMats[m] = _fallbackMatTemplate;
+                        changed = true;
+                        continue;
+                    }
+
+                    // Check if shader is already a known-good URP shader
+                    string shaderName = orig.shader != null ? orig.shader.name : "";
+                    bool isGoodShader = shaderName.StartsWith("Universal Render Pipeline/")
+                                     || shaderName.StartsWith("Unlit/")
+                                     || shaderName == "Sprites/Default";
+
+                    if (isGoodShader)
+                    {
+                        newMats[m] = orig;
+                        continue;
+                    }
+
+                    // Check cache
+                    if (_fixedMatCache.TryGetValue(orig, out var cached))
+                    {
+                        newMats[m] = cached;
+                        changed = true;
+                        continue;
+                    }
+
+                    // Create replacement URP/Unlit material
+                    var replacement = new Material(_unlitShader);
+                    replacement.name = orig.name + "_URPFixed";
+
+                    // Extract the best color from the original material properties
+                    Color color = ExtractColorFromMaterial(orig);
+                    SetMatColor(replacement, color);
+
+                    _fixedMatCache[orig] = replacement;
+                    _runtimeMats.Add(replacement);
+                    newMats[m] = replacement;
+                    changed = true;
+                }
+
+                if (changed)
+                    renderer.sharedMaterials = newMats;
+
+                // Always enable renderer
+                renderer.enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Try to extract the most representative color from a material,
+        /// checking common property names in order of priority.
+        /// </summary>
+        private static Color ExtractColorFromMaterial(Material mat)
+        {
+            // Priority list of color properties to try
+            string[] colorProps = {
+                "_Main_Color_1",   // SH_Tile_FakeUnlit - top face color
+                "_BaseColor",      // URP Lit standard
+                "_Color",          // Most shaders
+                "_MainColor",
+                "_TintColor",
+            };
+
+            foreach (var prop in colorProps)
+            {
+                if (mat.HasProperty(prop))
+                {
+                    var c = mat.GetColor(prop);
+                    // Skip if nearly transparent or completely black (likely unset)
+                    if (c.a > 0.01f && (c.r + c.g + c.b) > 0.05f)
+                        return new Color(c.r, c.g, c.b, 1f);
+                }
+            }
+
+            // Final fallback: white
+            return Color.white;
+        }
+
+        /// <summary>Set color on both _BaseColor and _Color so it works on any URP shader.</summary>
+        private static void SetMatColor(Material mat, Color color)
+        {
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+            if (mat.HasProperty("_Color"))     mat.SetColor("_Color",     color);
         }
 
         private void Update()
@@ -318,13 +438,12 @@ namespace LevelViewer
                     var instance = Instantiate(prefab, new Vector3(worldX, worldY, worldZ), Quaternion.identity, parent);
                     instance.name = $"{tileInfo.Name}_{gx}_{gy}";
 
-                    // Enable all renderers (in case they were disabled)
-                    foreach (var r in instance.GetComponentsInChildren<Renderer>(true))
-                        r.enabled = true;
-
-                    // Activate all children
+                    // Activate all children first
                     foreach (Transform child in instance.GetComponentsInChildren<Transform>(true))
                         child.gameObject.SetActive(true);
+
+                    // Fix all materials to use URP-compatible shader
+                    FixPrefabMaterials(instance);
                 }
                 else
                 {
@@ -375,11 +494,12 @@ namespace LevelViewer
             if (renderer != null)
             {
                 var mat = new Material(_fallbackMatTemplate);
+                mat.name = $"FallbackMat_{displayInfo.Name}";
                 Color c = new Color(displayInfo.Color.r / 255f, displayInfo.Color.g / 255f,
                                     displayInfo.Color.b / 255f, 1f);
-                mat.color = c;
-                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", c);
+                SetMatColor(mat, c);
                 renderer.sharedMaterial = mat;
+                _runtimeMats.Add(mat);
             }
         }
 
@@ -622,6 +742,12 @@ namespace LevelViewer
             ClearLevel();
             if (_grassGroundMat != null) Destroy(_grassGroundMat);
             if (_fallbackMatTemplate != null) Destroy(_fallbackMatTemplate);
+
+            // Clean up all runtime-created replacement materials
+            foreach (var mat in _runtimeMats)
+                if (mat != null) Destroy(mat);
+            _runtimeMats.Clear();
+            _fixedMatCache.Clear();
         }
     }
 }

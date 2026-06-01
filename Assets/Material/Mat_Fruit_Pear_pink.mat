@@ -162,10 +162,11 @@ Material:
     - _UnityShadowSharpness: 1
     - _VertexColorsEnabled: 0
     - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.41513827, g: 0.5283019, b: 0.042363837, a: 1}
-    - _Color: {r: 0.41513827, g: 0.5283019, b: 0.042363837, a: 1}
+    - _Color: {r: 0.41513824, g: 0.5283019, b: 0.042363822, a: 1}
     - _ColorDim: {r: 0.41513827, g: 0.5283019, b: 0.042363837, a: 1}
     - _ColorDimCurve: {r: 0.85023, g: 0.85034, b: 0.8504499, a: 0.85056}
     - _ColorDimExtra: {r: 0.85023, g: 0.85034, b: 0.8504499, a: 0.85056}
