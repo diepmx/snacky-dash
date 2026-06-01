@@ -4,6 +4,98 @@ Shader "Shader Graphs/SH_FakeUnlit_Color" {
         _Smoothness ("Smoothness", Range(0, 1)) = 0
         _ShadowColor ("ShadowColor", Color) = (0,0,0,0)
     }
+
+    // === URP-Compatible SubShader ===
+    SubShader {
+        Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline"="UniversalPipeline" }
+        Cull Back ZWrite On
+
+        Pass {
+            Name "UniversalForward"
+            Tags { "LightMode"="UniversalForward" }
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct appdata { float4 vertex : POSITION; half4 color : COLOR; };
+            struct v2f { float4 pos : SV_POSITION; half4 color : COLOR; };
+
+            CBUFFER_START(UnityPerMaterial)
+                half4 _Color;
+                half4 _ShadowColor;
+                half _Smoothness;
+            CBUFFER_END
+
+            v2f vert(appdata v) {
+                v2f o;
+                o.pos = TransformObjectToHClip(v.vertex.xyz);
+                o.color = v.color;
+                return o;
+            }
+
+            half4 frag(v2f i) : SV_Target {
+                half4 c = _Color * i.color;
+                c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
+                return c;
+            }
+            ENDHLSL
+        }
+
+        Pass {
+            Name "SRPDefaultUnlit"
+            Tags { "LightMode"="SRPDefaultUnlit" }
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct appdata { float4 vertex : POSITION; half4 color : COLOR; };
+            struct v2f { float4 pos : SV_POSITION; half4 color : COLOR; };
+
+            CBUFFER_START(UnityPerMaterial)
+                half4 _Color;
+                half4 _ShadowColor;
+                half _Smoothness;
+            CBUFFER_END
+
+            v2f vert(appdata v) {
+                v2f o;
+                o.pos = TransformObjectToHClip(v.vertex.xyz);
+                o.color = v.color;
+                return o;
+            }
+
+            half4 frag(v2f i) : SV_Target {
+                half4 c = _Color * i.color;
+                c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
+                return c;
+            }
+            ENDHLSL
+        }
+
+        Pass {
+            Name "DepthOnly"
+            Tags { "LightMode"="DepthOnly" }
+            ColorMask 0 ZWrite On
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            struct appdata { float4 vertex : POSITION; };
+            struct v2f { float4 pos : SV_POSITION; };
+            v2f vert(appdata v) { v2f o; o.pos = TransformObjectToHClip(v.vertex.xyz); return o; }
+            half4 frag(v2f i) : SV_Target { return 0; }
+            ENDHLSL
+        }
+    }
+
+    // === Built-in fallback ===
     SubShader {
         Tags { "RenderType"="Opaque" "Queue"="Geometry" }
         Cull Back ZWrite On
@@ -12,20 +104,16 @@ Shader "Shader Graphs/SH_FakeUnlit_Color" {
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-
             struct appdata { float4 vertex : POSITION; fixed4 color : COLOR; };
             struct v2f { float4 pos : SV_POSITION; fixed4 color : COLOR; };
-
             fixed4 _Color;
             fixed4 _ShadowColor;
-
             v2f vert(appdata v) {
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.color = v.color;
                 return o;
             }
-
             fixed4 frag(v2f i) : SV_Target {
                 fixed4 c = _Color * i.color;
                 c.rgb = lerp(c.rgb, c.rgb * _ShadowColor.rgb, _ShadowColor.a);
@@ -34,5 +122,5 @@ Shader "Shader Graphs/SH_FakeUnlit_Color" {
             ENDCG
         }
     }
-    Fallback Off
+    Fallback "Universal Render Pipeline/Unlit"
 }
