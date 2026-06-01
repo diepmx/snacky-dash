@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using JuicedUp.Features.Core;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -77,6 +78,13 @@ public class GameplaySandbox : MonoBehaviour
     private string[] availableLevelNames = new string[0];
     private int selectedLevelIndex = -1;
     private string levelInput = "";
+
+    // Fruit spawn - wave 1
+    private List<PillKind> wave1SpawnKinds = new List<PillKind>();
+    private int wave1SpawnKindIndex = 0;
+    private readonly Dictionary<string, GameObject> prefabCache = new Dictionary<string, GameObject>();
+    private Shader unlitShader;
+    private readonly List<Material> runtimeFruitMats = new List<Material>();
 
     // Trạng thái Rắn
     private GameObject snakeHead;
@@ -288,8 +296,20 @@ public class GameplaySandbox : MonoBehaviour
             ? Mathf.Max(1, activeMap.tilesets[0].firstgid)
             : 1;
 
+        // Chuẩn bị shader unlit nếu chưa có
+        if (unlitShader == null)
+        {
+            unlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (unlitShader == null) unlitShader = Shader.Find("Unlit/Color");
+            if (unlitShader == null) unlitShader = Shader.Find("Standard");
+        }
+
         // Tạo container cha để gọn Hierarchy
         boardContainer = new GameObject("GameBoard");
+
+        // Xây dựng danh sách loại fruit theo wave 1 từ respawnSequence
+        wave1SpawnKinds = BuildWave1SpawnKinds();
+        wave1SpawnKindIndex = 0;
 
         TiledLayer spawnLayer = activeMap.layers.Find(l => l.name == "spawn");
 
@@ -360,6 +380,8 @@ public class GameplaySandbox : MonoBehaviour
         tunnelPairs.Clear();
         tunnelExitDirections.Clear();
         snakePositionsHistory.Clear();
+        wave1SpawnKinds.Clear();
+        wave1SpawnKindIndex = 0;
 
         foreach (GameObject pill in spawnedPills.Values)
         {
@@ -398,6 +420,13 @@ public class GameplaySandbox : MonoBehaviour
             Destroy(backgroundContainer);
             backgroundContainer = null;
         }
+
+        // Dọn materials fruit đã tạo lúc runtime
+        foreach (Material mat in runtimeFruitMats)
+        {
+            if (mat != null) Destroy(mat);
+        }
+        runtimeFruitMats.Clear();
     }
 
     private int ResolveTiledId(int rawGid)
@@ -479,7 +508,9 @@ public class GameplaySandbox : MonoBehaviour
             }
         }
 
-        backgroundContainer.transform.position = new Vector3(center.x, center.y, 50f);
+        // z = 0.1f đặt background ngay sau tiles (giống LevelViewer3D dùng z = 0.03f cho ground)
+        // Tiles ở z = 0f, background ở z dương nhỏ = phía sau camera orthographic
+        backgroundContainer.transform.position = new Vector3(center.x, center.y, 0.1f);
         backgroundContainer.transform.rotation = Quaternion.identity;
         backgroundContainer.transform.localScale = new Vector3(width + backgroundMargin * 2f, height + backgroundMargin * 2f, 1f);
 
@@ -819,15 +850,148 @@ public class GameplaySandbox : MonoBehaviour
             snakeGridPos = gridPos;
             targetGridPos = gridPos;
         }
-        // 277 = pill_spawn_point
-        else if (gid == 277)
+        // 277 = pill_spawn_point (generic), 371-377 = spawn theo loại fruit cụ thể
+        else if (gid == 277 || (gid >= 371 && gid <= 377))
         {
-            if (pillPrefab != null)
+            SpawnFruitAtCell(gid, gridPos, worldPos);
+        }
+    }
+
+    /// <summary>
+    /// Xây dựng danh sách PillKind theo thứ tự từ wave 1 (batches[0]) trong respawnSequence.
+    /// Giống logic BuildSpawnKindSequence trong LevelViewer3DManager.
+    /// </summary>
+    private List<PillKind> BuildWave1SpawnKinds()
+    {
+        var result = new List<PillKind>();
+        if (currentLevelData == null) return result;
+
+        var batches = currentLevelData.respawnSequence?.batches;
+        if (batches == null || batches.Count == 0) return result;
+
+        var colors = batches[0]?.colors;
+        if (colors == null) return result;
+
+        foreach (var colorEntry in colors)
+        {
+            if (colorEntry == null) continue;
+            int count = Mathf.Max(0, colorEntry.count);
+            for (int i = 0; i < count; i++)
+                result.Add(colorEntry.pillKind);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Spawn fruit visual đúng loại tại một ô, sử dụng PillMaster prefab hoặc fallback sphere có màu.
+    /// Nếu có wave1SpawnKinds thì lấy theo thứ tự round-robin, ngược lại dùng GID để suy loại.
+    /// </summary>
+    private void SpawnFruitAtCell(int gid, Vector2Int gridPos, Vector3 worldPos)
+    {
+        // Xác định loại fruit
+        PillKind kind;
+        if (wave1SpawnKinds.Count > 0)
+        {
+            kind = wave1SpawnKinds[wave1SpawnKindIndex % wave1SpawnKinds.Count];
+            wave1SpawnKindIndex++;
+        }
+        else if (gid >= 371 && gid <= 377)
+        {
+            kind = (PillKind)(gid - 371);
+        }
+        else
+        {
+            kind = PillKind.Strawberry; // fallback
+        }
+
+        GameObject pill = null;
+
+        // Thử dùng pillPrefab được gán trong Inspector (PillMaster)
+        if (pillPrefab != null)
+        {
+            pill = Instantiate(pillPrefab, worldPos, Quaternion.identity);
+            pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+            ActivatePillKindOnInstance(pill, kind);
+        }
+        else
+        {
+            // Fallback: sphere có màu theo loại fruit
+            pill = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+            pill.transform.position = worldPos;
+            pill.transform.localScale = Vector3.one * 0.45f;
+
+            Collider col = pill.GetComponent<Collider>();
+            if (col != null) Destroy(col);
+
+            MeshRenderer mr = pill.GetComponent<MeshRenderer>();
+            if (mr != null && unlitShader != null)
             {
-                GameObject pill = Instantiate(pillPrefab, worldPos, Quaternion.identity);
-                pill.name = $"Pill_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
-                spawnedPills[gridPos] = pill;
+                Material mat = new Material(unlitShader);
+                mat.name = $"FruitMat_{kind}";
+                Color c = GetPillColor(kind);
+                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", c);
+                if (mat.HasProperty("_Color")) mat.SetColor("_Color", c);
+                mr.sharedMaterial = mat;
+                runtimeFruitMats.Add(mat);
             }
+        }
+
+        if (pill != null)
+        {
+            spawnedPills[gridPos] = pill;
+        }
+    }
+
+    /// <summary>
+    /// Kích hoạt đúng child PillColorShape tương ứng với loại fruit.
+    /// Port từ LevelViewer3DManager.ActivatePillKind.
+    /// </summary>
+    private static void ActivatePillKindOnInstance(GameObject instance, PillKind kind)
+    {
+        PillColorShape[] shapes = instance.GetComponentsInChildren<PillColorShape>(true);
+
+        foreach (PillColorShape shape in shapes)
+            shape.gameObject.SetActive(false);
+
+        foreach (Transform child in instance.GetComponentsInChildren<Transform>(true))
+        {
+            if (child.name == "Calibrators" || child.name == "SecreteCollectibleParent")
+                child.gameObject.SetActive(false);
+        }
+
+        foreach (PillColorShape shape in shapes)
+        {
+            if (shape.pillKind != kind) continue;
+            shape.gameObject.SetActive(true);
+            ActivateParentsUntil(shape.transform, instance.transform);
+        }
+    }
+
+    private static void ActivateParentsUntil(Transform child, Transform root)
+    {
+        Transform current = child.parent;
+        while (current != null && current != root.parent)
+        {
+            current.gameObject.SetActive(true);
+            if (current == root) break;
+            current = current.parent;
+        }
+    }
+
+    private static Color GetPillColor(PillKind kind)
+    {
+        switch (kind)
+        {
+            case PillKind.Strawberry: return new Color(0.95f, 0.12f, 0.24f, 1f);
+            case PillKind.Blueberry:  return new Color(0.17f, 0.32f, 0.85f, 1f);
+            case PillKind.Banana:     return new Color(0.98f, 0.78f, 0.18f, 1f);
+            case PillKind.Pear:       return new Color(0.74f, 0.90f, 0.27f, 1f);
+            case PillKind.Apple:      return new Color(0.35f, 0.78f, 0.20f, 1f);
+            case PillKind.Carrot:     return new Color(0.98f, 0.45f, 0.08f, 1f);
+            case PillKind.Eggplant:   return new Color(0.55f, 0.18f, 0.82f, 1f);
+            default:                   return Color.white;
         }
     }
 
@@ -1179,5 +1343,11 @@ public class GameplaySandbox : MonoBehaviour
             Destroy(backgroundMaterial);
             backgroundMaterial = null;
         }
+
+        foreach (Material mat in runtimeFruitMats)
+        {
+            if (mat != null) Destroy(mat);
+        }
+        runtimeFruitMats.Clear();
     }
 }
