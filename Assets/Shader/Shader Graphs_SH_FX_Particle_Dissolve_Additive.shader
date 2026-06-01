@@ -1,55 +1,60 @@
 Shader "Shader Graphs/SH_FX_Particle_Dissolve_Additive" {
-	Properties {
-		[NoScaleOffset] _Texture ("Texture", 2D) = "white" {}
-		[NoScaleOffset] _Dissolve_Texture ("Dissolve Texture", 2D) = "white" {}
-		_Dissolve_Tiling ("Dissolve Tiling", Vector) = (1,1,0,0)
-		_Dissolve_Speed ("Dissolve Speed", Vector) = (0,0,0,0)
-		_Dissolve_Smoothness ("Dissolve Smoothness", Float) = 20
-		[HideInInspector] _QueueOffset ("_QueueOffset", Float) = 0
-		[HideInInspector] _QueueControl ("_QueueControl", Float) = -1
-		[HideInInspector] [NoScaleOffset] unity_Lightmaps ("unity_Lightmaps", 2DArray) = "" {}
-		[HideInInspector] [NoScaleOffset] unity_LightmapsInd ("unity_LightmapsInd", 2DArray) = "" {}
-		[HideInInspector] [NoScaleOffset] unity_ShadowMasks ("unity_ShadowMasks", 2DArray) = "" {}
-	}
-	//DummyShaderTextExporter
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
+    Properties {
+        [NoScaleOffset] _Texture ("Texture", 2D) = "white" {}
+        [NoScaleOffset] _Dissolve_Texture ("Dissolve Texture", 2D) = "white" {}
+        _Dissolve_Tiling ("Dissolve Tiling", Vector) = (1,1,0,0)
+        _Dissolve_Speed ("Dissolve Speed", Vector) = (0,0,0,0)
+        _Dissolve_Smoothness ("Dissolve Smoothness", Float) = 20
+        _Color ("Color", Color) = (1,1,1,1)
+    }
+    SubShader {
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Cull Off ZWrite Off Blend SrcAlpha One
+        Pass {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
 
-		Pass
-		{
-			HLSLPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
+            struct appdata {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+                fixed4 color : COLOR;
+            };
 
-			float4x4 unity_ObjectToWorld;
-			float4x4 unity_MatrixVP;
+            struct v2f {
+                float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                fixed4 color : COLOR;
+            };
 
-			struct Vertex_Stage_Input
-			{
-				float4 pos : POSITION;
-			};
+            sampler2D _Texture;
+            sampler2D _Dissolve_Texture;
+            float4 _Dissolve_Tiling;
+            float4 _Dissolve_Speed;
+            half _Dissolve_Smoothness;
+            fixed4 _Color;
 
-			struct Vertex_Stage_Output
-			{
-				float4 pos : SV_POSITION;
-			};
+            v2f vert(appdata v) {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.uv = v.uv;
+                o.color = v.color;
+                return o;
+            }
 
-			Vertex_Stage_Output vert(Vertex_Stage_Input input)
-			{
-				Vertex_Stage_Output output;
-				output.pos = mul(unity_MatrixVP, mul(unity_ObjectToWorld, input.pos));
-				return output;
-			}
-
-			float4 frag(Vertex_Stage_Output input) : SV_TARGET
-			{
-				return float4(1.0, 1.0, 1.0, 1.0); // RGBA
-			}
-
-			ENDHLSL
-		}
-	}
-	Fallback "Hidden/Shader Graph/FallbackError"
-	//CustomEditor "UnityEditor.ShaderGraph.GenericShaderGraphMaterialGUI"
+            fixed4 frag(v2f i) : SV_Target {
+                fixed4 c = tex2D(_Texture, i.uv) * i.color;
+                fixed colorEnabled = step(0.001, _Color.a);
+                c.rgb *= lerp(fixed3(1, 1, 1), _Color.rgb, colorEnabled);
+                float2 duv = i.uv * max(_Dissolve_Tiling.xy, 0.0001.xx) + _Time.y * _Dissolve_Speed.xy;
+                half noise = tex2D(_Dissolve_Texture, duv).r;
+                c.a *= saturate(noise * max(_Dissolve_Smoothness, 0.001));
+                clip(c.a - 0.001);
+                return c;
+            }
+            ENDCG
+        }
+    }
+    Fallback Off
 }

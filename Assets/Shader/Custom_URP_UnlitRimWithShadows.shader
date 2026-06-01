@@ -1,53 +1,80 @@
 Shader "Custom/URP/UnlitRimWithShadows" {
-	Properties {
-		[Header(Base)] _BaseMap ("Base Map", 2D) = "white" {}
-		_BaseColor ("Base Color", Vector) = (1,1,1,1)
-		[Header(Rim Light)] [Toggle] _UseRim ("Enable Rim Light", Float) = 1
-		_RimColor ("Rim Color", Vector) = (0.2,0.8,1,1)
-		_RimPower ("Rim Power", Range(0.1, 8)) = 2.5
-		_RimIntensity ("Rim Intensity", Range(0, 4)) = 1
-		[Header(Bottom Mask)] _BottomAmount ("Bottom Amount", Range(0, 1)) = 1
-		_BottomSoftness ("Bottom Softness", Range(0.001, 1)) = 0.25
-		[Header(Right Mask)] _RightAmount ("Right Amount", Range(0, 1)) = 1
-		_RightSoftness ("Right Softness", Range(0.001, 1)) = 0.25
-	}
-	//DummyShaderTextExporter
-	SubShader{
-		Tags { "RenderType" = "Opaque" }
-		LOD 200
+    Properties {
+        [Header(Base)] _BaseMap ("Base Map", 2D) = "white" {}
+        _BaseColor ("Base Color", Color) = (1,1,1,1)
+        _Color ("Color", Color) = (1,1,1,1)
+        _RimColor ("Rim Color", Color) = (0.2,0.8,1,1)
+        _RimColorInner ("Rim Color Inner", Color) = (0.2,0,0,1)
+        _RimColorOuter ("Rim Color Outer", Color) = (0.8,0.25,0.05,1)
+        _RimPower ("Rim Power", Range(0.1, 8)) = 2.5
+        _RimIntensity ("Rim Intensity", Range(0, 4)) = 1
+        _RimMin ("Rim Min", Range(0, 1)) = 0
+        _RimMax ("Rim Max", Range(0, 1)) = 1
+        _RimSmoothness ("Rim Smoothness", Range(0.001, 1)) = 0.25
+        _RimDirection ("Rim Direction", Vector) = (0,1,0,0)
+        _RimDirStrength ("Rim Direction Strength", Range(0, 1)) = 0
+        _RimMaskStrength ("Rim Mask Strength", Range(0, 1)) = 1
+        _Saturation ("Saturation", Float) = 1
+    }
+    SubShader {
+        Tags { "RenderType"="Opaque" "Queue"="Geometry" }
+        Cull Back ZWrite On
+        Pass {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
 
-		Pass
-		{
-			HLSLPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
+            struct appdata {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+                float3 normal : NORMAL;
+            };
 
-			float4x4 unity_ObjectToWorld;
-			float4x4 unity_MatrixVP;
+            struct v2f {
+                float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float3 worldNormal : TEXCOORD1;
+                float3 viewDir : TEXCOORD2;
+            };
 
-			struct Vertex_Stage_Input
-			{
-				float4 pos : POSITION;
-			};
+            sampler2D _BaseMap;
+            float4 _BaseMap_ST;
+            fixed4 _BaseColor;
+            fixed4 _Color;
+            fixed4 _RimColor;
+            fixed4 _RimColorInner;
+            fixed4 _RimColorOuter;
+            half _RimPower;
+            half _RimIntensity;
+            half _RimMin;
+            half _RimMax;
+            half _RimSmoothness;
+            half _Saturation;
 
-			struct Vertex_Stage_Output
-			{
-				float4 pos : SV_POSITION;
-			};
+            v2f vert(appdata v) {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _BaseMap);
+                float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.worldNormal = UnityObjectToWorldNormal(v.normal);
+                o.viewDir = normalize(_WorldSpaceCameraPos - worldPos);
+                return o;
+            }
 
-			Vertex_Stage_Output vert(Vertex_Stage_Input input)
-			{
-				Vertex_Stage_Output output;
-				output.pos = mul(unity_MatrixVP, mul(unity_ObjectToWorld, input.pos));
-				return output;
-			}
-
-			float4 frag(Vertex_Stage_Output input) : SV_TARGET
-			{
-				return float4(1.0, 1.0, 1.0, 1.0); // RGBA
-			}
-
-			ENDHLSL
-		}
-	}
+            fixed4 frag(v2f i) : SV_Target {
+                fixed4 c = tex2D(_BaseMap, i.uv) * _BaseColor * _Color;
+                fixed luma = dot(c.rgb, fixed3(0.299, 0.587, 0.114));
+                c.rgb = lerp(luma.xxx, c.rgb, _Saturation);
+                half rim = 1.0 - saturate(dot(normalize(i.worldNormal), normalize(i.viewDir)));
+                rim = pow(saturate(rim), max(_RimPower, 0.001));
+                rim = smoothstep(_RimMin, max(_RimMax, _RimMin + 0.001), rim);
+                fixed3 rimColor = lerp(_RimColorInner.rgb, _RimColorOuter.rgb, rim) * _RimColor.rgb;
+                c.rgb += rimColor * rim * _RimIntensity;
+                return c;
+            }
+            ENDCG
+        }
+    }
+    Fallback Off
 }
