@@ -221,8 +221,8 @@ namespace LevelViewer
         private void CenterCamera()
         {
             if (_mainCamera == null || _currentParsed == null) return;
-            float centerX = _currentParsed.Width * 0.5f;
-            float centerY = _currentParsed.Height * 0.5f;
+            float centerX = (_currentParsed.Width - 1) * 0.5f;
+            float centerY = -(_currentParsed.Height - 1) * 0.5f;
             _mainCamera.transform.position = new Vector3(centerX, centerY, -20f);
             _cameraZoom = Mathf.Max(_currentParsed.Width, _currentParsed.Height) * 0.6f;
             _mainCamera.orthographicSize = _cameraZoom;
@@ -364,7 +364,7 @@ namespace LevelViewer
             groundGO.transform.SetParent(_levelRoot);
             groundGO.transform.position = new Vector3(
                 (gridW - 1) * 0.5f,
-                (gridH - 1) * 0.5f,
+                -(gridH - 1) * 0.5f,
                 0.1f
             );
             groundGO.transform.rotation = Quaternion.identity;
@@ -387,9 +387,9 @@ namespace LevelViewer
                 int gx = i % gridW;
                 int gy = i / gridW;
 
-                // Tiled uses top-left origin. Viewer uses Unity XY so prefab-authored tile covers face the camera.
+                // Match Sandbox: Tiled cell (x, y) is spawned at Unity (x, -y, z).
                 float worldX = gx;
-                float worldY = (gridH - 1 - gy);
+                float worldY = -gy;
                 float worldZ = -yOffset;
 
                 var tileInfo = TilePrefabMapping.Get(tileId);
@@ -436,7 +436,7 @@ namespace LevelViewer
                 int gx = i % gridW;
                 int gy = i / gridW;
                 float worldX = gx;
-                float worldY = gridH - 1 - gy;
+                float worldY = -gy;
                 float worldZ = -yOffset;
 
                 var displayInfo = _tileLookup != null ? _tileLookup.GetDisplayInfo(tileId) : TileIdMapping.Get(tileId);

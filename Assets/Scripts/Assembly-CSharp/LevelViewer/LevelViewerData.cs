@@ -277,28 +277,60 @@ namespace LevelViewer
                 Height = map.height
             };
 
+            int tilesetFirstGid = map.tilesets != null && map.tilesets.Length > 0
+                ? Mathf.Max(1, map.tilesets[0].firstgid)
+                : 1;
+
             foreach (var layer in map.layers)
             {
                 if (layer == null || layer.data == null) continue;
 
                 string layerName = layer.name != null ? layer.name.ToLowerInvariant() : "";
-
                 if (layerName == "map")
                 {
-                    parsed.MapData = layer.data;
+                    parsed.MapData = ResolveLayerData(layer.data, tilesetFirstGid);
                 }
                 else if (layerName == "ldf")
                 {
-                    parsed.LdfData = layer.data;
+                    parsed.LdfData = ResolveLayerData(layer.data, tilesetFirstGid);
                 }
                 else if (layerName.StartsWith("spawn"))
                 {
-                    parsed.SpawnLayers.Add(layer.data);
+                    parsed.SpawnLayers.Add(StripFlipFlags(layer.data));
                     parsed.SpawnLayerNames.Add(layer.name);
                 }
             }
 
             return parsed;
+        }
+
+        private static int[] ResolveLayerData(int[] rawData, int tilesetFirstGid)
+        {
+            var resolved = new int[rawData.Length];
+            for (int i = 0; i < rawData.Length; i++)
+                resolved[i] = ResolveTileId(rawData[i], tilesetFirstGid);
+            return resolved;
+        }
+
+        private static int ResolveTileId(int rawGid, int tilesetFirstGid)
+        {
+            uint gid = StripFlipFlags(rawGid);
+            if (gid == 0) return 0;
+            return (int)gid - tilesetFirstGid;
+        }
+
+        private static int[] StripFlipFlags(int[] rawData)
+        {
+            var resolved = new int[rawData.Length];
+            for (int i = 0; i < rawData.Length; i++)
+                resolved[i] = (int)StripFlipFlags(rawData[i]);
+            return resolved;
+        }
+
+        private static uint StripFlipFlags(int rawGid)
+        {
+            uint gid = (uint)rawGid;
+            return gid & ~(0x80000000u | 0x40000000u | 0x20000000u | 0x10000000u);
         }
     }
 
