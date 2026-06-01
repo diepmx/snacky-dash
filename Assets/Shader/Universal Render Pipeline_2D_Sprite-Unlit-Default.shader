@@ -1,62 +1,28 @@
-Shader "Universal Render Pipeline/2D/Sprite-Unlit-Default" {
-	Properties {
-		_MainTex ("Sprite Texture", 2D) = "white" {}
-		[HideInInspector] _Color ("Tint", Vector) = (1,1,1,1)
-		[HideInInspector] PixelSnap ("Pixel snap", Float) = 0
-		[HideInInspector] _RendererColor ("RendererColor", Vector) = (1,1,1,1)
-		[HideInInspector] _AlphaTex ("External Alpha", 2D) = "white" {}
-		[HideInInspector] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
-	}
-	//DummyShaderTextExporter
-	SubShader{
-		Tags { "RenderType"="Opaque" }
-		LOD 200
-
-		Pass
-		{
-			HLSLPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
-
-			float4x4 unity_ObjectToWorld;
-			float4x4 unity_MatrixVP;
-			float4 _MainTex_ST;
-
-			struct Vertex_Stage_Input
-			{
-				float4 pos : POSITION;
-				float2 uv : TEXCOORD0;
-			};
-
-			struct Vertex_Stage_Output
-			{
-				float2 uv : TEXCOORD0;
-				float4 pos : SV_POSITION;
-			};
-
-			Vertex_Stage_Output vert(Vertex_Stage_Input input)
-			{
-				Vertex_Stage_Output output;
-				output.uv = (input.uv.xy * _MainTex_ST.xy) + _MainTex_ST.zw;
-				output.pos = mul(unity_MatrixVP, mul(unity_ObjectToWorld, input.pos));
-				return output;
-			}
-
-			Texture2D<float4> _MainTex;
-			SamplerState sampler_MainTex;
-			float4 _Color;
-
-			struct Fragment_Stage_Input
-			{
-				float2 uv : TEXCOORD0;
-			};
-
-			float4 frag(Fragment_Stage_Input input) : SV_TARGET
-			{
-				return _MainTex.Sample(sampler_MainTex, input.uv.xy) * _Color;
-			}
-
-			ENDHLSL
-		}
-	}
+﻿Shader "Universal Render Pipeline/2D/Sprite-Unlit-Default" {
+    Properties {
+        [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
+        _Color ("Tint", Color) = (1,1,1,1)
+        _RendererColor ("RendererColor", Color) = (1,1,1,1)
+        _Flip ("Flip", Vector) = (1,1,1,1)
+        _AlphaTex ("External Alpha", 2D) = "white" {}
+        _EnableExternalAlpha ("Enable External Alpha", Float) = 0
+    }
+    SubShader {
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "RenderPipeline"="UniversalPipeline" "CanUseSpriteAtlas"="True" }
+        Cull Off Lighting Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Pass {
+            Tags { "LightMode"="Universal2D" }
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+            struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
+            struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; fixed4 color : COLOR; };
+            sampler2D _MainTex; float4 _MainTex_ST; fixed4 _Color; fixed4 _RendererColor;
+            v2f vert(appdata v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = TRANSFORM_TEX(v.uv, _MainTex); o.color = v.color * _Color * _RendererColor; return o; }
+            fixed4 frag(v2f i) : SV_Target { return tex2D(_MainTex, i.uv) * i.color; }
+            ENDCG
+        }
+    }
+    Fallback Off
 }
