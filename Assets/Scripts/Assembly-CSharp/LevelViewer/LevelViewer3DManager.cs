@@ -41,6 +41,7 @@ namespace LevelViewer
         private bool _showMapLayer = true;
         private bool _showLdfLayer = true;
         private bool _showSpawnLayer = true;
+        private bool _showFirstSpawnWaveOnly = true;
         private string _searchFilter = "";
         private bool _initialized;
 
@@ -343,7 +344,8 @@ namespace LevelViewer
             if (_showSpawnLayer)
             {
                 float yOff = 0.03f;
-                for (int i = 0; i < _currentParsed.SpawnLayers.Count; i++)
+                int spawnLayerCount = _showFirstSpawnWaveOnly ? Mathf.Min(1, _currentParsed.SpawnLayers.Count) : _currentParsed.SpawnLayers.Count;
+                for (int i = 0; i < spawnLayerCount; i++)
                 {
                     var spawnData = _currentParsed.SpawnLayers[i];
                     if (spawnData != null)
@@ -427,6 +429,7 @@ namespace LevelViewer
         {
             var spawnKinds = BuildSpawnKindSequence(spawnLayerIndex);
             int spawnKindIndex = 0;
+            bool limitToBatchCount = spawnKinds.Count > 0;
 
             for (int i = 0; i < data.Length && i < gridW * gridH; i++)
             {
@@ -448,6 +451,9 @@ namespace LevelViewer
 
                 if (displayInfo.Category == TileDisplayCategory.PillSpawn || IsSpawnTileId(tileId))
                 {
+                    if (limitToBatchCount && spawnKindIndex >= spawnKinds.Count)
+                        continue;
+
                     var kind = ResolveSpawnKind(tileId, spawnKinds, ref spawnKindIndex);
                     CreateFruitVisual(kind, worldX, worldY, worldZ, parent, gx, gy);
                     continue;
@@ -480,15 +486,15 @@ namespace LevelViewer
 
         private static PillKind ResolveSpawnKind(int tileId, List<PillKind> spawnKinds, ref int spawnKindIndex)
         {
-            if (tileId >= 371 && tileId <= 377)
-                return (PillKind)(tileId - 371);
-
             if (spawnKinds != null && spawnKinds.Count > 0)
             {
                 var kind = spawnKinds[spawnKindIndex % spawnKinds.Count];
                 spawnKindIndex++;
                 return kind;
             }
+
+            if (tileId >= 371 && tileId <= 377)
+                return (PillKind)(tileId - 371);
 
             return PillKind.Strawberry;
         }
@@ -525,6 +531,17 @@ namespace LevelViewer
 
         private void CreateFruitVisual(PillKind kind, float x, float y, float z, Transform parent, int gx, int gy)
         {
+            var prefab = LoadEditorPrefabByName("PillMaster");
+            if (prefab != null)
+            {
+                var instance = Instantiate(prefab, new Vector3(x, y, z - 0.04f), Quaternion.identity, parent);
+                instance.name = $"Pill_{kind}_{gx}_{gy}";
+                instance.transform.localScale = Vector3.one;
+                ActivatePillKind(instance, kind);
+                FixPrefabMaterials(instance);
+                return;
+            }
+
             var mesh = LoadFruitMesh(kind);
             var go = new GameObject($"Spawn_{kind}_{gx}_{gy}");
             go.transform.SetParent(parent);
@@ -546,8 +563,28 @@ namespace LevelViewer
                 sphere.transform.localScale = Vector3.one;
                 ApplyRuntimeMaterial(sphere, GetPillColor(kind), $"Fruit_{kind}_Mat");
             }
+        }
 
-            AddLabel(go.transform, GetPillShortLabel(kind), Color.white, -0.35f);
+        private static void ActivatePillKind(GameObject instance, PillKind kind)
+        {
+            var shapes = instance.GetComponentsInChildren<PillColorShape>(true);
+            foreach (var shape in shapes)
+            {
+                bool active = shape.pillKind == kind;
+                shape.gameObject.SetActive(active);
+                if (active) ActivateParentsUntil(shape.transform, instance.transform);
+            }
+        }
+
+        private static void ActivateParentsUntil(Transform child, Transform root)
+        {
+            var current = child.parent;
+            while (current != null && current != root.parent)
+            {
+                current.gameObject.SetActive(true);
+                if (current == root) break;
+                current = current.parent;
+            }
         }
 
         private Mesh LoadFruitMesh(PillKind kind)
@@ -882,11 +919,13 @@ namespace LevelViewer
             bool newMap = GUILayout.Toggle(_showMapLayer, " Map Layer");
             bool newLdf = GUILayout.Toggle(_showLdfLayer, " LDF Layer (Obstacles)");
             bool newSpawn = GUILayout.Toggle(_showSpawnLayer, " Spawn Layers");
-            if (newMap != _showMapLayer || newLdf != _showLdfLayer || newSpawn != _showSpawnLayer)
+            bool newFirstWaveOnly = GUILayout.Toggle(_showFirstSpawnWaveOnly, " First Spawn Wave Only");
+            if (newMap != _showMapLayer || newLdf != _showLdfLayer || newSpawn != _showSpawnLayer || newFirstWaveOnly != _showFirstSpawnWaveOnly)
             {
                 _showMapLayer = newMap;
                 _showLdfLayer = newLdf;
                 _showSpawnLayer = newSpawn;
+                _showFirstSpawnWaveOnly = newFirstWaveOnly;
                 BuildLevel3D();
             }
 
