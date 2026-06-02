@@ -46,6 +46,8 @@ public class GameplaySandbox : MonoBehaviour
 
     [Header("Fruit Presentation")]
     public bool useMeshFruitVisuals = false;
+    public bool fillInitialWaveFromData = true;
+    public int initialWaveFillMarkerThreshold = 10;
     public Vector3 fruitTiltEuler = new Vector3(-14f, 0f, 0f);
     public float meshFruitScale = 0.36f;
 
@@ -120,6 +122,12 @@ public class GameplaySandbox : MonoBehaviour
     private readonly Dictionary<PillKind, Material> fruitMaterialCache = new Dictionary<PillKind, Material>();
     private Shader unlitShader;
     private readonly List<Material> runtimeFruitMats = new List<Material>();
+
+    private struct SpawnCellData
+    {
+        public int Gid;
+        public Vector2Int GridPos;
+    }
 
     // Trạng thái Rắn
     private GameObject snakeHead;
@@ -455,6 +463,7 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         // Dựng đối tượng spawn (spawn layer: player start, pills)
+        List<SpawnCellData> initialFruitSlots = new List<SpawnCellData>();
         if (spawnLayer != null && spawnLayer.data != null)
         {
             for (int y = 0; y < activeMap.height; y++)
@@ -468,13 +477,22 @@ public class GameplaySandbox : MonoBehaviour
                     if (gid > 0)
                     {
                         spawnMap[gridPos] = gid;
-                        ProcessSpawnObject(gid, gridPos);
+                        if (gid == 287)
+                        {
+                            ProcessSpawnObject(gid, gridPos);
+                        }
+                        else if (IsInitialFruitSpawnTile(gid))
+                        {
+                            initialFruitSlots.Add(new SpawnCellData { Gid = gid, GridPos = gridPos });
+                        }
                     }
                 }
             }
         }
 
         // Khởi tạo lịch sử vị trí rắn chỉ khi có snake (không bắt buộc để fruit spawn)
+        SpawnInitialFruits(initialFruitSlots);
+
         if (snakeHead != null)
         {
             snakePositionsHistory.Add(snakeGridPos);
@@ -895,22 +913,26 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        float centerX = (activeMap.width - 1f) * 0.5f + cratePreviewOffset.x;
         float topY = cratePreviewOffset.y;
         cratePreviewContainer = new GameObject("CratePreview");
         cratePreviewContainer.transform.SetParent(boardContainer != null ? boardContainer.transform : transform, false);
         cratePreviewContainer.transform.position = Vector3.zero;
 
+        List<Vector2Int> deliveryAnchors = GetDeliveryEndAnchors();
+        float centerX = (activeMap.width - 1f) * 0.5f + cratePreviewOffset.x;
         float columnWidth = cratePreviewSpacing * 1.45f;
         float startX = centerX - (columnPreviews.Count - 1) * columnWidth * 0.5f;
+        float signGap = Mathf.Max(0.75f, cratePreviewSpacing * 0.55f);
         for (int i = 0; i < columnPreviews.Count; i++)
         {
             CrateColumnPreviewData preview = columnPreviews[i];
-            float columnX = startX + i * columnWidth;
+            float crateX = i < deliveryAnchors.Count
+                ? deliveryAnchors[i].x
+                : startX + i * columnWidth + cratePreviewSpacing * 0.5f;
 
             if (signPrefab != null)
             {
-                Vector3 signPosition = new Vector3(columnX - cratePreviewSpacing * 0.5f, topY, -0.4f);
+                Vector3 signPosition = new Vector3(crateX - signGap, topY + 0.08f, -0.4f);
                 GameObject sign = Instantiate(signPrefab, signPosition, Quaternion.identity, cratePreviewContainer.transform);
                 sign.name = $"NextCrateSign_Preview_{i + 1}";
                 sign.transform.localScale = Vector3.one * nextCrateSignScale;
@@ -920,13 +942,39 @@ public class GameplaySandbox : MonoBehaviour
             GameObject cratePrefab = ResolvePrefab(GetBoxCratePrefab(preview.Current), GetBoxCrateAssetPath(preview.Current));
             if (cratePrefab != null)
             {
-                Vector3 cratePosition = new Vector3(columnX + cratePreviewSpacing * 0.5f, topY, -0.45f);
+                Vector3 cratePosition = new Vector3(crateX, topY, -0.45f);
                 GameObject crate = Instantiate(cratePrefab, cratePosition, Quaternion.identity, cratePreviewContainer.transform);
                 crate.name = $"Box_Crate_Preview_{i + 1}";
                 crate.transform.localScale = Vector3.one * boxCrateScale;
                 ConfigureCratePreview(crate, preview.Current);
             }
         }
+    }
+
+    private List<Vector2Int> GetDeliveryEndAnchors()
+    {
+        List<Vector2Int> anchors = new List<Vector2Int>();
+        foreach (KeyValuePair<Vector2Int, int> entry in gridMap)
+        {
+            if (entry.Value == 387)
+            {
+                anchors.Add(entry.Key);
+            }
+        }
+
+        if (anchors.Count == 0)
+        {
+            foreach (KeyValuePair<Vector2Int, int> entry in gridMap)
+            {
+                if (entry.Value >= 295 && entry.Value <= 297)
+                {
+                    anchors.Add(entry.Key + Vector2Int.up);
+                }
+            }
+        }
+
+        anchors.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : b.y.CompareTo(a.y));
+        return anchors;
     }
 
     private void ConfigureCratePreview(GameObject crate, ManualCrateSetup crateData)
@@ -1479,6 +1527,117 @@ public class GameplaySandbox : MonoBehaviour
         {
             SpawnFruitAtCell(gid, gridPos, worldPos);
         }
+    }
+
+    private static bool IsInitialFruitSpawnTile(int gid)
+    {
+        return gid == 277 || gid == 276 || (gid >= 371 && gid <= 377);
+    }
+
+    private void SpawnInitialFruits(List<SpawnCellData> seedSlots)
+    {
+        if (seedSlots == null || seedSlots.Count == 0)
+        {
+            return;
+        }
+
+        List<PillKind> kinds = wave1SpawnKinds != null && wave1SpawnKinds.Count > 0
+            ? wave1SpawnKinds
+            : BuildKindsFromExplicitSlots(seedSlots);
+
+        bool shouldFillFromWave = fillInitialWaveFromData &&
+                                  kinds.Count > seedSlots.Count &&
+                                  seedSlots.Count < initialWaveFillMarkerThreshold;
+        int targetCount = shouldFillFromWave ? kinds.Count : seedSlots.Count;
+        List<SpawnCellData> cells = BuildInitialFruitCells(seedSlots, targetCount);
+        int count = Mathf.Min(targetCount, cells.Count);
+
+        wave1SpawnKindIndex = 0;
+        for (int i = 0; i < count; i++)
+        {
+            SpawnCellData cell = cells[i];
+            int gid = cell.Gid == 276 && kinds.Count > 0 ? 277 : cell.Gid;
+            SpawnFruitAtCell(gid, cell.GridPos, new Vector3(cell.GridPos.x, cell.GridPos.y, 0f));
+        }
+    }
+
+    private static List<PillKind> BuildKindsFromExplicitSlots(List<SpawnCellData> seedSlots)
+    {
+        List<PillKind> kinds = new List<PillKind>();
+        foreach (SpawnCellData slot in seedSlots)
+        {
+            if (slot.Gid >= 371 && slot.Gid <= 377)
+            {
+                kinds.Add((PillKind)(slot.Gid - 371));
+            }
+        }
+
+        return kinds;
+    }
+
+    private List<SpawnCellData> BuildInitialFruitCells(List<SpawnCellData> seedSlots, int targetCount)
+    {
+        List<SpawnCellData> cells = new List<SpawnCellData>();
+        HashSet<Vector2Int> used = new HashSet<Vector2Int>();
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+
+        foreach (SpawnCellData slot in seedSlots)
+        {
+            if (used.Add(slot.GridPos))
+            {
+                cells.Add(slot);
+                queue.Enqueue(slot.GridPos);
+            }
+        }
+
+        if (!fillInitialWaveFromData || cells.Count >= targetCount)
+        {
+            return cells;
+        }
+
+        Vector2Int[] dirs = { Vector2Int.right, Vector2Int.down, Vector2Int.left, Vector2Int.up };
+        while (queue.Count > 0 && cells.Count < targetCount)
+        {
+            Vector2Int origin = queue.Dequeue();
+            foreach (Vector2Int dir in dirs)
+            {
+                Vector2Int next = origin + dir;
+                if (!used.Add(next) || !IsInitialFruitPathCell(next))
+                {
+                    continue;
+                }
+
+                cells.Add(new SpawnCellData { Gid = 277, GridPos = next });
+                queue.Enqueue(next);
+                if (cells.Count >= targetCount)
+                {
+                    break;
+                }
+            }
+        }
+
+        return cells;
+    }
+
+    private bool IsInitialFruitPathCell(Vector2Int gridPos)
+    {
+        if (spawnMap.TryGetValue(gridPos, out int spawnGid) && spawnGid == 287)
+        {
+            return false;
+        }
+
+        if (!gridMap.TryGetValue(gridPos, out int tileGid))
+        {
+            return false;
+        }
+
+        if (tileGid == 387 || (tileGid >= 295 && tileGid <= 297))
+        {
+            return false;
+        }
+
+        return tileGid == 347 || tileGid == 350 || tileGid == 352 ||
+               tileGid == 353 || tileGid == 354 || tileGid == 355 || tileGid == 356;
     }
 
     /// <summary>
