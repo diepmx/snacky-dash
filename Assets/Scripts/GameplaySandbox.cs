@@ -10,6 +10,12 @@ using UnityEditor;
 
 public class GameplaySandbox : MonoBehaviour
 {
+    public enum InitialFruitPlacementMode
+    {
+        MarkerExpansion,
+        SpreadAcrossPath
+    }
+
     [Header("Level Configuration")]
     [Tooltip("Tên file JSON màn chơi trong Resources/levelmaps/ (ví dụ: 11004_v1). Để trống để tự động load level đầu tiên của cohort.")]
     public string levelMapName = "";
@@ -48,6 +54,7 @@ public class GameplaySandbox : MonoBehaviour
     public bool useMeshFruitVisuals = false;
     public bool fillInitialWaveFromData = true;
     public int initialWaveFillMarkerThreshold = 10;
+    public InitialFruitPlacementMode initialFruitPlacementMode = InitialFruitPlacementMode.SpreadAcrossPath;
     public Vector3 fruitTiltEuler = new Vector3(-14f, 0f, 0f);
     public float meshFruitScale = 0.36f;
 
@@ -1577,6 +1584,13 @@ public class GameplaySandbox : MonoBehaviour
 
     private List<SpawnCellData> BuildInitialFruitCells(List<SpawnCellData> seedSlots, int targetCount)
     {
+        if (fillInitialWaveFromData &&
+            targetCount > seedSlots.Count &&
+            initialFruitPlacementMode == InitialFruitPlacementMode.SpreadAcrossPath)
+        {
+            return BuildSpreadInitialFruitCells(seedSlots, targetCount);
+        }
+
         List<SpawnCellData> cells = new List<SpawnCellData>();
         HashSet<Vector2Int> used = new HashSet<Vector2Int>();
         Queue<Vector2Int> queue = new Queue<Vector2Int>();
@@ -1617,6 +1631,97 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         return cells;
+    }
+
+    private List<SpawnCellData> BuildSpreadInitialFruitCells(List<SpawnCellData> seedSlots, int targetCount)
+    {
+        List<SpawnCellData> cells = new List<SpawnCellData>();
+        HashSet<Vector2Int> used = new HashSet<Vector2Int>();
+
+        foreach (SpawnCellData slot in seedSlots)
+        {
+            if (slot.Gid >= 371 && slot.Gid <= 377 && used.Add(slot.GridPos))
+            {
+                cells.Add(slot);
+            }
+        }
+
+        List<Vector2Int> candidates = new List<Vector2Int>();
+        foreach (Vector2Int gridPos in gridMap.Keys)
+        {
+            if (!used.Contains(gridPos) && IsInitialFruitPathCell(gridPos))
+            {
+                candidates.Add(gridPos);
+            }
+        }
+
+        candidates.Sort(CompareInitialFruitCandidateCells);
+
+        int remaining = targetCount - cells.Count;
+        if (remaining <= 0)
+        {
+            return cells;
+        }
+
+        List<Vector2Int> picked = PickEvenlySpacedCells(candidates, remaining);
+        foreach (Vector2Int gridPos in picked)
+        {
+            if (used.Add(gridPos))
+            {
+                cells.Add(new SpawnCellData { Gid = 277, GridPos = gridPos });
+            }
+        }
+
+        return cells;
+    }
+
+    private static int CompareInitialFruitCandidateCells(Vector2Int a, Vector2Int b)
+    {
+        int yCompare = b.y.CompareTo(a.y);
+        return yCompare != 0 ? yCompare : a.x.CompareTo(b.x);
+    }
+
+    private static List<Vector2Int> PickEvenlySpacedCells(List<Vector2Int> candidates, int count)
+    {
+        List<Vector2Int> picked = new List<Vector2Int>();
+        if (candidates == null || candidates.Count == 0 || count <= 0)
+        {
+            return picked;
+        }
+
+        if (count >= candidates.Count)
+        {
+            picked.AddRange(candidates);
+            return picked;
+        }
+
+        HashSet<int> pickedIndices = new HashSet<int>();
+        float step = (candidates.Count - 1f) / Mathf.Max(1, count - 1);
+        for (int i = 0; i < count; i++)
+        {
+            int index = Mathf.Clamp(Mathf.RoundToInt(i * step), 0, candidates.Count - 1);
+            while (index < candidates.Count && !pickedIndices.Add(index))
+            {
+                index++;
+            }
+
+            if (index >= candidates.Count)
+            {
+                index = candidates.Count - 1;
+                while (index >= 0 && !pickedIndices.Add(index))
+                {
+                    index--;
+                }
+            }
+
+            if (index >= 0)
+            {
+                picked.Add(candidates[index]);
+            }
+        }
+
+        picked.Sort(CompareInitialFruitCandidateCells);
+        return picked;
     }
 
     private bool IsInitialFruitPathCell(Vector2Int gridPos)

@@ -175,7 +175,8 @@ MonoBehaviour:
   useMeshFruitVisuals: 0
   fillInitialWaveFromData: 1
   initialWaveFillMarkerThreshold: 10
-  fruitTiltEuler: {x: 14, y: 0, z: 0}
+  initialFruitPlacementMode: 1
+  fruitTiltEuler: {x: 10, y: 0, z: 0}
   meshFruitScale: 0.36
   showGameBackground: 1
   gameBackgroundColor: {r: 0.58310264, g: 1, b: 0.5424528, a: 1}
