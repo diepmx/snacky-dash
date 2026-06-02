@@ -5,12 +5,15 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
         _Main_Color_1    ("Main_Color_1",    Color)          = (1,0,0,1)
         _Main_Color_2    ("Main_Color_2",    Color)          = (0,0.4149446,1,1)
         _Main_Color_3    ("Main_Color_3",    Color)          = (1,1,1,0)
+        _World_Gradient_Direction ("World_Gradient_Direction", Vector) = (0,1,0,0)
+        _World_Gradient_Scale ("World_Gradient_Scale", Float) = 0
+        _World_Gradient_Offset ("World_Gradient_Offset", Float) = 0.65
         _Side_Color      ("Side_Color",      Color)          = (0.8261385,0,1,1)
         _Side_Height_Top ("Side_Height_Top", Float)          = 0
         _Side_Height_Bottom ("Side_Height_Bottom", Float)    = 1.4
         _Normal_Blend    ("Normal_Blend",    Range(0,1))     = 0.5
         _Top_Normal_Axis ("Top_Normal_Axis", Vector)          = (0,0,1,0)
-        _Top_Normal_Threshold ("Top_Normal_Threshold", Range(0,1)) = 0.55
+        _Top_Normal_Threshold ("Top_Normal_Threshold", Range(0,1)) = 0.75
         _Shadow_Color    ("Shadow_Color",    Color)          = (0,0,0,0)
         _Shadow_Edge_1   ("Shadow_Edge_1",   Float)          = 0.2
         _Shadow_Edge_2   ("Shadow_Edge_2",   Float)          = 1
@@ -55,9 +58,12 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
                 float4 _Shadow_Color;
                 float4 _Overlay_Color;
                 float4 _Top_Normal_Axis;
+                float4 _World_Gradient_Direction;
                 float  _Overlay_Tiling;
                 float  _Overlay_Strength;
                 float  _Shadow_Strength;
+                float  _World_Gradient_Scale;
+                float  _World_Gradient_Offset;
                 float  _Side_Height_Top;
                 float  _Side_Height_Bottom;
                 float  _Normal_Blend;
@@ -106,9 +112,11 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
 
                 float3 normalWS = normalize(IN.normalWS);
 
-                float topMask  = saturate(IN.uv.y);
-                float4 base    = lerp(_Main_Color_1, _Main_Color_2, topMask);
-                base           = lerp(base, _Main_Color_3, _Main_Color_3.a);
+                float gradientDirLengthSq = dot(_World_Gradient_Direction.xy, _World_Gradient_Direction.xy);
+                float2 gradientDir = lerp(float2(0.0, 1.0), _World_Gradient_Direction.xy * rsqrt(max(gradientDirLengthSq, 0.001)), step(0.001, gradientDirLengthSq));
+                float topMask = saturate(dot(IN.positionWS.xy, gradientDir) * _World_Gradient_Scale + _World_Gradient_Offset);
+                float4 base = lerp(_Main_Color_1, _Main_Color_2, topMask);
+                base = lerp(base, _Main_Color_3, _Main_Color_3.a);
 
                 float sideMaskPos = saturate((IN.positionWS.y - _Side_Height_Top) / max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
                 float axisLengthSq = dot(_Top_Normal_Axis.xyz, _Top_Normal_Axis.xyz);

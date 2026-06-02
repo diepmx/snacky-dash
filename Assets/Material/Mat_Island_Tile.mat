@@ -55,6 +55,8 @@ Material:
       _GlossyReflections: 1
       _Gradient_Edge_1: 0.58
       _Gradient_Edge_2: 1
+      _World_Gradient_Offset: 0.65
+      _World_Gradient_Scale: 0
       _Metallic: 0
       _Mode: 0
       _OcclusionStrength: 1
@@ -72,7 +74,7 @@ Material:
       _Shadow_Smoothness: 0.04
       _Shadow_Steps: 2
       _Normal_Blend: 1
-      _Top_Normal_Threshold: 0.55
+      _Top_Normal_Threshold: 0.75
       _Shadow_Strength: 0.8
       _Side_Height: 0.6
       _Side_Height_1: 0
@@ -94,6 +96,7 @@ Material:
       _Shadow_Color: {r: 0.012, g: 0.196, b: 0.008, a: 0.7}
       _Side_Color: {r: 0.059, g: 0.314, b: 0.020, a: 1}
       _Top_Normal_Axis: {r: 0, g: 0, b: 1, a: 0}
+      _World_Gradient_Direction: {r: 0, g: 1, b: 0, a: 0}
       _Vector2: {r: -1, g: 0, b: 0, a: 0}
       _Vector2_1: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
