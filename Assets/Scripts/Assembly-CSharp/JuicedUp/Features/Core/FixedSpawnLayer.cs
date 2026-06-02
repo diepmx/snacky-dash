@@ -11,6 +11,8 @@ namespace JuicedUp.Features.Core
 
 		public FixedSpawnLayer(int batchIndex, IReadOnlyList<(Vector3Int cell, int tileId)> entries)
 		{
+			BatchIndex = batchIndex;
+			Entries = entries ?? new List<(Vector3Int, int)>();
 		}
 	}
 }

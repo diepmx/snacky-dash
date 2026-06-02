@@ -14,6 +14,10 @@ namespace JuicedUp.Features.Core
 		[Button("Calculate Total")]
 		public void CalculateTotal()
 		{
+			total = 0;
+			if (colors != null)
+				foreach (RespawnColorCount c in colors)
+					if (c != null) total += c.count;
 		}
 	}
 }

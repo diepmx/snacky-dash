@@ -329,17 +329,17 @@ namespace JuicedUp.Features.Core
 		[SerializeField]
 		private RespawnScheduler _respawnScheduler;
 
-		private readonly Dictionary<Vector3Int, PillsGroup> _cellToGroup;
+		private readonly Dictionary<Vector3Int, PillsGroup> _cellToGroup = new Dictionary<Vector3Int, PillsGroup>();
 
 		private readonly bool _ignoreChunkEvents;
 
-		private readonly Dictionary<int, int> _chunkActivePillCount;
+		private readonly Dictionary<int, int> _chunkActivePillCount = new Dictionary<int, int>();
 
 		private readonly Vector3 _offsetSprite;
 
-		private readonly Queue<GameObject> _pillsEatenQueue;
+		private readonly Queue<GameObject> _pillsEatenQueue = new Queue<GameObject>();
 
-		private readonly HashSet<int> _recentlyRecoloredGroups;
+		private readonly HashSet<int> _recentlyRecoloredGroups = new HashSet<int>();
 
 		private bool _cellToGroupBuilt;
 
@@ -357,7 +357,7 @@ namespace JuicedUp.Features.Core
 
 		private LevelData _levelData;
 
-		private readonly Dictionary<Vector3Int, PillController> _allPillsSpawnedDict;
+		private readonly Dictionary<Vector3Int, PillController> _allPillsSpawnedDict = new Dictionary<Vector3Int, PillController>();
 
 		private RemoteConfigService _remoteConfigService;
 
@@ -365,7 +365,7 @@ namespace JuicedUp.Features.Core
 
 		private IShuffleVortexVfxController _shuffleVortexVfxController;
 
-		public bool IsRespawning => false;
+		public bool IsRespawning => _respawnScheduler != null && _respawnScheduler.IsRespawning;
 
 		public bool IsChunkRespawnOver => false;
 
@@ -388,6 +388,10 @@ namespace JuicedUp.Features.Core
 
 		public void Init(Player player, LevelData levelData)
 		{
+			_player = player;
+			_levelData = levelData;
+			_isInitialized = true;
+			InitializeRespawnScheduler();
 		}
 
 		public UniTask InitAsync(CancellationToken cancellationToken)
@@ -397,6 +401,9 @@ namespace JuicedUp.Features.Core
 
 		private void InitializeRespawnScheduler()
 		{
+			if (_respawnScheduler == null) return;
+			float delay = GetRespawnDelay();
+			_respawnScheduler.Init(_player, _levelData, this, delay, null);
 		}
 
 		private float GetRespawnDelay()
@@ -419,6 +426,8 @@ namespace JuicedUp.Features.Core
 
 		public bool TryFindPillAtCell(Vector3Int cell, out PillController pillController)
 		{
+			if (_allPillsSpawnedDict != null && _allPillsSpawnedDict.TryGetValue(cell, out pillController))
+				return true;
 			pillController = null;
 			return false;
 		}
@@ -434,10 +443,14 @@ namespace JuicedUp.Features.Core
 
 		public void InitFirstRespawn()
 		{
+			if (_respawnScheduler == null) return;
+			_respawnScheduler.InitFirstRespawn();
 		}
 
 		public void StartFirstRespawn()
 		{
+			if (_respawnScheduler == null) return;
+			_respawnScheduler.StartFirstRespawn();
 		}
 
 		public IEnumerator HandleChunkOver()
@@ -453,7 +466,20 @@ namespace JuicedUp.Features.Core
 		[IteratorStateMachine(typeof(_003CEnumerateActivePills_003Ed__56))]
 		public IEnumerable<PillController> EnumerateActivePills(bool onlyUnlockedGroups = true)
 		{
-			return null;
+			if (_allPillsSpawnedDict == null) yield break;
+			foreach (PillController pill in _allPillsSpawnedDict.Values)
+			{
+				if (pill == null) continue;
+				// If group map not built yet, skip the group filter
+				if (onlyUnlockedGroups && _cellToGroupBuilt)
+				{
+					Vector3Int cell = new Vector3Int(
+						(int)pill.transform.position.x,
+						(int)pill.transform.position.y, 0);
+					if (!IsCellInUnlockedPillGroup(cell)) continue;
+				}
+				yield return pill;
+			}
 		}
 
 		public void RegisterChunk(List<Collider2D> colliders)
@@ -466,7 +492,20 @@ namespace JuicedUp.Features.Core
 
 		public bool SpawnPill(Vector3Int position, TileType tileType)
 		{
-			return false;
+			if (pillPrefab == null) return false;
+			if (_allPillsSpawnedDict != null && _allPillsSpawnedDict.ContainsKey(position)) return false;
+
+			Vector3 worldPos = new Vector3(position.x, position.y, position.z);
+			PillController pill = Instantiate(pillPrefab, worldPos, Quaternion.identity);
+			if (pill == null) return false;
+
+			pill.SetTileType(tileType);
+			pill.SetPillActive(false); // RespawnScheduler will activate it
+
+			if (_allPillsSpawnedDict != null)
+				_allPillsSpawnedDict[position] = pill;
+
+			return true;
 		}
 
 		private void RemovePill(Vector3Int _, GameObject pill)

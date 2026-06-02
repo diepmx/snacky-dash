@@ -132,7 +132,7 @@ namespace JuicedUp.Features.Core
 
 		private readonly LevelMapCache _mapCache;
 
-		private readonly HashSet<Vector2Int> _priorityPillSpawnCells;
+		private readonly HashSet<Vector2Int> _priorityPillSpawnCells = new HashSet<Vector2Int>();
 
 		private TailManager _tailManager;
 
@@ -172,7 +172,7 @@ namespace JuicedUp.Features.Core
 
 		public LevelSpawnIdMap SpawnIdMap { get; private set; }
 
-		public IReadOnlyCollection<Vector2Int> PriorityPillSpawnCells => null;
+		public IReadOnlyCollection<Vector2Int> PriorityPillSpawnCells => _priorityPillSpawnCells;
 
 		public int TileMaxLayerIndex => 0;
 
@@ -237,6 +237,12 @@ namespace JuicedUp.Features.Core
 
 		public void InitMapping(LevelDataSO levelSO, Level level)
 		{
+			_currentLevelDataSO = levelSO;
+			// Build SpawnIdMap from the level's respawnSequence
+			if (levelSO != null && levelSO.respawnSequence != null)
+				SpawnIdMap = new LevelSpawnIdMap(levelSO.respawnSequence);
+			else
+				SpawnIdMap = new LevelSpawnIdMap(null);
 		}
 
 		private void UpdateRoadPieceForExplosion()
@@ -245,6 +251,11 @@ namespace JuicedUp.Features.Core
 
 		public void InitPillManager()
 		{
+			if (pillManager == null) return;
+			LevelData levelData = GetComponent<LevelData>();
+			Player p = player != null ? player : FindObjectOfType<Player>();
+			if (levelData != null)
+				pillManager.Init(p, levelData);
 		}
 
 		private static void ApplyDataMigration(LevelDataSO so, LevelData levelData)
@@ -280,11 +291,15 @@ namespace JuicedUp.Features.Core
 
 		public void SetPriorityPillSpawnCells(HashSet<Vector2Int> cells)
 		{
+			_priorityPillSpawnCells.Clear();
+			if (cells != null)
+				foreach (Vector2Int c in cells)
+					_priorityPillSpawnCells.Add(c);
 		}
 
 		public bool IsPriorityPillSpawnCell(Vector2Int cell)
 		{
-			return false;
+			return _priorityPillSpawnCells != null && _priorityPillSpawnCells.Contains(cell);
 		}
 
 		public TileType GetTileTypeAt(Vector2Int position)
@@ -393,6 +408,7 @@ namespace JuicedUp.Features.Core
 
 		internal void SetFixedSpawnPlan(FixedSpawnPlan plan)
 		{
+			FixedSpawnPlan = plan;
 		}
 
 		public void ForceLevelDefeat()

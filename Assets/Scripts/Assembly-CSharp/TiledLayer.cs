@@ -38,6 +38,6 @@ public class TiledLayer
 
 	public static uint StripFlipFlags(uint gid)
 	{
-		return 0u;
+		return gid & ~FlipMask;
 	}
 }
