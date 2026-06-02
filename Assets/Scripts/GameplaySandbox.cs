@@ -45,7 +45,9 @@ public class GameplaySandbox : MonoBehaviour
     public float cratePreviewSpacing = 1.75f;
 
     [Header("Fruit Presentation")]
+    public bool useMeshFruitVisuals = false;
     public Vector3 fruitTiltEuler = new Vector3(-14f, 0f, 0f);
+    public float meshFruitScale = 0.36f;
 
     [Header("Background")]
     public bool showGameBackground = true;
@@ -114,6 +116,8 @@ public class GameplaySandbox : MonoBehaviour
     private List<PillKind> wave1SpawnKinds = new List<PillKind>();
     private int wave1SpawnKindIndex = 0;
     private readonly Dictionary<string, GameObject> prefabCache = new Dictionary<string, GameObject>();
+    private readonly Dictionary<PillKind, Mesh> fruitMeshCache = new Dictionary<PillKind, Mesh>();
+    private readonly Dictionary<PillKind, Material> fruitMaterialCache = new Dictionary<PillKind, Material>();
     private Shader unlitShader;
     private readonly List<Material> runtimeFruitMats = new List<Material>();
 
@@ -208,7 +212,7 @@ public class GameplaySandbox : MonoBehaviour
             availableLevelData = levelData.ToArray();
 
             // Nếu levelMapName rỗng hoặc không tìm thấy → start tại level đầu tiên
-            selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+            selectedLevelIndex = FindLevelIndex(levelMapName);
             if (selectedLevelIndex < 0 && availableLevelNames.Length > 0)
             {
                 selectedLevelIndex = 0;
@@ -229,7 +233,7 @@ public class GameplaySandbox : MonoBehaviour
         names.Sort(CompareLevelNames);
         availableLevelNames = names.ToArray();
         availableLevelData = new LevelDataSO[availableLevelNames.Length];
-        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        selectedLevelIndex = FindLevelIndex(levelMapName);
         if (selectedLevelIndex < 0 && availableLevelNames.Length > 0)
         {
             selectedLevelIndex = 0;
@@ -370,10 +374,10 @@ public class GameplaySandbox : MonoBehaviour
     // 2. Load và tạo Level từ JSON
     private void LoadLevel()
     {
-        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        selectedLevelIndex = FindLevelIndex(levelMapName);
         currentLevelData = GetLevelDataAt(selectedLevelIndex);
 
-        TextAsset mapText = Resources.Load<TextAsset>("levelmaps/" + levelMapName);
+        TextAsset mapText = LoadLevelMapTextAsset(levelMapName);
         if (mapText == null)
         {
             Debug.LogError("Không tìm thấy file level map JSON: Resources/levelmaps/" + levelMapName);
@@ -406,7 +410,7 @@ public class GameplaySandbox : MonoBehaviour
         // Tạo container cha để gọn Hierarchy
         boardContainer = new GameObject("GameBoard");
 
-        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        selectedLevelIndex = FindLevelIndex(levelMapName);
         currentLevelData = GetLevelDataAt(selectedLevelIndex);
         levelInput = levelMapName;
 
@@ -480,6 +484,28 @@ public class GameplaySandbox : MonoBehaviour
         FitCameraToLevel();
     }
 
+    private TextAsset LoadLevelMapTextAsset(string mapName)
+    {
+        if (string.IsNullOrWhiteSpace(mapName))
+        {
+            return null;
+        }
+
+        TextAsset mapText = Resources.Load<TextAsset>("levelmaps/" + mapName.Trim());
+        if (mapText != null)
+        {
+            return mapText;
+        }
+
+        string normalized = NormalizeLevelName(mapName);
+        if (!string.Equals(normalized, mapName, StringComparison.Ordinal))
+        {
+            return Resources.Load<TextAsset>("levelmaps/" + normalized);
+        }
+
+        return null;
+    }
+
     private void ClearCurrentLevel()
     {
         isMoving = false;
@@ -551,6 +577,7 @@ public class GameplaySandbox : MonoBehaviour
             if (mat != null) Destroy(mat);
         }
         runtimeFruitMats.Clear();
+        fruitMaterialCache.Clear();
     }
 
     /// <summary>
@@ -861,10 +888,9 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         GameObject signPrefab = ResolvePrefab(nextCrateSignPrefab, "Assets/GameObject/NextCrateSign.prefab");
-        TryGetCratePreviewData(out ManualCrateSetup currentCrate, out ManualCrateSetup nextCrate);
-        GameObject cratePrefab = ResolvePrefab(GetBoxCratePrefab(currentCrate), GetBoxCrateAssetPath(currentCrate));
+        List<CrateColumnPreviewData> columnPreviews = BuildCrateColumnPreviews();
 
-        if (signPrefab == null && cratePrefab == null)
+        if (columnPreviews.Count == 0)
         {
             return;
         }
@@ -875,22 +901,176 @@ public class GameplaySandbox : MonoBehaviour
         cratePreviewContainer.transform.SetParent(boardContainer != null ? boardContainer.transform : transform, false);
         cratePreviewContainer.transform.position = Vector3.zero;
 
-        if (signPrefab != null)
+        float columnWidth = cratePreviewSpacing * 1.45f;
+        float startX = centerX - (columnPreviews.Count - 1) * columnWidth * 0.5f;
+        for (int i = 0; i < columnPreviews.Count; i++)
         {
-            Vector3 signPosition = new Vector3(centerX - cratePreviewSpacing * 0.5f, topY, -0.4f);
-            GameObject sign = Instantiate(signPrefab, signPosition, Quaternion.identity, cratePreviewContainer.transform);
-            sign.name = "NextCrateSign_Preview";
-            sign.transform.localScale = Vector3.one * nextCrateSignScale;
-            ApplyNextCrateSignSprites(sign, currentCrate.pillKind, nextCrate.pillKind);
+            CrateColumnPreviewData preview = columnPreviews[i];
+            float columnX = startX + i * columnWidth;
+
+            if (signPrefab != null)
+            {
+                Vector3 signPosition = new Vector3(columnX - cratePreviewSpacing * 0.5f, topY, -0.4f);
+                GameObject sign = Instantiate(signPrefab, signPosition, Quaternion.identity, cratePreviewContainer.transform);
+                sign.name = $"NextCrateSign_Preview_{i + 1}";
+                sign.transform.localScale = Vector3.one * nextCrateSignScale;
+                ApplyNextCrateSignSprites(sign, preview.Next.pillKind, preview.Next.pillKind);
+            }
+
+            GameObject cratePrefab = ResolvePrefab(GetBoxCratePrefab(preview.Current), GetBoxCrateAssetPath(preview.Current));
+            if (cratePrefab != null)
+            {
+                Vector3 cratePosition = new Vector3(columnX + cratePreviewSpacing * 0.5f, topY, -0.45f);
+                GameObject crate = Instantiate(cratePrefab, cratePosition, Quaternion.identity, cratePreviewContainer.transform);
+                crate.name = $"Box_Crate_Preview_{i + 1}";
+                crate.transform.localScale = Vector3.one * boxCrateScale;
+                ConfigureCratePreview(crate, preview.Current);
+            }
+        }
+    }
+
+    private void ConfigureCratePreview(GameObject crate, ManualCrateSetup crateData)
+    {
+        if (crate == null || crateData == null)
+        {
+            return;
         }
 
-        if (cratePrefab != null)
+        Sprite crateSprite = GetPillIconSprite(crateData.pillKind);
+        foreach (SpriteRenderer spriteRenderer in crate.GetComponentsInChildren<SpriteRenderer>(true))
         {
-            Vector3 cratePosition = new Vector3(centerX + cratePreviewSpacing * 0.5f, topY, -0.45f);
-            GameObject crate = Instantiate(cratePrefab, cratePosition, Quaternion.identity, cratePreviewContainer.transform);
-            crate.name = "Box_Crate_Preview";
-            crate.transform.localScale = Vector3.one * boxCrateScale;
+            if (spriteRenderer == null)
+            {
+                continue;
+            }
+
+            if (crateSprite != null && (spriteRenderer.name == "Fruit_Icon" || spriteRenderer.name == "CollectFruit"))
+            {
+                spriteRenderer.sprite = crateSprite;
+                spriteRenderer.gameObject.SetActive(true);
+            }
         }
+
+        Transform defaultFruits = FindChildByName(crate.transform, "FruitsParent");
+        if (defaultFruits != null)
+        {
+            defaultFruits.gameObject.SetActive(false);
+        }
+
+        Transform previewFruits = new GameObject("SandboxCrateFruitPreview").transform;
+        previewFruits.SetParent(crate.transform, false);
+        previewFruits.localPosition = Vector3.zero;
+        previewFruits.localRotation = Quaternion.identity;
+        previewFruits.localScale = Vector3.one;
+
+        int fruitCount = Mathf.Clamp(crateData.requiredCount, 1, 9);
+        for (int i = 0; i < fruitCount; i++)
+        {
+            int row = i / 3;
+            int col = i % 3;
+            Vector3 localPosition = new Vector3((col - 1) * 0.55f, 0.58f - row * 0.55f, -0.08f);
+            GameObject fruit = null;
+            if (pillPrefab != null)
+            {
+                fruit = Instantiate(pillPrefab, previewFruits);
+                ActivatePillKindOnInstance(fruit, crateData.pillKind);
+            }
+            else if (useMeshFruitVisuals)
+            {
+                fruit = CreateMeshFruit(crateData.pillKind, Vector3.zero, Quaternion.Euler(fruitTiltEuler), 0.18f, previewFruits);
+            }
+
+            if (fruit == null)
+            {
+                continue;
+            }
+
+            fruit.name = $"CrateFruit_{crateData.pillKind}_{i + 1}";
+            fruit.transform.localPosition = localPosition;
+            fruit.transform.localRotation = Quaternion.Euler(fruitTiltEuler);
+            fruit.transform.localScale = Vector3.one * 0.18f;
+        }
+    }
+
+    private static Transform FindChildByName(Transform root, string childName)
+    {
+        if (root == null)
+        {
+            return null;
+        }
+
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (child.name == childName)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private struct CrateColumnPreviewData
+    {
+        public ManualCrateSetup Current;
+        public ManualCrateSetup Next;
+    }
+
+    private List<CrateColumnPreviewData> BuildCrateColumnPreviews()
+    {
+        List<CrateColumnPreviewData> previews = new List<CrateColumnPreviewData>();
+        List<ManualColumnSetup> columns = currentLevelData != null ? currentLevelData.manualColumns : null;
+        if (columns == null)
+        {
+            return previews;
+        }
+
+        foreach (ManualColumnSetup column in columns)
+        {
+            if (column?.crates == null || column.crates.Count == 0)
+            {
+                continue;
+            }
+
+            ManualCrateSetup current = null;
+            ManualCrateSetup next = null;
+            foreach (ManualCrateSetup crate in column.crates)
+            {
+                if (crate == null)
+                {
+                    continue;
+                }
+
+                if (current == null)
+                {
+                    current = crate;
+                }
+                else
+                {
+                    next = crate;
+                    break;
+                }
+            }
+
+            if (current == null)
+            {
+                continue;
+            }
+
+            previews.Add(new CrateColumnPreviewData
+            {
+                Current = current,
+                Next = next ?? current
+            });
+        }
+
+        if (previews.Count == 0)
+        {
+            ManualCrateSetup fallback = new ManualCrateSetup { pillKind = PillKind.Strawberry, requiredCount = 9 };
+            previews.Add(new CrateColumnPreviewData { Current = fallback, Next = fallback });
+        }
+
+        return previews;
     }
 
     private GameObject GetBoxCratePrefab(ManualCrateSetup crate)
@@ -907,41 +1087,6 @@ public class GameplaySandbox : MonoBehaviour
         if (requiredCount <= 9) return "Assets/GameObject/Box_Crate_9.prefab";
         if (requiredCount <= 18) return "Assets/GameObject/Box_Crate_18.prefab";
         return "Assets/GameObject/Box_Crate_27.prefab";
-    }
-
-    private void TryGetCratePreviewData(out ManualCrateSetup currentCrate, out ManualCrateSetup nextCrate)
-    {
-        currentCrate = new ManualCrateSetup { pillKind = PillKind.Strawberry, requiredCount = 9 };
-        nextCrate = new ManualCrateSetup { pillKind = PillKind.Strawberry, requiredCount = 9 };
-
-        List<ManualColumnSetup> columns = currentLevelData != null ? currentLevelData.manualColumns : null;
-        if (columns == null || columns.Count == 0)
-        {
-            return;
-        }
-
-        bool foundCurrent = false;
-        foreach (ManualColumnSetup column in columns)
-        {
-            if (column?.crates == null) continue;
-
-            foreach (ManualCrateSetup crate in column.crates)
-            {
-                if (crate == null) continue;
-
-                if (!foundCurrent)
-                {
-                    currentCrate = crate;
-                    nextCrate = crate;
-                    foundCurrent = true;
-                }
-                else
-                {
-                    nextCrate = crate;
-                    return;
-                }
-            }
-        }
     }
 
     private GameObject ResolvePrefab(GameObject assignedPrefab, string editorAssetPath)
@@ -1037,7 +1182,7 @@ public class GameplaySandbox : MonoBehaviour
 
         int currentIndex = selectedLevelIndex >= 0
             ? selectedLevelIndex
-            : Array.IndexOf(availableLevelNames, levelMapName);
+            : FindLevelIndex(levelMapName);
 
         if (currentIndex < 0)
         {
@@ -1146,6 +1291,49 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         return availableLevelData[index];
+    }
+
+    private int FindLevelIndex(string mapName)
+    {
+        if (availableLevelNames == null || availableLevelNames.Length == 0)
+        {
+            return -1;
+        }
+
+        int exactIndex = Array.IndexOf(availableLevelNames, mapName);
+        if (exactIndex >= 0)
+        {
+            return exactIndex;
+        }
+
+        string normalized = NormalizeLevelName(mapName);
+        for (int i = 0; i < availableLevelNames.Length; i++)
+        {
+            if (NormalizeLevelName(availableLevelNames[i]) == normalized)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static string NormalizeLevelName(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        string trimmed = value.Trim();
+        string[] parts = trimmed.Split(new[] { "_v" }, StringSplitOptions.None);
+        if (parts.Length > 0 && int.TryParse(parts[0], out int levelNumber))
+        {
+            string suffix = parts.Length > 1 ? "_v" + parts[1] : string.Empty;
+            return levelNumber + suffix;
+        }
+
+        return trimmed;
     }
 
     private string FormatLevelLabel(LevelDataSO level)
@@ -1308,13 +1496,33 @@ public class GameplaySandbox : MonoBehaviour
         var colors = batches[0]?.colors;
         if (colors == null) return result;
 
+        List<RespawnColorCount> remainingColors = new List<RespawnColorCount>();
+        List<int> remainingCounts = new List<int>();
+
         foreach (var colorEntry in colors)
         {
             if (colorEntry == null) continue;
             int count = Mathf.Max(0, colorEntry.count);
-            for (int i = 0; i < count; i++)
-                result.Add(colorEntry.pillKind);
+            if (count <= 0) continue;
+
+            remainingColors.Add(colorEntry);
+            remainingCounts.Add(count);
         }
+
+        bool hasRemaining;
+        do
+        {
+            hasRemaining = false;
+            for (int i = 0; i < remainingColors.Count; i++)
+            {
+                if (remainingCounts[i] <= 0) continue;
+
+                result.Add(remainingColors[i].pillKind);
+                remainingCounts[i]--;
+                hasRemaining = true;
+            }
+        }
+        while (hasRemaining);
 
         return result;
     }
@@ -1327,14 +1535,14 @@ public class GameplaySandbox : MonoBehaviour
     {
         // Xác định loại fruit
         PillKind kind;
-        if (wave1SpawnKinds.Count > 0)
+        if (gid >= 371 && gid <= 377)
+        {
+            kind = (PillKind)(gid - 371);
+        }
+        else if (wave1SpawnKinds.Count > 0)
         {
             kind = wave1SpawnKinds[wave1SpawnKindIndex % wave1SpawnKinds.Count];
             wave1SpawnKindIndex++;
-        }
-        else if (gid >= 371 && gid <= 377)
-        {
-            kind = (PillKind)(gid - 371);
         }
         else
         {
@@ -1342,15 +1550,23 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         GameObject pill = null;
+        if (useMeshFruitVisuals)
+        {
+            pill = CreateMeshFruit(kind, worldPos, Quaternion.Euler(fruitTiltEuler), meshFruitScale, null);
+            if (pill != null)
+            {
+                pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+            }
+        }
 
         // Thử dùng pillPrefab được gán trong Inspector (PillMaster)
-        if (pillPrefab != null)
+        if (pill == null && pillPrefab != null)
         {
             pill = Instantiate(pillPrefab, worldPos, Quaternion.Euler(fruitTiltEuler));
             pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
             ActivatePillKindOnInstance(pill, kind);
         }
-        else
+        else if (pill == null)
         {
             // Fallback: sphere có màu theo loại fruit
             pill = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -1390,6 +1606,96 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         pill.transform.rotation = Quaternion.Euler(fruitTiltEuler);
+    }
+
+    private GameObject CreateMeshFruit(PillKind kind, Vector3 position, Quaternion rotation, float scale, Transform parent)
+    {
+        Mesh mesh = GetFruitMesh(kind);
+        if (mesh == null || unlitShader == null)
+        {
+            return null;
+        }
+
+        GameObject fruit = new GameObject($"FruitMesh_{kind}");
+        fruit.transform.SetParent(parent, false);
+        fruit.transform.position = position;
+        fruit.transform.rotation = rotation;
+        fruit.transform.localScale = Vector3.one * scale;
+
+        MeshFilter meshFilter = fruit.AddComponent<MeshFilter>();
+        meshFilter.sharedMesh = mesh;
+
+        MeshRenderer meshRenderer = fruit.AddComponent<MeshRenderer>();
+        meshRenderer.sharedMaterial = GetFruitMaterial(kind);
+        return fruit;
+    }
+
+    private Mesh GetFruitMesh(PillKind kind)
+    {
+        if (fruitMeshCache.TryGetValue(kind, out Mesh cached))
+        {
+            return cached;
+        }
+
+        Mesh mesh = null;
+#if UNITY_EDITOR
+        string[] paths = GetFruitMeshPaths(kind);
+        foreach (string path in paths)
+        {
+            mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            if (mesh != null)
+            {
+                break;
+            }
+        }
+#endif
+        fruitMeshCache[kind] = mesh;
+        return mesh;
+    }
+
+    private Material GetFruitMaterial(PillKind kind)
+    {
+        if (fruitMaterialCache.TryGetValue(kind, out Material cached))
+        {
+            return cached;
+        }
+
+        Material mat = new Material(unlitShader);
+        mat.name = $"Fruit_{kind}_Runtime";
+        Color color = GetPillColor(kind);
+        if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
+        if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
+        SetCullOff(mat);
+
+        fruitMaterialCache[kind] = mat;
+        runtimeFruitMats.Add(mat);
+        return mat;
+    }
+
+    private static string[] GetFruitMeshPaths(PillKind kind)
+    {
+        switch (kind)
+        {
+            case PillKind.Strawberry: return new[] { "Assets/Mesh/FruitMesh_Strawberry_red.asset" };
+            case PillKind.Blueberry: return new[] { "Assets/Mesh/FruitMesh_Blueberry.asset", "Assets/Mesh/Blueberry.asset" };
+            case PillKind.Banana: return new[] { "Assets/Mesh/Fruit_BananaV2.asset", "Assets/Mesh/FruitMesh_Banana.asset" };
+            case PillKind.Pear: return new[] { "Assets/Mesh/Fruit_PearV2.asset", "Assets/Mesh/FruitMesh_Pear_yellow.asset" };
+            case PillKind.Apple: return new[] { "Assets/Mesh/FruitMesh_Apple.asset", "Assets/Mesh/apple_lo.asset" };
+            case PillKind.Carrot: return new[] { "Assets/Mesh/FruitMesh_Carrot.asset", "Assets/Mesh/Carrot.asset" };
+            case PillKind.Eggplant: return new[] { "Assets/Mesh/FruitMesh_Eggplant.asset" };
+            default: return Array.Empty<string>();
+        }
+    }
+
+    private static void SetCullOff(Material mat)
+    {
+        if (mat == null)
+        {
+            return;
+        }
+
+        if (mat.HasProperty("_Cull")) mat.SetFloat("_Cull", 0f);
+        if (mat.HasProperty("_CullMode")) mat.SetFloat("_CullMode", 0f);
     }
 
     /// <summary>
@@ -1797,5 +2103,6 @@ public class GameplaySandbox : MonoBehaviour
             if (mat != null) Destroy(mat);
         }
         runtimeFruitMats.Clear();
+        fruitMaterialCache.Clear();
     }
 }
