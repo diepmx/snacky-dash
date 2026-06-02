@@ -156,13 +156,14 @@ MonoBehaviour:
   showLevelSwitcher: 1
   showLevelInfo: 1
   usePerspectiveCamera: 1
-  useFixedPerspectiveCameraPose: 1
+  useFixedPerspectiveCameraPose: 0
   fixedPerspectiveCameraPosition: {x: 7, y: -43.5, z: -71.42}
   fixedPerspectiveCameraEuler: {x: -26.5, y: 0, z: 0}
   perspectiveFieldOfView: 26
   perspectiveDistanceMultiplier: 1.15
   perspectiveVerticalOffset: 0.45
   perspectiveLookOffset: {x: 0, y: -0.35, z: 0}
+  minPerspectiveCameraZ: -95
   showCratePreview: 1
   nextCrateSignPrefab: {fileID: 1709254077376921, guid: 339acdcd92db9514d8f82b982fc9e042, type: 3}
   boxCrate9Prefab: {fileID: 1709254077376921, guid: a73937b9bc71d7242947b62df3014eb2, type: 3}
@@ -456,7 +457,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.58310264, g: 1, b: 0.5424528, a: 1}
+  m_BackGroundColor: {r: 0.38, g: 0.72, b: 0.28, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

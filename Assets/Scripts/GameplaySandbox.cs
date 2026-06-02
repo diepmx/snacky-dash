@@ -30,7 +30,7 @@ public class GameplaySandbox : MonoBehaviour
 
     [Header("Game View Composition")]
     public bool usePerspectiveCamera = true;
-    public bool useFixedPerspectiveCameraPose = true;
+    public bool useFixedPerspectiveCameraPose = false;
     public Vector3 fixedPerspectiveCameraPosition = new Vector3(7f, -43.5f, -71.42f);
     public Vector3 fixedPerspectiveCameraEuler = new Vector3(-26.5f, 0f, 0f);
     [Range(15f, 60f)]
@@ -38,6 +38,7 @@ public class GameplaySandbox : MonoBehaviour
     public float perspectiveDistanceMultiplier = 1.15f;
     public float perspectiveVerticalOffset = 0.45f;
     public Vector3 perspectiveLookOffset = new Vector3(0f, -0.35f, 0f);
+    public float minPerspectiveCameraZ = -95f;
 
     [Header("Crate Preview")]
     public bool showCratePreview = true;
@@ -700,7 +701,7 @@ public class GameplaySandbox : MonoBehaviour
         float horizontalSize = ((contentBounds.size.x * 0.5f) + cameraPadding) / aspect;
 
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = gameBackgroundColor;
+        cam.backgroundColor = grassBackgroundColor;
 
         if (usePerspectiveCamera)
         {
@@ -722,6 +723,7 @@ public class GameplaySandbox : MonoBehaviour
                     center.x,
                     center.y - contentBounds.size.y * perspectiveVerticalOffset,
                     lookTarget.z - distance);
+                cameraPosition.z = Mathf.Max(cameraPosition.z, minPerspectiveCameraZ);
 
                 cam.transform.position = cameraPosition;
                 cam.transform.rotation = Quaternion.LookRotation(lookTarget - cameraPosition, Vector3.up);
@@ -797,13 +799,12 @@ public class GameplaySandbox : MonoBehaviour
 
         if (backgroundOverride != null)
         {
-            // Giữ nguyên rotation đã set trong scene (Inspector)
-            // Scale: vì Quad nằm ngang (-90° X), truc X = East/West, truc Z = North/South
-            // Dùng XZ scale: localScale.x = width, localScale.z = height
+            // Giữ nguyên rotation đã set trong scene (Inspector).
+            // Ground_BG trong Sandbox là Quad trên mặt XY, nên scale theo X/Y để phủ đủ camera.
             backgroundContainer.transform.localScale = new Vector3(
                 width + backgroundMargin * 2f,
-                backgroundContainer.transform.localScale.y,
-                height + backgroundMargin * 2f
+                height + backgroundMargin * 2f,
+                backgroundContainer.transform.localScale.z
             );
         }
         else
