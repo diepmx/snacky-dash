@@ -17,14 +17,14 @@ Shader "Shader Graphs/SH_Snake"
     {
         Tags
         {
-            "Queue"         = "Transparent"
-            "RenderType"    = "Transparent"
+            "Queue"         = "Geometry"
+            "RenderType"    = "Opaque"
             "RenderPipeline" = "UniversalPipeline"
         }
 
         Cull Back
-        ZWrite Off
-        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite On
+        Blend One Zero
 
         Pass
         {
