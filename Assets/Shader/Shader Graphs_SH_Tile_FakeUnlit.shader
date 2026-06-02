@@ -9,6 +9,8 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
         _Side_Height_Top ("Side_Height_Top", Float)          = 0
         _Side_Height_Bottom ("Side_Height_Bottom", Float)    = 1.4
         _Normal_Blend    ("Normal_Blend",    Range(0,1))     = 0.5
+        _Top_Normal_Axis ("Top_Normal_Axis", Vector)          = (0,0,1,0)
+        _Top_Normal_Threshold ("Top_Normal_Threshold", Range(0,1)) = 0.55
         _Shadow_Color    ("Shadow_Color",    Color)          = (0,0,0,0)
         _Shadow_Edge_1   ("Shadow_Edge_1",   Float)          = 0.2
         _Shadow_Edge_2   ("Shadow_Edge_2",   Float)          = 1
@@ -52,12 +54,14 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
                 float4 _Side_Color;
                 float4 _Shadow_Color;
                 float4 _Overlay_Color;
+                float4 _Top_Normal_Axis;
                 float  _Overlay_Tiling;
                 float  _Overlay_Strength;
                 float  _Shadow_Strength;
                 float  _Side_Height_Top;
                 float  _Side_Height_Bottom;
                 float  _Normal_Blend;
+                float  _Top_Normal_Threshold;
                 float  _Shadow_Edge_1;
                 float  _Shadow_Edge_2;
                 float  _Shadow_Steps;
@@ -99,22 +103,42 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
             float4 frag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
+
+                float3 normalWS = normalize(IN.normalWS);
+
                 float topMask  = saturate(IN.uv.y);
                 float4 base    = lerp(_Main_Color_1, _Main_Color_2, topMask);
                 base           = lerp(base, _Main_Color_3, _Main_Color_3.a);
-                
+
                 float sideMaskPos = saturate((IN.positionWS.y - _Side_Height_Top) / max(_Side_Height_Bottom - _Side_Height_Top, 0.001));
-                float sideMaskNorm = saturate(IN.normalWS.y);
-                float sideMask = lerp(sideMaskPos, sideMaskNorm, _Normal_Blend);
-                
-                float4 c       = lerp(_Side_Color, base, sideMask);
+                float axisLengthSq = dot(_Top_Normal_Axis.xyz, _Top_Normal_Axis.xyz);
+                float3 topAxis = lerp(float3(0.0, 0.0, 1.0), _Top_Normal_Axis.xyz * rsqrt(max(axisLengthSq, 0.001)), step(0.001, axisLengthSq));
+                float topFacing = abs(dot(normalWS, topAxis));
+                float sideMaskNorm = step(saturate(_Top_Normal_Threshold), topFacing);
+                float sideMask = lerp(sideMaskPos, sideMaskNorm, saturate(_Normal_Blend));
+
+                float4 c = lerp(_Side_Color, base, sideMask);
+
+                float2 overlayUV = IN.positionWS.xy * max(_Overlay_Tiling, 0.001);
+                float angle = _Overlay_Rotation * 0.01745329252;
+                float s = sin(angle);
+                float co = cos(angle);
+                overlayUV = float2(
+                    overlayUV.x * co - overlayUV.y * s,
+                    overlayUV.x * s + overlayUV.y * co
+                );
+
                 float4 overlay = SAMPLE_TEXTURE2D(_Overlay_Texture, sampler_Overlay_Texture,
-                                   IN.uv * max(_Overlay_Tiling, 0.001)) * _Overlay_Color;
-                c.rgb          = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a);
-                float shade    = saturate(1.0 - abs(IN.normalWS.y));
-                c.rgb          = lerp(c.rgb, c.rgb * _Shadow_Color.rgb,
-                                   saturate(_Shadow_Strength) * shade * _Shadow_Color.a);
-                c.a            = 1.0;
+                                   overlayUV) * _Overlay_Color;
+                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a * sideMask);
+
+                float isSideFace = 1.0 - sideMask;
+                float steps = max(_Shadow_Steps, 1.0);
+                float shadowBand = floor(saturate(1.0 - topFacing) * steps) / steps;
+                float shadowMask = saturate(shadowBand * isSideFace);
+                c.rgb = lerp(c.rgb, c.rgb * _Shadow_Color.rgb,
+                             saturate(_Shadow_Strength) * shadowMask * _Shadow_Color.a);
+
                 return float4(c.rgb, 1.0);
             }
             ENDHLSL
