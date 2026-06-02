@@ -75,6 +75,11 @@ Material:
       _Shadow_Steps: 2
       _Normal_Blend: 1
       _Top_Normal_Threshold: 0.75
+      _Side_Bottom_Darken: 0.18
+      _Side_Overlay_Strength: 0.22
+      _Side_Shadow_Darken: 0.24
+      _Side_Tint_Strength: 0.38
+      _Side_Top_Highlight: 0.18
       _Shadow_Strength: 0.8
       _Side_Height: 0.6
       _Side_Height_1: 0

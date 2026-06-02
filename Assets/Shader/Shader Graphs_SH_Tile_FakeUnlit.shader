@@ -9,6 +9,11 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
         _World_Gradient_Scale ("World_Gradient_Scale", Float) = 0
         _World_Gradient_Offset ("World_Gradient_Offset", Float) = 0.65
         _Side_Color      ("Side_Color",      Color)          = (0.8261385,0,1,1)
+        _Side_Tint_Strength ("Side_Tint_Strength", Range(0,1)) = 0.38
+        _Side_Overlay_Strength ("Side_Overlay_Strength", Range(0,1)) = 0.22
+        _Side_Shadow_Darken ("Side_Shadow_Darken", Range(0,1)) = 0.24
+        _Side_Top_Highlight ("Side_Top_Highlight", Range(0,1)) = 0.18
+        _Side_Bottom_Darken ("Side_Bottom_Darken", Range(0,1)) = 0.18
         _Side_Height_Top ("Side_Height_Top", Float)          = 0
         _Side_Height_Bottom ("Side_Height_Bottom", Float)    = 1.4
         _Normal_Blend    ("Normal_Blend",    Range(0,1))     = 0.5
@@ -62,6 +67,11 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
                 float  _Overlay_Tiling;
                 float  _Overlay_Strength;
                 float  _Shadow_Strength;
+                float  _Side_Tint_Strength;
+                float  _Side_Overlay_Strength;
+                float  _Side_Shadow_Darken;
+                float  _Side_Top_Highlight;
+                float  _Side_Bottom_Darken;
                 float  _World_Gradient_Scale;
                 float  _World_Gradient_Offset;
                 float  _Side_Height_Top;
@@ -125,7 +135,15 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
                 float sideMaskNorm = step(saturate(_Top_Normal_Threshold), topFacing);
                 float sideMask = lerp(sideMaskPos, sideMaskNorm, saturate(_Normal_Blend));
 
-                float4 c = lerp(_Side_Color, base, sideMask);
+                float4 side = base;
+                float sideUv = saturate(IN.uv.y);
+                float sideTopHighlight = smoothstep(0.62, 1.0, sideUv) * saturate(_Side_Top_Highlight);
+                float sideBottomDarken = (1.0 - smoothstep(0.08, 0.55, sideUv)) * saturate(_Side_Bottom_Darken);
+
+                side.rgb = lerp(base.rgb, _Side_Color.rgb, saturate(_Side_Tint_Strength));
+                side.rgb = lerp(side.rgb, base.rgb, sideTopHighlight);
+                side.rgb *= 1.0 - sideBottomDarken;
+                float4 c = lerp(side, base, sideMask);
 
                 float2 overlayUV = IN.positionWS.xy * max(_Overlay_Tiling, 0.001);
                 float angle = _Overlay_Rotation * 0.01745329252;
@@ -138,14 +156,15 @@ Shader "Shader Graphs/SH_Tile_FakeUnlit"
 
                 float4 overlay = SAMPLE_TEXTURE2D(_Overlay_Texture, sampler_Overlay_Texture,
                                    overlayUV) * _Overlay_Color;
-                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a * sideMask);
+                float overlayMask = lerp(saturate(_Side_Overlay_Strength), 1.0, sideMask);
+                c.rgb = lerp(c.rgb, overlay.rgb, saturate(_Overlay_Strength) * overlay.a * overlayMask);
 
                 float isSideFace = 1.0 - sideMask;
                 float steps = max(_Shadow_Steps, 1.0);
                 float shadowBand = floor(saturate(1.0 - topFacing) * steps) / steps;
                 float shadowMask = saturate(shadowBand * isSideFace);
-                c.rgb = lerp(c.rgb, c.rgb * _Shadow_Color.rgb,
-                             saturate(_Shadow_Strength) * shadowMask * _Shadow_Color.a);
+                float shadowAmount = saturate(_Shadow_Strength) * shadowMask * _Shadow_Color.a;
+                c.rgb *= 1.0 - shadowAmount * saturate(_Side_Shadow_Darken);
 
                 return float4(c.rgb, 1.0);
             }
