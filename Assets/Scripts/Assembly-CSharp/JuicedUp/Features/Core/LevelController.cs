@@ -292,9 +292,14 @@ namespace JuicedUp.Features.Core
 		public void SetPriorityPillSpawnCells(HashSet<Vector2Int> cells)
 		{
 			_priorityPillSpawnCells.Clear();
-			if (cells != null)
-				foreach (Vector2Int c in cells)
-					_priorityPillSpawnCells.Add(c);
+			if (cells == null)
+			{
+				return;
+			}
+			foreach (Vector2Int cell in cells)
+			{
+				_priorityPillSpawnCells.Add(cell);
+			}
 		}
 
 		public bool IsPriorityPillSpawnCell(Vector2Int cell)

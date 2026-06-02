@@ -16,15 +16,14 @@ namespace JuicedUp.Features.Core
 
 		public LevelSpawnIdMap(RespawnSequence sequence)
 		{
-			_tileIdToKind = new Dictionary<int, PillKind>(MaxKinds);
-			_kindToTileId = new Dictionary<PillKind, int>(MaxKinds);
-			// Fixed mapping: tileId 371 = PillKind 0 (Strawberry) ... 377 = PillKind 6 (Eggplant)
-			for (int i = 0; i < MaxKinds; i++)
+			_tileIdToKind = new Dictionary<int, PillKind>(7);
+			_kindToTileId = new Dictionary<PillKind, int>(7);
+			for (int i = 0; i < 7; i++)
 			{
-				int tileId = TileIdMin + i;
-				PillKind kind = (PillKind)i;
-				_tileIdToKind[tileId] = kind;
-				_kindToTileId[kind] = tileId;
+				int num = 371 + i;
+				PillKind pillKind = (PillKind)i;
+				_tileIdToKind[num] = pillKind;
+				_kindToTileId[pillKind] = num;
 			}
 		}
 

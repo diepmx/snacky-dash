@@ -15,9 +15,15 @@ namespace JuicedUp.Features.Core
 			_fixedCells = new HashSet<Vector2Int>();
 			foreach (FixedSpawnLayer layer in _layers)
 			{
-				if (layer?.Entries == null) continue;
-				foreach ((Vector3Int cell, int _) in layer.Entries)
-					_fixedCells.Add(new Vector2Int(cell.x, cell.y));
+				if (layer?.Entries == null)
+				{
+					continue;
+				}
+				foreach (var entry in layer.Entries)
+				{
+					Vector3Int item = entry.cell;
+					_fixedCells.Add(new Vector2Int(item.x, item.y));
+				}
 			}
 		}
 
@@ -30,11 +36,11 @@ namespace JuicedUp.Features.Core
 		{
 			if (_layers != null)
 			{
-				foreach (FixedSpawnLayer l in _layers)
+				foreach (FixedSpawnLayer layer2 in _layers)
 				{
-					if (l != null && l.BatchIndex == batchIndex)
+					if (layer2 != null && layer2.BatchIndex == batchIndex)
 					{
-						layer = l;
+						layer = layer2;
 						return true;
 					}
 				}
