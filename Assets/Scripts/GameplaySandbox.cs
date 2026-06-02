@@ -118,6 +118,8 @@ public class GameplaySandbox : MonoBehaviour
     private int selectedLevelIndex = -1;
     private string levelInput = "";
     private GameObject cratePreviewContainer;
+    private string loadedLevelMapAssetName = "";
+    private string spawnDebugSummary = "";
 
     // Cohort switching
     private LevelCohortSO[] allCohorts = new LevelCohortSO[0];
@@ -400,6 +402,7 @@ public class GameplaySandbox : MonoBehaviour
             Debug.LogError("Không tìm thấy file level map JSON: Resources/levelmaps/" + levelMapName);
             return;
         }
+        loadedLevelMapAssetName = mapText.name;
 
         TiledMap parsedMap = JsonUtility.FromJson<TiledMap>(mapText.text);
         if (parsedMap == null || parsedMap.layers == null)
@@ -431,12 +434,9 @@ public class GameplaySandbox : MonoBehaviour
         currentLevelData = GetLevelDataAt(selectedLevelIndex);
         levelInput = levelMapName;
 
-        // Xây dựng danh sách loại fruit theo wave 1 từ respawnSequence
+        // wave1SpawnKinds kept for potential fallback use
         wave1SpawnKinds = BuildWave1SpawnKinds();
         wave1SpawnKindIndex = 0;
-
-        // Tìm spawn layer đầu tiên: ưu tiên "spawn1", nếu không có thì "spawn"
-        TiledLayer spawnLayer = GetFirstSpawnLayer();
 
         // Dựng bản đồ từ tất cả layer tile gameplay, gồm map + ldf/obstacle layers.
         // Skip TẤT CẢ spawn layers (spawn, spawn1, spawn2, ...)
@@ -471,36 +471,35 @@ public class GameplaySandbox : MonoBehaviour
             visualLayerIndex++;
         }
 
-        // Dựng đối tượng spawn (spawn layer: player start, pills)
-        List<SpawnCellData> initialFruitSlots = new List<SpawnCellData>();
-        if (spawnLayer != null && spawnLayer.data != null)
-        {
-            for (int y = 0; y < activeMap.height; y++)
-            {
-                for (int x = 0; x < activeMap.width; x++)
-                {
-                    int index = y * activeMap.width + x;
-                    int gid = ResolveTiledId(spawnLayer.data[index]);
-                    Vector2Int gridPos = new Vector2Int(x, -y);
+        // -- ORIGINAL LOGIC (TiledJsonLevelMapBuilder.ProcessSpawnLayer) -------------------
+        // Build spawn batches from ALL spawn layers using the restored regex logic.
+        // "spawn"/"spawn1" → batchIndex=0, "spawn2" → batchIndex=1, etc.
+        Dictionary<int, List<SpawnCellData>> spawnBatches = BuildSpawnBatchesFromAllLayers();
+        spawnDebugSummary = BuildSpawnDebugSummary(spawnBatches);
+        Debug.Log("[Sandbox] " + spawnDebugSummary);
 
-                    if (gid > 0)
+        // Process non-fruit spawn objects (player start gid=287) from all spawn layers
+        if (activeMap?.layers != null)
+        {
+            foreach (TiledLayer sLayer in activeMap.layers)
+            {
+                if (sLayer == null || sLayer.data == null || !IsSpawnLayer(sLayer.name)) continue;
+                for (int sy = 0; sy < activeMap.height; sy++)
+                    for (int sx = 0; sx < activeMap.width; sx++)
                     {
-                        spawnMap[gridPos] = gid;
-                        if (gid == 287)
-                        {
-                            ProcessSpawnObject(gid, gridPos);
-                        }
-                        else if (IsInitialFruitSpawnTile(gid))
-                        {
-                            initialFruitSlots.Add(new SpawnCellData { Gid = gid, GridPos = gridPos });
-                        }
+                        int sgid = ResolveTiledId(sLayer.data[sy * activeMap.width + sx]);
+                        if (sgid == 287)
+                            ProcessSpawnObject(sgid, new Vector2Int(sx, -sy));
                     }
-                }
             }
         }
 
-        // Khởi tạo lịch sử vị trí rắn chỉ khi có snake (không bắt buộc để fruit spawn)
-        SpawnInitialFruits(initialFruitSlots);
+        // Spawn initial fruits using exact cells+kinds when the map has explicit spawn ids.
+        // Older levels only mark seed cells with 276/277, then use respawnSequence to fill kinds.
+        if (!SpawnInitialFruitsFromPlan(spawnBatches))
+        {
+            SpawnInitialFruitsFromSeedPlan(BuildInitialFruitSeedSlotsFromFirstSpawnLayer());
+        }
 
         if (snakeHead != null)
         {
@@ -538,6 +537,8 @@ public class GameplaySandbox : MonoBehaviour
         isMoving = false;
         moveDir = Vector2Int.zero;
         activeMap = null;
+        loadedLevelMapAssetName = "";
+        spawnDebugSummary = "";
         gridMap.Clear();
         spawnMap.Clear();
         tunnelPairs.Clear();
@@ -656,6 +657,179 @@ public class GameplaySandbox : MonoBehaviour
 
         // Tiled stores global IDs. TileDefinitionDatabase stores local tiledId values.
         return rawGid - tilesetFirstGid;
+    }
+
+    /// <summary>
+    /// Original TiledJsonLevelMapBuilder.ProcessSpawnLayer logic:
+    /// reads ALL layers matching "^spawn\d*$", groups by batchIndex.
+    /// "spawn"/"spawn1" → batchIndex=0, "spawn2" → batchIndex=1, etc.
+    /// Only records cells where tileId is in [371..377] (fruit spawn tiles).
+    /// </summary>
+    private Dictionary<int, List<SpawnCellData>> BuildSpawnBatchesFromAllLayers()
+    {
+        var result = new Dictionary<int, List<SpawnCellData>>();
+        if (activeMap?.layers == null) return result;
+
+        var spawnRegex = new System.Text.RegularExpressions.Regex(@"^spawn\d*$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        foreach (TiledLayer layer in activeMap.layers)
+        {
+            if (layer == null || layer.data == null) continue;
+            string name = layer.name ?? string.Empty;
+            if (!spawnRegex.IsMatch(name)) continue;
+
+            // Determine batchIndex: "spawn" or "spawn1" → 0, "spawn2" → 1, etc.
+            int batchIndex = 0;
+            var numMatch = System.Text.RegularExpressions.Regex.Match(name, @"\d+$");
+            if (numMatch.Success)
+                batchIndex = Mathf.Max(0, int.Parse(numMatch.Value) - 1);
+
+            if (!result.ContainsKey(batchIndex))
+                result[batchIndex] = new List<SpawnCellData>();
+
+            for (int y = 0; y < activeMap.height; y++)
+            {
+                for (int x = 0; x < activeMap.width; x++)
+                {
+                    int gid = ResolveTiledId(layer.data[y * activeMap.width + x]);
+                    // Only fruit spawn tiles (371–377)
+                    if (gid >= 371 && gid <= 377)
+                    {
+                        result[batchIndex].Add(new SpawnCellData
+                        {
+                            Gid = gid,
+                            GridPos = new Vector2Int(x, -y)   // sandbox coord: y negated
+                        });
+                        spawnMap[new Vector2Int(x, -y)] = gid;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Original spawn logic: use EXACT cells from batch 0 (spawn1 layer).
+    /// tileId 371→PillKind.0, 372→PillKind.1, ... (same as LevelSpawnIdMap).
+    /// No round-robin, no path-filling.
+    /// </summary>
+    private bool SpawnInitialFruitsFromPlan(Dictionary<int, List<SpawnCellData>> batches)
+    {
+        if (batches == null) return false;
+        if (!batches.TryGetValue(0, out List<SpawnCellData> batch0) || batch0.Count == 0)
+        {
+            Debug.LogWarning("[Sandbox] No explicit batch-0 fruit spawn entries found; falling back to spawn seed markers.");
+            return false;
+        }
+
+        foreach (SpawnCellData cell in batch0)
+        {
+            Vector3 worldPos = new Vector3(cell.GridPos.x, cell.GridPos.y, fruitWorldZ);
+            SpawnFruitAtCell(cell.Gid, cell.GridPos, worldPos);
+        }
+
+        return true;
+    }
+
+    private string BuildSpawnDebugSummary(Dictionary<int, List<SpawnCellData>> batches)
+    {
+        string mapName = string.IsNullOrEmpty(loadedLevelMapAssetName) ? levelMapName : loadedLevelMapAssetName;
+        string coordNote = activeMap != null
+            ? $"coords sandbox=(x,-row), runtime=(x,{activeMap.height - 1}-row)"
+            : "coords unavailable";
+
+        if (batches == null || batches.Count == 0)
+        {
+            return $"map={mapName}, firstgid={tilesetFirstGid}, no explicit spawn batches, {coordNote}";
+        }
+
+        List<int> keys = new List<int>(batches.Keys);
+        keys.Sort();
+
+        List<string> parts = new List<string>();
+        foreach (int key in keys)
+        {
+            List<SpawnCellData> cells = batches[key];
+            parts.Add($"batch{key}={DescribeSpawnBatch(cells)}");
+        }
+
+        return $"map={mapName}, firstgid={tilesetFirstGid}, {string.Join(", ", parts)}, {coordNote}";
+    }
+
+    private static string DescribeSpawnBatch(List<SpawnCellData> cells)
+    {
+        if (cells == null || cells.Count == 0)
+        {
+            return "0";
+        }
+
+        int[] kindCounts = new int[7];
+        foreach (SpawnCellData cell in cells)
+        {
+            if (cell.Gid >= 371 && cell.Gid <= 377)
+            {
+                kindCounts[cell.Gid - 371]++;
+            }
+        }
+
+        List<string> kinds = new List<string>();
+        for (int i = 0; i < kindCounts.Length; i++)
+        {
+            if (kindCounts[i] > 0)
+            {
+                kinds.Add($"{i}:{kindCounts[i]}");
+            }
+        }
+
+        return $"{cells.Count}[{string.Join("/", kinds)}]";
+    }
+
+    private List<SpawnCellData> BuildInitialFruitSeedSlotsFromFirstSpawnLayer()
+    {
+        List<SpawnCellData> seedSlots = new List<SpawnCellData>();
+        TiledLayer spawnLayer = GetFirstSpawnLayer();
+        if (spawnLayer == null || spawnLayer.data == null)
+        {
+            return seedSlots;
+        }
+
+        for (int y = 0; y < activeMap.height; y++)
+        {
+            for (int x = 0; x < activeMap.width; x++)
+            {
+                int index = y * activeMap.width + x;
+                int gid = ResolveTiledId(spawnLayer.data[index]);
+                if (gid <= 0)
+                {
+                    continue;
+                }
+
+                Vector2Int gridPos = new Vector2Int(x, -y);
+                spawnMap[gridPos] = gid;
+                if (IsInitialFruitSpawnTile(gid))
+                {
+                    seedSlots.Add(new SpawnCellData { Gid = gid, GridPos = gridPos });
+                }
+            }
+        }
+
+        return seedSlots;
+    }
+
+    private void SpawnInitialFruitsFromSeedPlan(List<SpawnCellData> seedSlots)
+    {
+        if (seedSlots == null || seedSlots.Count == 0)
+        {
+            return;
+        }
+
+        wave1SpawnKindIndex = 0;
+        foreach (SpawnCellData cell in seedSlots)
+        {
+            Vector3 worldPos = new Vector3(cell.GridPos.x, cell.GridPos.y, fruitWorldZ);
+            SpawnFruitAtCell(cell.Gid, cell.GridPos, worldPos);
+        }
     }
 
 
@@ -1263,7 +1437,7 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        float panelHeight = showLevelInfo ? 318f : 182f;
+        float panelHeight = showLevelInfo ? 354f : 218f;
         GUILayout.BeginArea(new Rect(12f, 12f, 360f, panelHeight), GUI.skin.box);
         GUILayout.Label("Sandbox Level");
 
@@ -1323,6 +1497,14 @@ public class GameplaySandbox : MonoBehaviour
             ? $"{selectedLevelIndex + 1}/{availableLevelNames.Length}"
             : "-";
         GUILayout.Label($"{FormatLevelLabel(currentLevelData)} ({indexText})");
+        if (!string.IsNullOrEmpty(loadedLevelMapAssetName))
+        {
+            InfoRow("JSON", loadedLevelMapAssetName);
+        }
+        if (!string.IsNullOrEmpty(spawnDebugSummary))
+        {
+            GUILayout.Label(spawnDebugSummary);
+        }
 
         if (showLevelInfo && currentLevelData != null)
         {
