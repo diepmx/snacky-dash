@@ -120,6 +120,7 @@ public class GameplaySandbox : MonoBehaviour
     private GameObject cratePreviewContainer;
     private string loadedLevelMapAssetName = "";
     private string spawnDebugSummary = "";
+    private string cohortDebugSummary = "";
 
     // Cohort switching
     private LevelCohortSO[] allCohorts = new LevelCohortSO[0];
@@ -433,6 +434,7 @@ public class GameplaySandbox : MonoBehaviour
         selectedLevelIndex = FindLevelIndex(levelMapName);
         currentLevelData = GetLevelDataAt(selectedLevelIndex);
         levelInput = levelMapName;
+        cohortDebugSummary = BuildCohortDebugSummary();
 
         // wave1SpawnKinds kept for potential fallback use
         wave1SpawnKinds = BuildWave1SpawnKinds();
@@ -455,7 +457,7 @@ public class GameplaySandbox : MonoBehaviour
                 {
                     int index = y * activeMap.width + x;
                     int gid = ResolveTiledId(mapLayer.data[index]);
-                    Vector2Int gridPos = new Vector2Int(x, -y);
+                    Vector2Int gridPos = ToRuntimeGridPosition(x, y);
 
                     if (gid > 0)
                     {
@@ -476,7 +478,6 @@ public class GameplaySandbox : MonoBehaviour
         // "spawn"/"spawn1" → batchIndex=0, "spawn2" → batchIndex=1, etc.
         Dictionary<int, List<SpawnCellData>> spawnBatches = BuildSpawnBatchesFromAllLayers();
         spawnDebugSummary = BuildSpawnDebugSummary(spawnBatches);
-        Debug.Log("[Sandbox] " + spawnDebugSummary);
 
         // Process non-fruit spawn objects (player start gid=287) from all spawn layers
         if (activeMap?.layers != null)
@@ -489,7 +490,7 @@ public class GameplaySandbox : MonoBehaviour
                     {
                         int sgid = ResolveTiledId(sLayer.data[sy * activeMap.width + sx]);
                         if (sgid == 287)
-                            ProcessSpawnObject(sgid, new Vector2Int(sx, -sy));
+                            ProcessSpawnObject(sgid, ToRuntimeGridPosition(sx, sy));
                     }
             }
         }
@@ -498,8 +499,19 @@ public class GameplaySandbox : MonoBehaviour
         // Older levels only mark seed cells with 276/277, then use respawnSequence to fill kinds.
         if (!SpawnInitialFruitsFromPlan(spawnBatches))
         {
-            SpawnInitialFruitsFromSeedPlan(BuildInitialFruitSeedSlotsFromFirstSpawnLayer());
+            List<SpawnCellData> seedSlots = BuildInitialFruitSeedSlotsFromFirstSpawnLayer();
+            if (seedSlots.Count > 0)
+            {
+                SpawnInitialFruits(seedSlots);
+            }
+            else
+            {
+                SpawnInitialFruitsFromRuntimeEligibility();
+            }
         }
+
+        spawnDebugSummary = $"{spawnDebugSummary}, initialVisible={spawnedPills.Count}, wave1Kinds={(wave1SpawnKinds != null ? wave1SpawnKinds.Count : 0)}";
+        Debug.Log("[Sandbox] " + spawnDebugSummary);
 
         if (snakeHead != null)
         {
@@ -539,6 +551,7 @@ public class GameplaySandbox : MonoBehaviour
         activeMap = null;
         loadedLevelMapAssetName = "";
         spawnDebugSummary = "";
+        cohortDebugSummary = "";
         gridMap.Clear();
         spawnMap.Clear();
         tunnelPairs.Clear();
@@ -659,6 +672,12 @@ public class GameplaySandbox : MonoBehaviour
         return rawGid - tilesetFirstGid;
     }
 
+    private Vector2Int ToRuntimeGridPosition(int x, int tiledRow)
+    {
+        int height = activeMap != null ? activeMap.height : 0;
+        return new Vector2Int(x, height - 1 - tiledRow);
+    }
+
     /// <summary>
     /// Original TiledJsonLevelMapBuilder.ProcessSpawnLayer logic:
     /// reads ALL layers matching "^spawn\d*$", groups by batchIndex.
@@ -699,9 +718,9 @@ public class GameplaySandbox : MonoBehaviour
                         result[batchIndex].Add(new SpawnCellData
                         {
                             Gid = gid,
-                            GridPos = new Vector2Int(x, -y)   // sandbox coord: y negated
+                            GridPos = ToRuntimeGridPosition(x, y)
                         });
-                        spawnMap[new Vector2Int(x, -y)] = gid;
+                        spawnMap[ToRuntimeGridPosition(x, y)] = gid;
                     }
                 }
             }
@@ -736,7 +755,7 @@ public class GameplaySandbox : MonoBehaviour
     {
         string mapName = string.IsNullOrEmpty(loadedLevelMapAssetName) ? levelMapName : loadedLevelMapAssetName;
         string coordNote = activeMap != null
-            ? $"coords sandbox=(x,-row), runtime=(x,{activeMap.height - 1}-row)"
+            ? $"coords runtime=(x,{activeMap.height - 1}-row)"
             : "coords unavailable";
 
         if (batches == null || batches.Count == 0)
@@ -805,7 +824,7 @@ public class GameplaySandbox : MonoBehaviour
                     continue;
                 }
 
-                Vector2Int gridPos = new Vector2Int(x, -y);
+                Vector2Int gridPos = ToRuntimeGridPosition(x, y);
                 spawnMap[gridPos] = gid;
                 if (IsInitialFruitSpawnTile(gid))
                 {
@@ -832,6 +851,90 @@ public class GameplaySandbox : MonoBehaviour
         }
     }
 
+    private void SpawnInitialFruitsFromRuntimeEligibility()
+    {
+        int targetCount = wave1SpawnKinds != null ? wave1SpawnKinds.Count : 0;
+        if (targetCount <= 0)
+        {
+            targetCount = CountEligibleInitialFruitCells();
+        }
+
+        List<SpawnCellData> cells = BuildRuntimeEligibleInitialFruitCells(targetCount);
+        if (cells.Count == 0)
+        {
+            Debug.LogWarning("[Sandbox] No eligible runtime pill cells found for initial wave.");
+            return;
+        }
+
+        wave1SpawnKindIndex = 0;
+        foreach (SpawnCellData cell in cells)
+        {
+            Vector3 worldPos = new Vector3(cell.GridPos.x, cell.GridPos.y, fruitWorldZ);
+            SpawnFruitAtCell(cell.Gid, cell.GridPos, worldPos);
+        }
+    }
+
+    private int CountEligibleInitialFruitCells()
+    {
+        int count = 0;
+        foreach (Vector2Int gridPos in gridMap.Keys)
+        {
+            if (IsInitialFruitPathCell(gridPos))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private List<SpawnCellData> BuildRuntimeEligibleInitialFruitCells(int targetCount)
+    {
+        List<SpawnCellData> cells = new List<SpawnCellData>();
+        if (targetCount <= 0)
+        {
+            return cells;
+        }
+
+        HashSet<Vector2Int> used = new HashSet<Vector2Int>();
+        if (activeMap?.layers != null)
+        {
+            foreach (TiledLayer layer in activeMap.layers)
+            {
+                if (layer == null || layer.data == null || IsSpawnLayer(layer.name))
+                {
+                    continue;
+                }
+
+                for (int row = 0; row < activeMap.height; row++)
+                {
+                    for (int x = 0; x < activeMap.width; x++)
+                    {
+                        int gid = ResolveTiledId(layer.data[row * activeMap.width + x]);
+                        if (gid <= 0)
+                        {
+                            continue;
+                        }
+
+                        Vector2Int gridPos = ToRuntimeGridPosition(x, row);
+                        if (!used.Add(gridPos) || !IsInitialFruitPathCell(gridPos))
+                        {
+                            continue;
+                        }
+
+                        cells.Add(new SpawnCellData { Gid = 277, GridPos = gridPos });
+                        if (cells.Count >= targetCount)
+                        {
+                            return cells;
+                        }
+                    }
+                }
+            }
+        }
+
+        return cells;
+    }
+
 
     private void InstantiateTileVisual(int gid, Vector2Int gridPos, Transform parent, float worldZ)
     {
@@ -842,7 +945,7 @@ public class GameplaySandbox : MonoBehaviour
             {
                 Vector3 worldPos = new Vector3(gridPos.x, gridPos.y, worldZ);
                 GameObject spawnedTile = Instantiate(tilePrefab, worldPos, Quaternion.identity, parent);
-                spawnedTile.name = $"Tile_{gridPos.x}_{Mathf.Abs(gridPos.y)}_{tilePrefab.name}";
+                spawnedTile.name = $"Tile_{gridPos.x}_{gridPos.y}_{tilePrefab.name}";
                 
                 // Reset Z rotation nếu hầm chui để hướng đúng
                 AdjustTunnelRotation(gid, spawnedTile);
@@ -911,13 +1014,13 @@ public class GameplaySandbox : MonoBehaviour
             cam.transform.rotation = Quaternion.identity;
         }
 
-        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, (height - 1f) * 0.5f, 0f);
         UpdateBackground(mapCenter, width, height);
     }
 
     private Bounds CalculateContentBounds(float width, float height)
     {
-        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, (height - 1f) * 0.5f, 0f);
         Bounds bounds = new Bounds(mapCenter, new Vector3(width, height, 0.1f));
 
         if (cratePreviewContainer != null)
@@ -1437,7 +1540,7 @@ public class GameplaySandbox : MonoBehaviour
             return;
         }
 
-        float panelHeight = showLevelInfo ? 354f : 218f;
+        float panelHeight = showLevelInfo ? 386f : 250f;
         GUILayout.BeginArea(new Rect(12f, 12f, 360f, panelHeight), GUI.skin.box);
         GUILayout.Label("Sandbox Level");
 
@@ -1497,6 +1600,10 @@ public class GameplaySandbox : MonoBehaviour
             ? $"{selectedLevelIndex + 1}/{availableLevelNames.Length}"
             : "-";
         GUILayout.Label($"{FormatLevelLabel(currentLevelData)} ({indexText})");
+        if (!string.IsNullOrEmpty(cohortDebugSummary))
+        {
+            GUILayout.Label(cohortDebugSummary);
+        }
         if (!string.IsNullOrEmpty(loadedLevelMapAssetName))
         {
             InfoRow("JSON", loadedLevelMapAssetName);
@@ -1584,6 +1691,20 @@ public class GameplaySandbox : MonoBehaviour
         }
 
         return levelNumber > 0 ? $"Lv {levelNumber:000}  {levelMapName}" : levelMapName;
+    }
+
+    private string BuildCohortDebugSummary()
+    {
+        string source = activeCohort != null
+            ? $"{activeCohort.name}/{activeCohort.cohortName}"
+            : "levelmaps";
+        int count = availableLevelNames != null ? availableLevelNames.Length : 0;
+        string levelDataName = currentLevelData != null ? currentLevelData.name : "null";
+        string indexText = selectedLevelIndex >= 0 && count > 0
+            ? $"{selectedLevelIndex + 1}/{count}"
+            : "-";
+
+        return $"source={source}, index={indexText}, LevelData={levelDataName}";
     }
 
     private void InfoRow(string label, string value)
@@ -2005,7 +2126,7 @@ public class GameplaySandbox : MonoBehaviour
             pill = CreateMeshFruit(kind, worldPos, Quaternion.Euler(fruitTiltEuler), meshFruitScale, null);
             if (pill != null)
             {
-                pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+                pill.name = $"Pill_{kind}_{gridPos.x}_{gridPos.y}";
             }
         }
 
@@ -2013,14 +2134,14 @@ public class GameplaySandbox : MonoBehaviour
         if (pill == null && pillPrefab != null)
         {
             pill = Instantiate(pillPrefab, worldPos, Quaternion.Euler(fruitTiltEuler));
-            pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+            pill.name = $"Pill_{kind}_{gridPos.x}_{gridPos.y}";
             ActivatePillKindOnInstance(pill, kind);
         }
         else if (pill == null)
         {
             // Fallback: sphere có màu theo loại fruit
             pill = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
+            pill.name = $"Pill_{kind}_{gridPos.x}_{gridPos.y}";
             pill.transform.position = worldPos;
             pill.transform.rotation = Quaternion.Euler(fruitTiltEuler);
             pill.transform.localScale = Vector3.one * 0.45f;
