@@ -22,6 +22,25 @@ public class GameplaySandbox : MonoBehaviour
     public bool showLevelSwitcher = true;
     public bool showLevelInfo = true;
 
+    [Header("Game View Composition")]
+    public bool usePerspectiveCamera = true;
+    [Range(15f, 60f)]
+    public float perspectiveFieldOfView = 26f;
+    public float perspectiveDistanceMultiplier = 1.15f;
+    public float perspectiveVerticalOffset = 0.45f;
+    public Vector3 perspectiveLookOffset = new Vector3(0f, -0.35f, 0f);
+
+    [Header("Crate Preview")]
+    public bool showCratePreview = true;
+    public GameObject nextCrateSignPrefab;
+    public GameObject boxCrate9Prefab;
+    public GameObject boxCrate18Prefab;
+    public GameObject boxCrate27Prefab;
+    public Vector2 cratePreviewOffset = new Vector2(0f, 1.75f);
+    public float nextCrateSignScale = 0.9f;
+    public float boxCrateScale = 0.68f;
+    public float cratePreviewSpacing = 1.75f;
+
     [Header("Background")]
     public bool showGameBackground = true;
     public Color gameBackgroundColor = new Color(0.58310264f, 1f, 0.5424528f, 1f);
@@ -79,6 +98,7 @@ public class GameplaySandbox : MonoBehaviour
     private string[] availableLevelNames = new string[0];
     private int selectedLevelIndex = -1;
     private string levelInput = "";
+    private GameObject cratePreviewContainer;
 
     // Cohort switching
     private LevelCohortSO[] allCohorts = new LevelCohortSO[0];
@@ -380,6 +400,10 @@ public class GameplaySandbox : MonoBehaviour
         // Tạo container cha để gọn Hierarchy
         boardContainer = new GameObject("GameBoard");
 
+        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
+        currentLevelData = GetLevelDataAt(selectedLevelIndex);
+        levelInput = levelMapName;
+
         // Xây dựng danh sách loại fruit theo wave 1 từ respawnSequence
         wave1SpawnKinds = BuildWave1SpawnKinds();
         wave1SpawnKindIndex = 0;
@@ -446,10 +470,8 @@ public class GameplaySandbox : MonoBehaviour
             snakePositionsHistory.Add(snakeGridPos);
             UpdateTailVisuals();
         }
+        SpawnCratePreview();
         FitCameraToLevel();
-        selectedLevelIndex = Array.IndexOf(availableLevelNames, levelMapName);
-        currentLevelData = GetLevelDataAt(selectedLevelIndex);
-        levelInput = levelMapName;
     }
 
     private void ClearCurrentLevel()
@@ -495,6 +517,12 @@ public class GameplaySandbox : MonoBehaviour
         {
             Destroy(boardContainer);
             boardContainer = null;
+        }
+
+        if (cratePreviewContainer != null)
+        {
+            Destroy(cratePreviewContainer);
+            cratePreviewContainer = null;
         }
 
         if (backgroundContainer != null)
@@ -606,19 +634,66 @@ public class GameplaySandbox : MonoBehaviour
 
         float width = Mathf.Max(1, activeMap.width);
         float height = Mathf.Max(1, activeMap.height);
-        Vector3 center = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        Bounds contentBounds = CalculateContentBounds(width, height);
+        Vector3 center = contentBounds.center;
         float aspect = Mathf.Max(0.01f, cam.aspect);
-        float verticalSize = (height * 0.5f) + cameraPadding;
-        float horizontalSize = ((width * 0.5f) + cameraPadding) / aspect;
+        float verticalSize = (contentBounds.size.y * 0.5f) + cameraPadding;
+        float horizontalSize = ((contentBounds.size.x * 0.5f) + cameraPadding) / aspect;
 
-        cam.orthographic = true;
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = gameBackgroundColor;
-        cam.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
-        cam.transform.position = new Vector3(center.x, center.y, -10f);
-        cam.transform.rotation = Quaternion.identity;
 
-        UpdateBackground(center, width, height);
+        if (usePerspectiveCamera)
+        {
+            float fitSize = Mathf.Max(verticalSize, horizontalSize);
+            float halfFovRadians = Mathf.Max(1f, perspectiveFieldOfView) * 0.5f * Mathf.Deg2Rad;
+            float distance = fitSize / Mathf.Tan(halfFovRadians) * Mathf.Max(0.1f, perspectiveDistanceMultiplier);
+            Vector3 lookTarget = center + perspectiveLookOffset;
+            Vector3 cameraPosition = new Vector3(
+                center.x,
+                center.y - contentBounds.size.y * perspectiveVerticalOffset,
+                lookTarget.z - distance);
+
+            cam.orthographic = false;
+            cam.fieldOfView = perspectiveFieldOfView;
+            cam.transform.position = cameraPosition;
+            cam.transform.rotation = Quaternion.LookRotation(lookTarget - cameraPosition, Vector3.up);
+        }
+        else
+        {
+            cam.orthographic = true;
+            cam.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
+            cam.transform.position = new Vector3(center.x, center.y, -10f);
+            cam.transform.rotation = Quaternion.identity;
+        }
+
+        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        UpdateBackground(mapCenter, width, height);
+    }
+
+    private Bounds CalculateContentBounds(float width, float height)
+    {
+        Vector3 mapCenter = new Vector3((width - 1f) * 0.5f, -(height - 1f) * 0.5f, 0f);
+        Bounds bounds = new Bounds(mapCenter, new Vector3(width, height, 0.1f));
+
+        if (cratePreviewContainer != null)
+        {
+            EncapsulateRenderers(ref bounds, cratePreviewContainer);
+        }
+
+        return bounds;
+    }
+
+    private static void EncapsulateRenderers(ref Bounds bounds, GameObject root)
+    {
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer != null)
+            {
+                bounds.Encapsulate(renderer.bounds);
+            }
+        }
     }
 
     private void UpdateBackground(Vector3 center, float width, float height)
@@ -761,6 +836,161 @@ public class GameplaySandbox : MonoBehaviour
 
         if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", texture);
         if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", texture);
+    }
+
+    private void SpawnCratePreview()
+    {
+        if (!showCratePreview || activeMap == null)
+        {
+            return;
+        }
+
+        GameObject signPrefab = ResolvePrefab(nextCrateSignPrefab, "Assets/GameObject/NextCrateSign.prefab");
+        TryGetCratePreviewData(out ManualCrateSetup currentCrate, out ManualCrateSetup nextCrate);
+        GameObject cratePrefab = ResolvePrefab(GetBoxCratePrefab(currentCrate), GetBoxCrateAssetPath(currentCrate));
+
+        if (signPrefab == null && cratePrefab == null)
+        {
+            return;
+        }
+
+        float centerX = (activeMap.width - 1f) * 0.5f + cratePreviewOffset.x;
+        float topY = cratePreviewOffset.y;
+        cratePreviewContainer = new GameObject("CratePreview");
+        cratePreviewContainer.transform.SetParent(boardContainer != null ? boardContainer.transform : transform, false);
+        cratePreviewContainer.transform.position = Vector3.zero;
+
+        if (signPrefab != null)
+        {
+            Vector3 signPosition = new Vector3(centerX - cratePreviewSpacing * 0.5f, topY, -0.4f);
+            GameObject sign = Instantiate(signPrefab, signPosition, Quaternion.identity, cratePreviewContainer.transform);
+            sign.name = "NextCrateSign_Preview";
+            sign.transform.localScale = Vector3.one * nextCrateSignScale;
+            ApplyNextCrateSignSprites(sign, currentCrate.pillKind, nextCrate.pillKind);
+        }
+
+        if (cratePrefab != null)
+        {
+            Vector3 cratePosition = new Vector3(centerX + cratePreviewSpacing * 0.5f, topY, -0.45f);
+            GameObject crate = Instantiate(cratePrefab, cratePosition, Quaternion.identity, cratePreviewContainer.transform);
+            crate.name = "Box_Crate_Preview";
+            crate.transform.localScale = Vector3.one * boxCrateScale;
+        }
+    }
+
+    private GameObject GetBoxCratePrefab(ManualCrateSetup crate)
+    {
+        int requiredCount = Mathf.Max(1, crate.requiredCount);
+        if (requiredCount <= 9) return boxCrate9Prefab;
+        if (requiredCount <= 18) return boxCrate18Prefab != null ? boxCrate18Prefab : boxCrate9Prefab;
+        return boxCrate27Prefab != null ? boxCrate27Prefab : (boxCrate18Prefab != null ? boxCrate18Prefab : boxCrate9Prefab);
+    }
+
+    private static string GetBoxCrateAssetPath(ManualCrateSetup crate)
+    {
+        int requiredCount = Mathf.Max(1, crate.requiredCount);
+        if (requiredCount <= 9) return "Assets/GameObject/Box_Crate_9.prefab";
+        if (requiredCount <= 18) return "Assets/GameObject/Box_Crate_18.prefab";
+        return "Assets/GameObject/Box_Crate_27.prefab";
+    }
+
+    private void TryGetCratePreviewData(out ManualCrateSetup currentCrate, out ManualCrateSetup nextCrate)
+    {
+        currentCrate = new ManualCrateSetup { pillKind = PillKind.Strawberry, requiredCount = 9 };
+        nextCrate = new ManualCrateSetup { pillKind = PillKind.Strawberry, requiredCount = 9 };
+
+        List<ManualColumnSetup> columns = currentLevelData != null ? currentLevelData.manualColumns : null;
+        if (columns == null || columns.Count == 0)
+        {
+            return;
+        }
+
+        bool foundCurrent = false;
+        foreach (ManualColumnSetup column in columns)
+        {
+            if (column?.crates == null) continue;
+
+            foreach (ManualCrateSetup crate in column.crates)
+            {
+                if (crate == null) continue;
+
+                if (!foundCurrent)
+                {
+                    currentCrate = crate;
+                    nextCrate = crate;
+                    foundCurrent = true;
+                }
+                else
+                {
+                    nextCrate = crate;
+                    return;
+                }
+            }
+        }
+    }
+
+    private GameObject ResolvePrefab(GameObject assignedPrefab, string editorAssetPath)
+    {
+        if (assignedPrefab != null)
+        {
+            return assignedPrefab;
+        }
+
+#if UNITY_EDITOR
+        return AssetDatabase.LoadAssetAtPath<GameObject>(editorAssetPath);
+#else
+        return null;
+#endif
+    }
+
+    private void ApplyNextCrateSignSprites(GameObject sign, PillKind currentKind, PillKind nextKind)
+    {
+        Sprite currentSprite = GetPillIconSprite(currentKind);
+        Sprite nextSprite = GetPillIconSprite(nextKind);
+
+        foreach (SpriteRenderer spriteRenderer in sign.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            if (spriteRenderer == null)
+            {
+                continue;
+            }
+
+            if (currentSprite != null && spriteRenderer.name == "FruitIcon")
+            {
+                spriteRenderer.sprite = currentSprite;
+                spriteRenderer.gameObject.SetActive(true);
+            }
+            else if (nextSprite != null && spriteRenderer.name == "FruitIconNext")
+            {
+                spriteRenderer.sprite = nextSprite;
+                spriteRenderer.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private Sprite GetPillIconSprite(PillKind kind)
+    {
+        if (pillPrefab == null)
+        {
+            return null;
+        }
+
+        PillColorShape[] shapes = pillPrefab.GetComponentsInChildren<PillColorShape>(true);
+        foreach (PillColorShape shape in shapes)
+        {
+            if (shape == null || shape.pillKind != kind)
+            {
+                continue;
+            }
+
+            SpriteRenderer spriteRenderer = shape.GetComponentInChildren<SpriteRenderer>(true);
+            if (spriteRenderer != null && spriteRenderer.sprite != null)
+            {
+                return spriteRenderer.sprite;
+            }
+        }
+
+        return null;
     }
 
     private void HandleSandboxShortcuts()
