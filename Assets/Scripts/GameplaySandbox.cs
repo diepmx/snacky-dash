@@ -24,6 +24,9 @@ public class GameplaySandbox : MonoBehaviour
 
     [Header("Game View Composition")]
     public bool usePerspectiveCamera = true;
+    public bool useFixedPerspectiveCameraPose = true;
+    public Vector3 fixedPerspectiveCameraPosition = new Vector3(7f, -43.5f, -71.42f);
+    public Vector3 fixedPerspectiveCameraEuler = new Vector3(-26.5f, 0f, 0f);
     [Range(15f, 60f)]
     public float perspectiveFieldOfView = 26f;
     public float perspectiveDistanceMultiplier = 1.15f;
@@ -36,10 +39,13 @@ public class GameplaySandbox : MonoBehaviour
     public GameObject boxCrate9Prefab;
     public GameObject boxCrate18Prefab;
     public GameObject boxCrate27Prefab;
-    public Vector2 cratePreviewOffset = new Vector2(0f, 1.75f);
+    public Vector2 cratePreviewOffset = new Vector2(-0.87f, 1.75f);
     public float nextCrateSignScale = 0.9f;
     public float boxCrateScale = 0.68f;
     public float cratePreviewSpacing = 1.75f;
+
+    [Header("Fruit Presentation")]
+    public Vector3 fruitTiltEuler = new Vector3(-14f, 0f, 0f);
 
     [Header("Background")]
     public bool showGameBackground = true;
@@ -645,19 +651,28 @@ public class GameplaySandbox : MonoBehaviour
 
         if (usePerspectiveCamera)
         {
-            float fitSize = Mathf.Max(verticalSize, horizontalSize);
-            float halfFovRadians = Mathf.Max(1f, perspectiveFieldOfView) * 0.5f * Mathf.Deg2Rad;
-            float distance = fitSize / Mathf.Tan(halfFovRadians) * Mathf.Max(0.1f, perspectiveDistanceMultiplier);
-            Vector3 lookTarget = center + perspectiveLookOffset;
-            Vector3 cameraPosition = new Vector3(
-                center.x,
-                center.y - contentBounds.size.y * perspectiveVerticalOffset,
-                lookTarget.z - distance);
-
             cam.orthographic = false;
             cam.fieldOfView = perspectiveFieldOfView;
-            cam.transform.position = cameraPosition;
-            cam.transform.rotation = Quaternion.LookRotation(lookTarget - cameraPosition, Vector3.up);
+
+            if (useFixedPerspectiveCameraPose)
+            {
+                cam.transform.position = fixedPerspectiveCameraPosition;
+                cam.transform.rotation = Quaternion.Euler(fixedPerspectiveCameraEuler);
+            }
+            else
+            {
+                float fitSize = Mathf.Max(verticalSize, horizontalSize);
+                float halfFovRadians = Mathf.Max(1f, perspectiveFieldOfView) * 0.5f * Mathf.Deg2Rad;
+                float distance = fitSize / Mathf.Tan(halfFovRadians) * Mathf.Max(0.1f, perspectiveDistanceMultiplier);
+                Vector3 lookTarget = center + perspectiveLookOffset;
+                Vector3 cameraPosition = new Vector3(
+                    center.x,
+                    center.y - contentBounds.size.y * perspectiveVerticalOffset,
+                    lookTarget.z - distance);
+
+                cam.transform.position = cameraPosition;
+                cam.transform.rotation = Quaternion.LookRotation(lookTarget - cameraPosition, Vector3.up);
+            }
         }
         else
         {
@@ -1331,7 +1346,7 @@ public class GameplaySandbox : MonoBehaviour
         // Thử dùng pillPrefab được gán trong Inspector (PillMaster)
         if (pillPrefab != null)
         {
-            pill = Instantiate(pillPrefab, worldPos, Quaternion.identity);
+            pill = Instantiate(pillPrefab, worldPos, Quaternion.Euler(fruitTiltEuler));
             pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
             ActivatePillKindOnInstance(pill, kind);
         }
@@ -1341,6 +1356,7 @@ public class GameplaySandbox : MonoBehaviour
             pill = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             pill.name = $"Pill_{kind}_{gridPos.x}_{Mathf.Abs(gridPos.y)}";
             pill.transform.position = worldPos;
+            pill.transform.rotation = Quaternion.Euler(fruitTiltEuler);
             pill.transform.localScale = Vector3.one * 0.45f;
 
             Collider col = pill.GetComponent<Collider>();
@@ -1361,8 +1377,19 @@ public class GameplaySandbox : MonoBehaviour
 
         if (pill != null)
         {
+            ApplyFruitTilt(pill);
             spawnedPills[gridPos] = pill;
         }
+    }
+
+    private void ApplyFruitTilt(GameObject pill)
+    {
+        if (pill == null)
+        {
+            return;
+        }
+
+        pill.transform.rotation = Quaternion.Euler(fruitTiltEuler);
     }
 
     /// <summary>

@@ -156,6 +156,9 @@ MonoBehaviour:
   showLevelSwitcher: 1
   showLevelInfo: 1
   usePerspectiveCamera: 1
+  useFixedPerspectiveCameraPose: 1
+  fixedPerspectiveCameraPosition: {x: 7, y: -43.5, z: -71.42}
+  fixedPerspectiveCameraEuler: {x: -26.5, y: 0, z: 0}
   perspectiveFieldOfView: 26
   perspectiveDistanceMultiplier: 1.15
   perspectiveVerticalOffset: 0.45
@@ -165,10 +168,11 @@ MonoBehaviour:
   boxCrate9Prefab: {fileID: 1709254077376921, guid: a73937b9bc71d7242947b62df3014eb2, type: 3}
   boxCrate18Prefab: {fileID: 1709254077376921, guid: f5d9f0b757d1ee24ea5a7a0c05484af2, type: 3}
   boxCrate27Prefab: {fileID: 1709254077376921, guid: a069eb6399f5dd0419e1f840a69d522f, type: 3}
-  cratePreviewOffset: {x: 0, y: 1.75}
+  cratePreviewOffset: {x: -0.87, y: 1.75}
   nextCrateSignScale: 0.9
   boxCrateScale: 0.68
   cratePreviewSpacing: 1.75
+  fruitTiltEuler: {x: 20, y: 0, z: 0}
   showGameBackground: 1
   gameBackgroundColor: {r: 0.58310264, g: 1, b: 0.5424528, a: 1}
   grassBackgroundColor: {r: 0.38, g: 0.72, b: 0.28, a: 1}
