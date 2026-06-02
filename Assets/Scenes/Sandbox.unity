@@ -176,8 +176,9 @@ MonoBehaviour:
   fillInitialWaveFromData: 1
   initialWaveFillMarkerThreshold: 10
   initialFruitPlacementMode: 1
-  fruitTiltEuler: {x: 10, y: 0, z: 0}
+  fruitTiltEuler: {x: -4, y: 0, z: 0}
   meshFruitScale: 0.36
+  fruitWorldZ: -0.5
   showGameBackground: 1
   gameBackgroundColor: {r: 0.58310264, g: 1, b: 0.5424528, a: 1}
   grassBackgroundColor: {r: 0.38, g: 0.72, b: 0.28, a: 1}

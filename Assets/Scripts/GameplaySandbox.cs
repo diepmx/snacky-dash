@@ -57,6 +57,7 @@ public class GameplaySandbox : MonoBehaviour
     public InitialFruitPlacementMode initialFruitPlacementMode = InitialFruitPlacementMode.SpreadAcrossPath;
     public Vector3 fruitTiltEuler = new Vector3(-14f, 0f, 0f);
     public float meshFruitScale = 0.36f;
+    public float fruitWorldZ = -0.5f;
 
     [Header("Background")]
     public bool showGameBackground = true;
@@ -1797,6 +1798,8 @@ public class GameplaySandbox : MonoBehaviour
     /// </summary>
     private void SpawnFruitAtCell(int gid, Vector2Int gridPos, Vector3 worldPos)
     {
+        worldPos.z = fruitWorldZ;
+
         // Xác định loại fruit
         PillKind kind;
         if (gid >= 371 && gid <= 377)
