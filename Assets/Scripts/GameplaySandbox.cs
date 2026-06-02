@@ -389,6 +389,7 @@ public class GameplaySandbox : MonoBehaviour
 
         // Dựng bản đồ từ tất cả layer tile gameplay, gồm map + ldf/obstacle layers.
         // Skip TẤT CẢ spawn layers (spawn, spawn1, spawn2, ...)
+        int visualLayerIndex = 0;
         foreach (TiledLayer mapLayer in activeMap.layers)
         {
             if (mapLayer == null || mapLayer.data == null)
@@ -396,6 +397,7 @@ public class GameplaySandbox : MonoBehaviour
             if (IsSpawnLayer(mapLayer.name))
                 continue;
 
+            float layerZ = -visualLayerIndex * 0.01f;
             for (int y = 0; y < activeMap.height; y++)
             {
                 for (int x = 0; x < activeMap.width; x++)
@@ -407,13 +409,15 @@ public class GameplaySandbox : MonoBehaviour
                     if (gid > 0)
                     {
                         gridMap[gridPos] = gid;
-                        InstantiateTileVisual(gid, gridPos, boardContainer.transform);
+                        InstantiateTileVisual(gid, gridPos, boardContainer.transform, layerZ);
 
                         // Đăng ký hầm chui nếu có
                         RegisterTunnelIfAny(gid, gridPos);
                     }
                 }
             }
+
+            visualLayerIndex++;
         }
 
         // Dựng đối tượng spawn (spawn layer: player start, pills)
@@ -567,14 +571,14 @@ public class GameplaySandbox : MonoBehaviour
     }
 
 
-    private void InstantiateTileVisual(int gid, Vector2Int gridPos, Transform parent)
+    private void InstantiateTileVisual(int gid, Vector2Int gridPos, Transform parent, float worldZ)
     {
         if (tiledIdToResourcePath.TryGetValue(gid, out string resPath))
         {
             GameObject tilePrefab = Resources.Load<GameObject>(resPath);
             if (tilePrefab != null)
             {
-                Vector3 worldPos = new Vector3(gridPos.x, gridPos.y, 0f);
+                Vector3 worldPos = new Vector3(gridPos.x, gridPos.y, worldZ);
                 GameObject spawnedTile = Instantiate(tilePrefab, worldPos, Quaternion.identity, parent);
                 spawnedTile.name = $"Tile_{gridPos.x}_{Mathf.Abs(gridPos.y)}_{tilePrefab.name}";
                 
