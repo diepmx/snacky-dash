@@ -122,12 +122,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
             }
 
             transportDropdown.Init(TransportProtocol.HTTPLocal);
-            bool useHttpTransport = EditorConfigurationCache.Instance.UseHttpTransport;
-            if (!useHttpTransport)
-            {
-                transportDropdown.value = TransportProtocol.Stdio;
-            }
-            else
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
             {
                 // Back-compat: if scope pref isn't set yet, infer from current URL.
                 string scope = EditorPrefs.GetString(EditorPrefKeys.HttpTransportScope, string.Empty);
@@ -184,8 +179,14 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
             {
                 var previous = (TransportProtocol)evt.previousValue;
                 var selected = (TransportProtocol)evt.newValue;
-                bool useHttp = selected != TransportProtocol.Stdio;
-                EditorConfigurationCache.Instance.SetUseHttpTransport(useHttp);
+                if (selected == TransportProtocol.Stdio)
+                {
+                    selected = TransportProtocol.HTTPLocal;
+                    transportDropdown.SetValueWithoutNotify(selected);
+                }
+
+                bool useHttp = true;
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
 
                 // Clear any stale resume flags when user manually changes transport
                 try { EditorPrefs.DeleteKey(EditorPrefKeys.ResumeStdioAfterReload); } catch { }
@@ -212,7 +213,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
                 bool nextIsHttp = selected != TransportProtocol.Stdio;
                 if (prevWasHttp != nextIsHttp)
                 {
-                    var stopMode = nextIsHttp ? TransportMode.Stdio : TransportMode.Http;
+                    var stopMode = TransportMode.Http;
                     try
                     {
                         var stopTask = MCPServiceLocator.TransportManager.StopAsync(stopMode);
@@ -324,9 +325,8 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
             bool isRunning = bridgeService.IsRunning;
             bool showLocalServerControls = IsHttpLocalSelected();
             bool debugMode = EditorPrefs.GetBool(EditorPrefKeys.DebugLogs, false);
-            // EditorConfigurationCache is the source of truth for transport selection after domain reload
-            // (EditorPrefs is still used for debugMode and other UI-only state)
-            bool stdioSelected = !EditorConfigurationCache.Instance.UseHttpTransport;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            bool stdioSelected = false;
 
             // Keep the Start/Stop Server button label in sync even when the session is not running
             // (e.g., orphaned server after a domain reload).
@@ -373,10 +373,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
             }
             else
             {
-                // Check if we're resuming the stdio bridge after a domain reload.
-                // During this brief window, show "Resuming..." instead of "No Session" to avoid UI flicker.
-                bool isStdioResuming = stdioSelected
-                    && EditorPrefs.GetBool(EditorPrefKeys.ResumeStdioAfterReload, false);
+                bool isStdioResuming = false;
 
                 if (isStdioResuming)
                 {
@@ -438,9 +435,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
                     : savedPort).ToString();
             }
 
-            // For stdio session toggling, make End Session visually "danger" (red).
-            // (HTTP Local uses the consolidated Start/Stop Server button instead.)
-            connectionToggleButton?.EnableInClassList("server-running", isRunning && stdioSelected);
+            connectionToggleButton?.EnableInClassList("server-running", false);
         }
 
         public void UpdateHttpServerCommandDisplay()
@@ -450,7 +445,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
                 return;
             }
 
-            bool useHttp = transportDropdown != null && (TransportProtocol)transportDropdown.value != TransportProtocol.Stdio;
+            bool useHttp = true;
             bool httpLocalSelected = IsHttpLocalSelected();
             bool isLocalHttpUrlAllowed = TryGetLocalHttpLaunchPolicy(out _, out string localUrlError);
 
@@ -527,7 +522,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
 
         private void UpdateHttpFieldVisibility()
         {
-            bool useHttp = (TransportProtocol)transportDropdown.value != TransportProtocol.Stdio;
+            bool useHttp = true;
             bool httpLocalSelected = IsHttpLocalSelected();
             bool httpRemoteSelected = transportDropdown != null && (TransportProtocol)transportDropdown.value == TransportProtocol.HTTPRemote;
 
@@ -818,8 +813,7 @@ namespace MCPForUnity.Editor.Windows.Components.Connection
                     }
                     else
                     {
-                        var mode = EditorConfigurationCache.Instance.UseHttpTransport
-                            ? TransportMode.Http : TransportMode.Stdio;
+                        var mode = TransportMode.Http;
                         var state = MCPServiceLocator.TransportManager.GetState(mode);
                         string errorMsg = state?.Error
                             ?? "Failed to start the MCP session. Check the server URL and that the server is running.";

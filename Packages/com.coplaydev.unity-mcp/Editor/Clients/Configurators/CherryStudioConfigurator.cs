@@ -17,8 +17,7 @@ namespace MCPForUnity.Editor.Clients.Configurators
             name = ClientName,
             windowsConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cherry Studio", "config"),
             macConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Cherry Studio", "config"),
-            linuxConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "Cherry Studio", "config"),
-            SupportsHttpTransport = false
+            linuxConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "Cherry Studio", "config")
         })
         { }
 
@@ -29,11 +28,10 @@ namespace MCPForUnity.Editor.Clients.Configurators
             "Open Cherry Studio",
             "Go to Settings (⚙️) → MCP Server",
             "Click 'Add Server' button",
-            "For STDIO mode (recommended):",
+            "For HTTP mode:",
             "  - Name: unity-mcp",
-            "  - Type: STDIO",
-            "  - Command: uvx",
-            "  - Arguments: Copy from the Manual Configuration JSON below",
+            "  - Type: HTTP",
+            "  - URL: Copy from the Manual Configuration JSON below",
             "Click Save and restart Cherry Studio",
             "",
             "Note: Cherry Studio uses UI-based configuration.",
@@ -56,23 +54,7 @@ namespace MCPForUnity.Editor.Clients.Configurators
 
         public override string GetManualSnippet()
         {
-            bool useHttp = EditorConfigurationCache.Instance.UseHttpTransport;
-
-            if (useHttp)
-            {
-                return "# Cherry Studio does not support WebSocket transport.\n" +
-                       "# Cherry Studio supports STDIO and SSE transports.\n" +
-                       "# \n" +
-                       "# To use Cherry Studio:\n" +
-                       "# 1. Switch transport to 'Stdio' in Advanced Settings below\n" +
-                       "# 2. Return to this configuration screen\n" +
-                       "# 3. Copy the STDIO configuration snippet that will appear\n" +
-                       "# \n" +
-                       "# OPTION 2: SSE mode (future support)\n" +
-                       "# Note: Unity MCP does not currently have an SSE endpoint.\n" +
-                       "# This may be added in a future update.";
-            }
-
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
             return base.GetManualSnippet() + "\n\n" +
                    "# Cherry Studio Configuration Instructions:\n" +
                    "# Cherry Studio uses UI-based configuration, not a JSON file.\n" +
@@ -83,9 +65,8 @@ namespace MCPForUnity.Editor.Clients.Configurators
                    "# 3. Click 'Add Server'\n" +
                    "# 4. Enter the following values from the JSON above:\n" +
                    "#    - Name: unity-mcp\n" +
-                   "#    - Type: STDIO\n" +
-                   "#    - Command: (copy 'command' value from JSON)\n" +
-                   "#    - Arguments: (copy 'args' array values, space-separated or as individual entries)\n" +
+                   "#    - Type: HTTP\n" +
+                   "#    - URL: (copy 'url' value from JSON)\n" +
                    "#    - Active: true\n" +
                    "# 5. Click Save\n" +
                    "# 6. Restart Cherry Studio";

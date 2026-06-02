@@ -25,7 +25,8 @@ namespace MCPForUnity.Editor.Migrations
             if (Application.isBatchMode)
                 return;
 
-            EditorApplication.delayCall += RunMigrationIfNeeded;
+            try { EditorPrefs.DeleteKey(EditorPrefKeys.ResumeStdioAfterReload); } catch { }
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
         }
 
         private static void RunMigrationIfNeeded()

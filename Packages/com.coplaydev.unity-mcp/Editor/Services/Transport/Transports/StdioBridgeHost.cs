@@ -33,7 +33,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
     [InitializeOnLoad]
     public static class StdioBridgeHost
     {
-        private static readonly bool ForceProjectStdioBridgeAutoStart = true;
+        private static readonly bool ForceProjectStdioBridgeAutoStart = false;
         private static TcpListener listener;
         private static bool isRunning = false;
         private static readonly object lockObj = new();
@@ -80,6 +80,12 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
 
         public static void StartAutoConnect()
         {
+            McpLog.Warn("Stdio transport is disabled for this project. Use HTTP transport instead.");
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            EditorConfigurationCache.Instance.Refresh();
+            return;
+
+#pragma warning disable CS0162
             Stop();
 
             try
@@ -96,6 +102,7 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
                 TelemetryHelper.RecordBridgeConnection(false, ex.Message);
                 throw;
             }
+#pragma warning restore CS0162
         }
 
         public static bool FolderExists(string path)
@@ -184,19 +191,25 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
         {
             try
             {
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+                EditorConfigurationCache.Instance.Refresh();
+                return false;
+
+#pragma warning disable CS0162
                 if (ForceProjectStdioBridgeAutoStart)
                 {
-                    EditorConfigurationCache.Instance.SetUseHttpTransport(false);
+                    EditorConfigurationCache.Instance.SetUseHttpTransport(true);
                     EditorConfigurationCache.Instance.Refresh();
                     return true;
                 }
 
                 bool useHttpTransport = EditorConfigurationCache.Instance.UseHttpTransport;
                 return !useHttpTransport;
+#pragma warning restore CS0162
             }
             catch
             {
-                return true;
+                return false;
             }
         }
 

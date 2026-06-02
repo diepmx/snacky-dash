@@ -36,7 +36,7 @@ namespace MCPForUnity.Editor.Clients
         // treated as "detected" by ConfigureAllDetectedClients.
         public virtual bool IsInstalled => ParentDirectoryExists(GetConfigPath());
         private static readonly ConfiguredTransport[] DefaultTransports =
-            { ConfiguredTransport.Stdio, ConfiguredTransport.Http };
+            { ConfiguredTransport.Http };
         public virtual IReadOnlyList<ConfiguredTransport> SupportedTransports => DefaultTransports;
         public virtual bool SupportsSkills => false;
         public virtual string GetConfigureActionLabel() => "Configure";
@@ -879,30 +879,24 @@ namespace MCPForUnity.Editor.Clients
             string apiKey,
             Models.ConfiguredTransport serverTransport)
         {
+            useHttpTransport = true;
+            serverTransport = HttpEndpointUtility.GetCurrentServerTransport();
+
             if (string.IsNullOrEmpty(claudePath))
             {
                 throw new InvalidOperationException("Claude CLI not found. Please install Claude Code first.");
             }
 
             string args;
-            if (useHttpTransport)
+            // Stdio is disabled for this project; Claude CLI registration is always HTTP.
+            if (serverTransport == Models.ConfiguredTransport.HttpRemote && !string.IsNullOrEmpty(apiKey))
             {
-                // Only include API key header for remote-hosted mode
-                // Use --scope local to register in the project-local config, avoiding conflicts with user-level config (#664)
-                if (serverTransport == Models.ConfiguredTransport.HttpRemote && !string.IsNullOrEmpty(apiKey))
-                {
-                    string safeKey = SanitizeShellHeaderValue(apiKey);
-                    args = $"mcp add --scope local --transport http UnityMCP {httpUrl} --header \"{AuthConstants.ApiKeyHeader}: {safeKey}\"";
-                }
-                else
-                {
-                    args = $"mcp add --scope local --transport http UnityMCP {httpUrl}";
-                }
+                string safeKey = SanitizeShellHeaderValue(apiKey);
+                args = $"mcp add --scope local --transport http UnityMCP {httpUrl} --header \"{AuthConstants.ApiKeyHeader}: {safeKey}\"";
             }
             else
             {
-                // Use --scope local to register in the project-local config, avoiding conflicts with user-level config (#664)
-                args = $"mcp add --scope local --transport stdio UnityMCP -- \"{uvxPath}\" {uvxDevFlags}{fromArgs} {packageName}";
+                args = $"mcp add --scope local --transport http UnityMCP {httpUrl}";
             }
 
             // Remove any existing registrations from ALL scopes to prevent stale config conflicts (#664)
@@ -948,26 +942,18 @@ namespace MCPForUnity.Editor.Clients
                 throw new InvalidOperationException("Claude CLI not found. Please install Claude Code first.");
             }
 
-            bool useHttpTransport = EditorConfigurationCache.Instance.UseHttpTransport;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            bool useHttpTransport = true;
 
             string args;
-            if (useHttpTransport)
+            string httpUrl = HttpEndpointUtility.GetMcpRpcUrl();
+            if (HttpEndpointUtility.IsRemoteScope())
             {
-                string httpUrl = HttpEndpointUtility.GetMcpRpcUrl();
-                // Only include API key header for remote-hosted mode
-                // Use --scope local to register in the project-local config, avoiding conflicts with user-level config (#664)
-                if (HttpEndpointUtility.IsRemoteScope())
+                string apiKey = EditorPrefs.GetString(EditorPrefKeys.ApiKey, string.Empty);
+                if (!string.IsNullOrEmpty(apiKey))
                 {
-                    string apiKey = EditorPrefs.GetString(EditorPrefKeys.ApiKey, string.Empty);
-                    if (!string.IsNullOrEmpty(apiKey))
-                    {
-                        string safeKey = SanitizeShellHeaderValue(apiKey);
-                        args = $"mcp add --scope local --transport http UnityMCP {httpUrl} --header \"{AuthConstants.ApiKeyHeader}: {safeKey}\"";
-                    }
-                    else
-                    {
-                        args = $"mcp add --scope local --transport http UnityMCP {httpUrl}";
-                    }
+                    string safeKey = SanitizeShellHeaderValue(apiKey);
+                    args = $"mcp add --scope local --transport http UnityMCP {httpUrl} --header \"{AuthConstants.ApiKeyHeader}: {safeKey}\"";
                 }
                 else
                 {
@@ -976,11 +962,7 @@ namespace MCPForUnity.Editor.Clients
             }
             else
             {
-                var (uvxPath, _, packageName) = AssetPathUtility.GetUvxCommandParts();
-                string devFlags = AssetPathUtility.GetUvxDevFlags();
-                string fromArgs = AssetPathUtility.GetBetaServerFromArgs(quoteFromPath: true);
-                // Use --scope local to register in the project-local config, avoiding conflicts with user-level config (#664)
-                args = $"mcp add --scope local --transport stdio UnityMCP -- \"{uvxPath}\" {devFlags}{fromArgs} {packageName}";
+                args = $"mcp add --scope local --transport http UnityMCP {httpUrl}";
             }
 
             string projectDir = GetClientProjectDir();
@@ -1058,7 +1040,8 @@ namespace MCPForUnity.Editor.Clients
         public override string GetManualSnippet()
         {
             string uvxPath = MCPServiceLocator.Paths.GetUvxPath();
-            bool useHttpTransport = EditorConfigurationCache.Instance.UseHttpTransport;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            bool useHttpTransport = true;
 
             if (useHttpTransport)
             {
@@ -1080,22 +1063,7 @@ namespace MCPForUnity.Editor.Clients
                        "claude mcp list";
             }
 
-            if (string.IsNullOrEmpty(uvxPath))
-            {
-                return "# Error: Configuration not available - check paths in Advanced Settings";
-            }
-
-            string devFlags = AssetPathUtility.GetUvxDevFlags();
-            string fromArgs = AssetPathUtility.GetBetaServerFromArgs(quoteFromPath: true);
-
-            return "# Register the MCP server with Claude Code:\n" +
-                   $"claude mcp add --scope local --transport stdio UnityMCP -- \"{uvxPath}\" {devFlags}{fromArgs} mcp-for-unity\n\n" +
-                   "# Unregister the MCP server (from all scopes to clean up any stale configs):\n" +
-                   "claude mcp remove --scope local UnityMCP\n" +
-                   "claude mcp remove --scope user UnityMCP\n" +
-                   "claude mcp remove --scope project UnityMCP\n\n" +
-                   "# List registered servers:\n" +
-                   "claude mcp list";
+            return "# Error: HTTP configuration is required for this project";
         }
 
         public override IList<string> GetInstallationSteps() => new List<string>

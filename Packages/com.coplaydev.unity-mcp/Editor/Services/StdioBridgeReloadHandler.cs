@@ -30,9 +30,8 @@ namespace MCPForUnity.Editor.Services
 
         static StdioBridgeReloadHandler()
         {
-            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
-            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
-            EditorApplication.quitting += CancelRetries;
+            try { EditorPrefs.DeleteKey(EditorPrefKeys.ResumeStdioAfterReload); } catch { }
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
         }
 
         private static void CancelRetries()

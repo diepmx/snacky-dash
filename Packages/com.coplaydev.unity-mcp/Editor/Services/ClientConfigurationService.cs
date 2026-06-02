@@ -69,15 +69,15 @@ namespace MCPForUnity.Editor.Services
 
         private static void ConfigureWithTransportCoercion(IMcpClientConfigurator configurator)
         {
-            bool originalHttp = EditorConfigurationCache.Instance.UseHttpTransport;
             try
             {
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
                 CoerceTransportFor(configurator);
                 configurator.Configure();
             }
             finally
             {
-                EditorConfigurationCache.Instance.SetUseHttpTransport(originalHttp);
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
             }
         }
 
@@ -93,22 +93,26 @@ namespace MCPForUnity.Editor.Services
             var supported = configurator.SupportedTransports;
             if (supported == null || supported.Count == 0) return;
 
-            bool currentlyHttp = EditorConfigurationCache.Instance.UseHttpTransport;
-            var requested = currentlyHttp ? ConfiguredTransport.Http : ConfiguredTransport.Stdio;
+            var requested = ConfiguredTransport.Http;
 
             // Accept any HTTP variant (Http, HttpRemote) when the user wants HTTP — a client that
             // only supports HttpRemote should not get coerced to stdio just because Http isn't
             // explicitly listed.
             if (SupportsRequested(supported, requested)) return;
 
-            // Fall back in the direction of the user's intent: if they wanted HTTP, prefer any
-            // HTTP variant the client does support; otherwise prefer stdio. Honors the
-            // configurator's declared order when more than one option remains.
+            // Stdio is disabled for this project, so never coerce client setup away from HTTP.
             ConfiguredTransport chosen = PickFallback(supported, requested);
             bool needHttp = IsHttpVariant(chosen);
+            if (!needHttp)
+            {
+                McpLog.Info(
+                    $"[{configurator.DisplayName}] skipped stdio fallback because stdio transport is disabled.");
+                return;
+            }
+
             if (EditorConfigurationCache.Instance.UseHttpTransport != needHttp)
             {
-                EditorConfigurationCache.Instance.SetUseHttpTransport(needHttp);
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
                 McpLog.Info(
                     $"[{configurator.DisplayName}] auto-selected {chosen} transport (client does not support {requested}).");
             }
@@ -134,11 +138,6 @@ namespace MCPForUnity.Editor.Services
             {
                 foreach (var t in supported)
                     if (IsHttpVariant(t)) return t;
-            }
-            else
-            {
-                foreach (var t in supported)
-                    if (t == ConfiguredTransport.Stdio) return t;
             }
             return supported[0];
         }

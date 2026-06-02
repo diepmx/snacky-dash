@@ -142,8 +142,7 @@ namespace MCPForUnity.Editor.Helpers
         /// </summary>
         public static ConfiguredTransport GetCurrentServerTransport()
         {
-            bool useHttp = EditorConfigurationCache.Instance.UseHttpTransport;
-            if (!useHttp) return ConfiguredTransport.Stdio;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
             return IsRemoteScope() ? ConfiguredTransport.HttpRemote : ConfiguredTransport.Http;
         }
 

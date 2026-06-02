@@ -30,9 +30,8 @@ namespace MCPForUnity.Editor.Services
                 var transport = MCPServiceLocator.TransportManager;
 
                 Task stopHttp = transport.StopAsync(TransportMode.Http);
-                Task stopStdio = transport.StopAsync(TransportMode.Stdio);
 
-                try { Task.WaitAll(new[] { stopHttp, stopStdio }, 750); } catch { }
+                try { stopHttp.Wait(750); } catch { }
             }
             catch (Exception ex)
             {
@@ -74,4 +73,3 @@ namespace MCPForUnity.Editor.Services
         }
     }
 }
-

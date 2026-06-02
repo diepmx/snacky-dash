@@ -43,15 +43,13 @@ namespace MCPForUnity.Editor.Helpers
         /// Centralized builder that applies all caveats consistently.
         /// - Sets command/args with uvx and package version
         /// - Ensures env exists
-        /// - Adds transport configuration (HTTP or stdio)
+        /// - Adds HTTP transport configuration
         /// - Adds disabled:false for Windsurf/Kiro only when missing
         /// </summary>
         private static void PopulateUnityNode(JObject unity, string uvPath, McpClient client, bool isVSCode)
         {
-            // Get transport preference (default to HTTP)
-            bool prefValue = EditorConfigurationCache.Instance.UseHttpTransport;
-            bool clientSupportsHttp = client?.SupportsHttpTransport != false;
-            bool useHttpTransport = clientSupportsHttp && prefValue;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            bool useHttpTransport = true;
             bool isCline = client?.name == "Cline";
             string httpProperty = string.IsNullOrEmpty(client?.HttpUrlProperty) ? "url" : client.HttpUrlProperty;
             var urlPropsToRemove = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "url", "serverUrl" };
@@ -106,7 +104,7 @@ namespace MCPForUnity.Editor.Helpers
             }
             else
             {
-                // Stdio mode: Use uvx command
+                // Disabled transport fallback. HTTP mode is enforced above.
                 var (uvxPath, fromUrl, packageName) = AssetPathUtility.GetUvxCommandParts();
 
                 var toolArgs = BuildUvxArgs(fromUrl, packageName);
@@ -119,7 +117,7 @@ namespace MCPForUnity.Editor.Helpers
                 if (unity["serverUrl"] != null) unity.Remove("serverUrl");
 
                 // Include type for all clients — standard MCP protocol field.
-                unity["type"] = "stdio";
+                unity["type"] = "http";
             }
 
             bool requiresEnv = client?.EnsureEnvObject == true;
@@ -176,7 +174,7 @@ namespace MCPForUnity.Editor.Helpers
             args.Add(packageName);
 
             args.Add("--transport");
-            args.Add("stdio");
+            args.Add("http");
 
             return args;
         }

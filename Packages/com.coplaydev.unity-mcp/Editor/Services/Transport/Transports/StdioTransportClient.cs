@@ -17,33 +17,20 @@ namespace MCPForUnity.Editor.Services.Transport.Transports
 
         public Task<bool> StartAsync()
         {
-            try
-            {
-                StdioBridgeHost.StartAutoConnect();
-                _state = TransportState.Connected("stdio", port: StdioBridgeHost.GetCurrentPort());
-                return Task.FromResult(true);
-            }
-            catch (Exception ex)
-            {
-                _state = TransportState.Disconnected("stdio", ex.Message);
-                return Task.FromResult(false);
-            }
+            _state = TransportState.Disconnected("stdio", "Stdio transport is disabled for this project");
+            return Task.FromResult(false);
         }
 
         public Task StopAsync()
         {
-            StdioBridgeHost.Stop();
             _state = TransportState.Disconnected("stdio");
             return Task.CompletedTask;
         }
 
         public Task<bool> VerifyAsync()
         {
-            bool running = StdioBridgeHost.IsRunning;
-            _state = running
-                ? TransportState.Connected("stdio", port: StdioBridgeHost.GetCurrentPort())
-                : TransportState.Disconnected("stdio", "Bridge not running");
-            return Task.FromResult(running);
+            _state = TransportState.Disconnected("stdio", "Stdio transport is disabled for this project");
+            return Task.FromResult(false);
         }
 
         public Task ReregisterToolsAsync()

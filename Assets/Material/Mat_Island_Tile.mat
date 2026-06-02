@@ -71,12 +71,13 @@ Material:
       _Shadow_Realtime_Step: 0.51
       _Shadow_Smoothness: 0.04
       _Shadow_Steps: 2
-      _Shadow_Strength: 0
+      _Normal_Blend: 1
+      _Shadow_Strength: 0.8
       _Side_Height: 0.6
       _Side_Height_1: 0
       _Side_Height_2: 1
       _Side_Height_Bottom: 1.4
-      _Side_Height_Top: 0.6
+      _Side_Height_Top: 0
       _SmoothnessTextureChannel: 0
       _SpecularHighlights: 1
       _SrcBlend: 1
@@ -85,12 +86,12 @@ Material:
     m_Colors:
       _Color: {r: 1, g: 1, b: 1, a: 1}
       _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-      _Main_Color_1: {r: 0.07058824, g: 0.41960788, b: 0.043137256, a: 1}
-      _Main_Color_2: {r: 0.2830626, g: 0.66666657, b: 0.11111103, a: 1}
+      _Main_Color_1: {r: 0.118, g: 0.565, b: 0.059, a: 1}
+      _Main_Color_2: {r: 0.271, g: 0.737, b: 0.098, a: 1}
       _Main_Color_3: {r: 1, g: 0.11622709, b: 0, a: 0}
       _Overlay_Color: {r: 0.9496855, g: 0.8422468, b: 0.06868786, a: 1}
-      _Shadow_Color: {r: 0.6878683, g: 0.9308176, b: 0.78063077, a: 1}
-      _Side_Color: {r: 0.4766992, g: 0.5849056, b: 0.16369995, a: 1}
+      _Shadow_Color: {r: 0.012, g: 0.196, b: 0.008, a: 0.7}
+      _Side_Color: {r: 0.059, g: 0.314, b: 0.020, a: 1}
       _Vector2: {r: -1, g: 0, b: 0, a: 0}
       _Vector2_1: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []

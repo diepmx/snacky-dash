@@ -10,8 +10,8 @@ namespace MCPForUnity.Editor.Clients.Configurators
     /// Qwen Code uses a JSON-based configuration file with mcpServers section.
     /// Config path: ~/.qwen/settings.json
     ///
-    /// Qwen Code supports both stdio (uvx) and HTTP transport modes.
-    /// Default: stdio mode (works without Unity Editor for basic operations)
+    /// Qwen Code is configured with HTTP transport in this project.
+    /// Default: HTTP mode for this project.
     /// HTTP mode: requires Unity Editor running with MCP HTTP server started
     /// </summary>
     public class QwenCodeConfigurator : JsonFileMcpConfigurator
@@ -23,7 +23,7 @@ namespace MCPForUnity.Editor.Clients.Configurators
             macConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".qwen", "settings.json"),
             linuxConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".qwen", "settings.json"),
             SupportsHttpTransport = true,
-            // Default to stdio transport for Qwen Code (like Cursor)
+            // Default to HTTP transport for Qwen Code.
             // User can switch to HTTP in Unity: Window > MCP for Unity > Settings
         })
         { }

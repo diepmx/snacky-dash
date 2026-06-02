@@ -16,7 +16,6 @@ namespace MCPForUnity.Editor.Clients.Configurators
             windowsConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Claude", "claude_desktop_config.json"),
             macConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Claude", "claude_desktop_config.json"),
             linuxConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "Claude", "claude_desktop_config.json"),
-            SupportsHttpTransport = false,
             StripEnvWhenNotRequired = true
         })
         { }
@@ -37,7 +36,7 @@ namespace MCPForUnity.Editor.Clients.Configurators
             "Save and restart Claude Desktop"
         };
 
-        private static readonly ConfiguredTransport[] StdioOnly = { ConfiguredTransport.Stdio };
-        public override IReadOnlyList<ConfiguredTransport> SupportedTransports => StdioOnly;
+        private static readonly ConfiguredTransport[] HttpOnly = { ConfiguredTransport.Http };
+        public override IReadOnlyList<ConfiguredTransport> SupportedTransports => HttpOnly;
     }
 }

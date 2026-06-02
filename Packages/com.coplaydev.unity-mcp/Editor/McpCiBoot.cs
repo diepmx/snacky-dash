@@ -1,6 +1,6 @@
 using System;
 using MCPForUnity.Editor.Constants;
-using MCPForUnity.Editor.Services.Transport.Transports;
+using MCPForUnity.Editor.Services;
 using UnityEditor;
 
 namespace MCPForUnity.Editor
@@ -11,11 +11,10 @@ namespace MCPForUnity.Editor
         {
             try 
             { 
-                EditorPrefs.SetBool(EditorPrefKeys.UseHttpTransport, false); 
+                EditorPrefs.SetBool(EditorPrefKeys.UseHttpTransport, true);
+                EditorConfigurationCache.Instance.SetUseHttpTransport(true);
             }
             catch { /* ignore */ }
-
-            StdioBridgeHost.StartAutoConnect();
         }
     }
 }

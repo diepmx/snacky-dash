@@ -24,8 +24,8 @@ namespace MCPForUnity.Editor.Services
 
         private TransportMode ResolvePreferredMode()
         {
-            bool useHttp = EditorConfigurationCache.Instance.UseHttpTransport;
-            _preferredMode = useHttp ? TransportMode.Http : TransportMode.Stdio;
+            EditorConfigurationCache.Instance.SetUseHttpTransport(true);
+            _preferredMode = TransportMode.Http;
             return _preferredMode;
         }
 
@@ -69,12 +69,11 @@ namespace MCPForUnity.Editor.Services
                     return state.Port.Value;
                 }
 
-                // Legacy fallback while the stdio bridge is still in play
-                return StdioBridgeHost.GetCurrentPort();
+                return 0;
             }
         }
 
-        public bool IsAutoConnectMode => StdioBridgeHost.IsAutoConnectMode();
+        public bool IsAutoConnectMode => false;
         public TransportMode? ActiveMode => ResolvePreferredMode();
 
         public async Task<bool> StartAsync()

@@ -30,8 +30,8 @@ namespace MCPForUnity.Editor.Helpers
             var mcpServers = new TomlTable();
             var unityMCP = new TomlTable();
 
-            // Check transport preference
-            bool useHttpTransport = EditorPrefs.GetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            EditorPrefs.SetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            bool useHttpTransport = true;
 
             if (useHttpTransport)
             {
@@ -44,7 +44,7 @@ namespace MCPForUnity.Editor.Helpers
             }
             else
             {
-                // Stdio mode: Use command and args
+                // Disabled transport fallback. HTTP mode is enforced above.
                 var (uvxPath, _, packageName) = AssetPathUtility.GetUvxCommandParts();
 
                 unityMCP["command"] = uvxPath;
@@ -58,11 +58,11 @@ namespace MCPForUnity.Editor.Helpers
                 }
                 args.Add(new TomlString { Value = packageName });
                 args.Add(new TomlString { Value = "--transport" });
-                args.Add(new TomlString { Value = "stdio" });
+                args.Add(new TomlString { Value = "http" });
 
                 unityMCP["args"] = args;
 
-                // Add Windows-specific environment configuration for stdio mode
+                // Preserve Windows environment configuration for disabled command fallback.
                 var platformService = MCPServiceLocator.Platform;
                 if (platformService.IsWindows())
                 {
@@ -88,7 +88,8 @@ namespace MCPForUnity.Editor.Helpers
             // Parse existing TOML or create new root table
             var root = TryParseToml(existingToml) ?? new TomlTable();
 
-            bool useHttpTransport = EditorPrefs.GetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            EditorPrefs.SetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            bool useHttpTransport = true;
 
             // Ensure mcp_servers table exists
             if (!root.TryGetNode("mcp_servers", out var mcpServersNode) || !(mcpServersNode is TomlTable))
@@ -144,7 +145,7 @@ namespace MCPForUnity.Editor.Helpers
                 return true;
             }
 
-            // Check for stdio mode (command + args)
+            // Check for legacy command + args configuration.
             command = GetTomlString(unity, "command");
             args = GetTomlStringArray(unity, "args");
 
@@ -185,8 +186,8 @@ namespace MCPForUnity.Editor.Helpers
         {
             var unityMCP = new TomlTable();
 
-            // Check transport preference
-            bool useHttpTransport = EditorPrefs.GetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            EditorPrefs.SetBool(MCPForUnity.Editor.Constants.EditorPrefKeys.UseHttpTransport, true);
+            bool useHttpTransport = true;
 
             if (useHttpTransport)
             {
@@ -196,7 +197,7 @@ namespace MCPForUnity.Editor.Helpers
             }
             else
             {
-                // Stdio mode: Use command and args
+                // Disabled transport fallback. HTTP mode is enforced above.
                 var (uvxPath, _, packageName) = AssetPathUtility.GetUvxCommandParts();
 
                 unityMCP["command"] = new TomlString { Value = uvxPath };
@@ -210,10 +211,10 @@ namespace MCPForUnity.Editor.Helpers
                 }
                 argsArray.Add(new TomlString { Value = packageName });
                 argsArray.Add(new TomlString { Value = "--transport" });
-                argsArray.Add(new TomlString { Value = "stdio" });
+                argsArray.Add(new TomlString { Value = "http" });
                 unityMCP["args"] = argsArray;
 
-                // Add Windows-specific environment configuration for stdio mode
+                // Preserve Windows environment configuration for disabled command fallback.
                 var platformService = MCPServiceLocator.Platform;
                 if (platformService.IsWindows())
                 {
