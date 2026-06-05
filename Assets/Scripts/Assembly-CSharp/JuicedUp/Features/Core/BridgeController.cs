@@ -1,144 +1,184 @@
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.CompilerServices;
 using UnityEngine;
 
 namespace JuicedUp.Features.Core
 {
+	/// <summary>
+	/// Controller cho Switchable Bridge (Flipping Bridge).
+	///
+	/// Được điều khiển bởi SwitchController cùng _bridgeGroupId.
+	/// Khi Switch toggle:
+	///   - Nếu snake KHÔNG trên bridge → animate ngay
+	///   - Nếu snake ĐANG trên bridge → defer đến khi snake rời đi
+	///
+	/// State:
+	///   - Off (Closed) = bridge ở vị trí A (chặn một đường)
+	///   - On  (Open)   = bridge lật sang vị trí B (mở đường kia)
+	/// </summary>
 	[RequireComponent(typeof(BridgeView))]
 	public class BridgeController : MonoBehaviour
 	{
-		[StructLayout((LayoutKind)3)]
-		[CompilerGenerated]
-		private struct _003CRunAsync_003Ed__19 : IAsyncStateMachine
+		// ─── Static group registry ────────────────────────────────────────────
+		private static readonly Dictionary<int, List<BridgeController>> _groupRegistry
+			= new Dictionary<int, List<BridgeController>>();
+
+		/// <summary>
+		/// Toggle tất cả BridgeController trong group có groupId = id.
+		/// Gọi từ SwitchController.
+		/// </summary>
+		public static void ToggleGroup(int groupId, SwitchToggleState newState)
 		{
-			public int _003C_003E1__state;
-
-			public AsyncUniTaskVoidMethodBuilder _003C_003Et__builder;
-
-			public int version;
-
-			public BridgeController _003C_003E4__this;
-
-			public CancellationToken token;
-
-			public bool withSound;
-
-			private UniTask.Awaiter _003C_003Eu__1;
-
-			private void MoveNext()
-			{
-			}
-
-			void IAsyncStateMachine.MoveNext()
-			{
-				//ILSpy generated this explicit interface implementation from .override directive in MoveNext
-				this.MoveNext();
-			}
-
-			[DebuggerHidden]
-			private void SetStateMachine(IAsyncStateMachine stateMachine)
-			{
-			}
-
-			void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine)
-			{
-				//ILSpy generated this explicit interface implementation from .override directive in SetStateMachine
-				this.SetStateMachine(stateMachine);
-			}
+			if (!_groupRegistry.TryGetValue(groupId, out List<BridgeController> group)) return;
+			foreach (BridgeController bridge in group)
+				bridge.SetDesired(newState);
 		}
 
-		[SerializeField]
-		private BridgeView _view;
+		// ─── Instance ─────────────────────────────────────────────────────────
 
-		private TileType _bridgeTypeAtCell;
+		[SerializeField] private BridgeView _view;
 
-		private TileType _openBridgeType;
+		[Header("Group — phải khớp với SwitchController._bridgeGroupId")]
+		[SerializeField] private int _bridgeGroupId;
+
+		[Header("State ban đầu (do level designer set)")]
+		[SerializeField] private SwitchToggleState _initialState = SwitchToggleState.Off;
 
 		private Vector3Int _cell;
-
-		private Vector3Int _playerCell;
-
-		private CancellationTokenSource _cancellationTokenSource;
-
+		private SnakeOccupancyManager _occupancy;
+		private LevelController _levelController;
 		private SwitchToggleState _desiredState;
-
+		private CancellationTokenSource _cts;
 		private bool _isInitialized;
-
 		private int _requestVersion;
 
-		private SnakeOccupancyManager _occupancy;
-
-		private LevelController _levelController;
+		// ─── Lifecycle ────────────────────────────────────────────────────────
 
 		private void OnEnable()
 		{
+			// Register vào group
+			if (!_groupRegistry.TryGetValue(_bridgeGroupId, out List<BridgeController> list))
+			{
+				list = new List<BridgeController>();
+				_groupRegistry[_bridgeGroupId] = list;
+			}
+			if (!list.Contains(this)) list.Add(this);
+
+			if (_isInitialized)
+				ApplyStateImmediate(_desiredState);
 		}
 
 		private void OnDisable()
 		{
+			_cts?.Cancel();
+			_cts?.Dispose();
+			_cts = null;
+
+			if (_groupRegistry.TryGetValue(_bridgeGroupId, out List<BridgeController> list))
+				list.Remove(this);
 		}
 
+		// ─── Init ─────────────────────────────────────────────────────────────
+
+		/// <summary>Gọi từ LevelBuilder sau khi spawn bridge prefab.</summary>
 		public void Init(Vector3Int cell, SnakeOccupancyManager occupancy, LevelController levelController)
 		{
+			_cell            = cell;
+			_occupancy       = occupancy;
+			_levelController = levelController;
+			_desiredState    = _initialState;
+			_isInitialized   = true;
+
+			// Snap về trạng thái ban đầu (không animate)
+			ApplyStateImmediate(_desiredState);
 		}
 
-		public void RequestOpen()
-		{
-		}
-
-		public void RequestClose()
-		{
-		}
+		// ─── State control ────────────────────────────────────────────────────
 
 		private void SetDesired(SwitchToggleState state)
 		{
+			_desiredState = state;
+			StartDeferredApply();
 		}
 
-		private void ForceRecheck()
+		/// <summary>Apply ngay (không chờ snake rời), dùng khi init.</summary>
+		private void ApplyStateImmediate(SwitchToggleState state)
 		{
+			_cts?.Cancel();
+			_cts?.Dispose();
+			_cts = null;
+
+			if (_view != null) _view.SnapState(state == SwitchToggleState.On);
+			UpdateTileType(state);
 		}
 
-		private void StartRun(bool withSound)
+		/// <summary>
+		/// Nếu snake không trên bridge → apply ngay.
+		/// Nếu snake trên bridge → chờ snake rời rồi mới apply.
+		/// </summary>
+		private void StartDeferredApply()
 		{
+			_cts?.Cancel();
+			_cts?.Dispose();
+			_cts = new CancellationTokenSource();
+
+			int version = ++_requestVersion;
+			DeferredApplyAsync(version, _cts.Token).Forget();
 		}
 
-		[AsyncStateMachine(typeof(_003CRunAsync_003Ed__19))]
-		private UniTaskVoid RunAsync(int version, bool withSound, CancellationToken token)
+		private async UniTaskVoid DeferredApplyAsync(int version, CancellationToken token)
 		{
-			return default(UniTaskVoid);
+			float pollInterval = (_view != null) ? _view.PollInterval : 0.1f;
+			if (pollInterval <= 0f) pollInterval = 0.1f;
+
+			// Chờ đến khi snake rời khỏi cell (nếu đang đứng trên)
+			while (!token.IsCancellationRequested && version == _requestVersion)
+			{
+				if (!IsSnakeOnBridge())
+					break;
+
+				await UniTask.Delay(System.TimeSpan.FromSeconds(pollInterval), cancellationToken: token);
+			}
+
+			if (token.IsCancellationRequested || version != _requestVersion) return;
+
+			// Apply state với animation
+			if (_view != null)
+				_view.AnimateState(_desiredState == SwitchToggleState.On, withSound: true);
+
+			UpdateTileType(_desiredState);
 		}
 
-		private void ApplyState(SwitchToggleState state, bool withSound)
+		private bool IsSnakeOnBridge()
 		{
+			if (_occupancy == null) return false;
+			return _occupancy.IsAnySnakeOnCell(_cell);
 		}
 
-		private bool CanOpenNow(Vector3Int cell)
+		private void UpdateTileType(SwitchToggleState state)
 		{
-			return false;
-		}
+			if (_levelController == null) return;
 
-		private bool CanCloseNow(Vector3Int cell)
-		{
-			return false;
-		}
+			// Lấy tile type hiện tại để xác định orientation
+			if (!_levelController.TryGetTileType(_cell, out TileType currentType))
+				return;
 
-		private bool IsCellEmpty(Vector3Int cell)
-		{
-			return false;
-		}
+			TileType newType;
+			if (state == SwitchToggleState.On)
+			{
+				// Open: bridge lật sang vị trí cho phép đi qua
+				newType = BridgeOrientation.IsLR(currentType)
+					? TileType.BridgeSwitchableLR
+					: TileType.BridgeSwitchableUD;
+			}
+			else
+			{
+				// Closed: bridge ở vị trí chặn
+				newType = TileType.BridgeDownStop;
+			}
 
-		private bool IsCellEmptyOneOnly(Vector3Int cell)
-		{
-			return false;
-		}
-
-		private static bool IsUnderBridgeShape(SegmentShape shape, TileType bridgeType)
-		{
-			return false;
+			_levelController.SetTileType(_cell, newType);
 		}
 	}
 }
