@@ -145,7 +145,7 @@ namespace JuicedUp.Features.Core
 
 			// Apply state với animation
 			if (_view != null)
-				_view.AnimateState(_desiredState == SwitchToggleState.On, withSound: true);
+				_view.AnimateState(_desiredState, withSound: true);
 
 			UpdateTileType(_desiredState);
 		}
